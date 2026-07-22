@@ -1,0 +1,32 @@
+---
+// Home hero. Layout-free section: src/pages/index.astro owns BaseLayout + SEO and
+// composes the page from Sections/Home.
+import siteData from "@config/siteData.json";
+---
+
+<section
+  class="site-container flex min-h-[100lvh] flex-col items-center justify-center gap-8 py-20 text-center"
+>
+  <h1 class="h1 max-w-3xl text-balance">
+    <span class="main-text-gradient">{siteData.name}</span>
+  </h1>
+
+  <p class="description max-w-2xl text-balance">
+    A lean Astro 7 starter — Tailwind v4 tokens, typed config-driven content, ready to extend.
+  </p>
+
+  <div class="flex flex-wrap items-center justify-center gap-3">
+    <a
+      href="https://docs.astro.build"
+      class="primary-focus bg-primary text-primary-foreground rounded-lg px-5 py-2.5 font-medium transition hover:opacity-90"
+    >
+      Astro docs
+    </a>
+    <a
+      href="https://tailwindcss.com/docs"
+      class="primary-focus border-border text-foreground hover:bg-muted rounded-lg border px-5 py-2.5 font-medium transition"
+    >
+      Tailwind docs
+    </a>
+  </div>
+</section>

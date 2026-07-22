@@ -1,0 +1,31 @@
+---
+// src/components/ui/switch/Switch.astro — astro-boiler primitive (see ../README.md).
+// Toggle built from a native checkbox (role=switch) hidden with `sr-only` as the `peer`; the track and
+// thumb are styled siblings driven by `peer-checked` / `peer-focus-visible`. The root <label> makes the
+// whole control clickable — give the input an accessible name via `aria-label` or an associated Label
+// (`id`/`for`). Zero-JS. Tokens only.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+type Props = HTMLAttributes<"input"> & VariantProps<typeof switchTrack>;
+
+export const switchTrack = tv({
+  base: [
+    "bg-input peer-checked:bg-primary absolute inset-0 rounded-full transition-colors",
+    "peer-focus-visible:ring-3 peer-focus-visible:ring-outline/50",
+    "peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+  ],
+});
+
+const { class: className, ...rest } = Astro.props;
+---
+
+<label class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer" data-slot="switch">
+  <input type="checkbox" role="switch" class="peer sr-only" {...rest} />
+  <span class={switchTrack({ class: className })} data-slot="switch-track" aria-hidden="true"
+  ></span>
+  <span
+    class="bg-background pointer-events-none absolute top-0.5 left-0.5 size-5 rounded-full shadow-sm transition-transform peer-checked:translate-x-5"
+    data-slot="switch-thumb"
+    aria-hidden="true"></span>
+</label>

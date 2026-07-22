@@ -1,0 +1,40 @@
+---
+/**
+ * Top-level page shell: <html> + <head> (via BaseHead) + <body> with a single slot.
+ * Intentionally chrome-free (no nav/footer) — compose those per template.
+ */
+import "@/styles/global.css";
+
+import { siteLang } from "@config/siteSettings.json";
+import { type SeoProps } from "@js/schema";
+import BaseHead from "@layouts/BaseHead.astro";
+
+// title/description/image/noindex + the SEO pass-throughs (schema/article) — forwarded to BaseHead
+interface Props extends SeoProps {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+  noindex?: boolean;
+}
+
+const { title, description, image, noindex = false, schema, article } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang={siteLang}>
+  <head>
+    <BaseHead
+      title={title}
+      description={description}
+      image={image}
+      noindex={noindex}
+      schema={schema}
+      article={article}
+    />
+  </head>
+  <body class="min-h-[100lvh]">
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

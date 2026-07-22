@@ -1,0 +1,29 @@
+---
+// src/components/ui/badge/Badge.astro — astro-boiler primitive (see ../README.md).
+// Static status pill; semantic tone via `variant`. Tokens only.
+import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
+
+type Props = HTMLAttributes<"span"> & VariantProps<typeof badge>;
+
+export const badge = tv({
+  base: ["inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium"],
+  variants: {
+    variant: {
+      primary: "bg-primary text-primary-foreground",
+      secondary: "bg-secondary text-secondary-foreground",
+      muted: "bg-muted text-muted-foreground",
+      outline: "border-border text-foreground border",
+      info: "bg-info text-info-foreground",
+      success: "bg-success text-success-foreground",
+      warning: "bg-warning text-warning-foreground",
+      error: "bg-error text-error-foreground",
+    },
+  },
+  defaultVariants: { variant: "primary" },
+});
+
+const { variant, class: className, ...rest } = Astro.props;
+---
+
+<span class={badge({ variant, class: className })} data-slot="badge" {...rest}><slot /></span>

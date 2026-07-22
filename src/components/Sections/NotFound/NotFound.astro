@@ -1,0 +1,36 @@
+---
+// 404 content. Layout-free section: src/pages/404.astro owns BaseLayout + SEO (noindex) and
+// passes the title/description copy down (it doubles as the page's meta tags).
+import Button from "@components/ui/button/Button.astro";
+import { siteSettings } from "@config/siteSettings.json";
+
+import NotFoundIllustration from "./NotFoundIllustration.astro";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props as Props;
+---
+
+<section
+  class="site-container flex min-h-[100lvh] flex-col items-center justify-center gap-8 py-20 text-center"
+>
+  {
+    /* Above the fold → a time-based `animate-*` (plays once on load), gated on the decorative-motion switch. */
+  }
+  <NotFoundIllustration
+    class:list={[
+      "max-w-xs md:max-w-sm",
+      siteSettings.useAnimations && "animate-fade-in-up motion-reduce:animate-none",
+    ]}
+  />
+
+  <div class="flex flex-col items-center gap-4">
+    <h1 class="h1 text-balance"><span class="main-text-gradient">{title}</span></h1>
+    <p class="description max-w-xl text-balance">{description}</p>
+  </div>
+
+  <Button href="/" size="lg">Back to home</Button>
+</section>

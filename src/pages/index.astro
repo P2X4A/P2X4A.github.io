@@ -1,0 +1,10 @@
+---
+// Home (/). Thin route shell: owns BaseLayout + SEO and composes sections from Sections/Home.
+import Hero from "@components/Sections/Home/Hero.astro";
+import siteData from "@config/siteData.json";
+import BaseLayout from "@layouts/BaseLayout.astro";
+---
+
+<BaseLayout title={siteData.title} description={siteData.description}>
+  <Hero />
+</BaseLayout>

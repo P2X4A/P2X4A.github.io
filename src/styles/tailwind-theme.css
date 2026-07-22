@@ -1,0 +1,117 @@
+/**
+ * * Tailwind theme tokens (LAYER 1 of the token architecture)
+ *
+ * Kept in its own file so it can ALSO be imported into a `.astro` <style> block.
+ * Two jobs here:
+ *   1. `@theme`        — palette aliases: name your brand on top of Tailwind's scale,
+ *                        so a rebrand is one edit per ramp (swap violet -> your color).
+ *   2. `@theme inline` — bridge the semantic runtime vars (defined in global.css) to
+ *                        utilities, so `bg-background`/`text-primary` resolve to the
+ *                        `:root`/`.dark` variables and flip with the theme.
+ *
+ * Rule for markup: use `bg-primary`, `text-foreground`, `text-base-700` — NEVER raw
+ * `bg-violet-700`/`text-zinc-300`, which bypass theming + dark mode.
+ */
+@theme {
+  /* primary palette — rebrand by repointing these to another Tailwind ramp */
+  --color-primary-50: var(--color-violet-50);
+  --color-primary-100: var(--color-violet-100);
+  --color-primary-200: var(--color-violet-200);
+  --color-primary-300: var(--color-violet-300);
+  --color-primary-400: var(--color-violet-400);
+  --color-primary-500: var(--color-violet-500);
+  --color-primary-600: var(--color-violet-600);
+  --color-primary-700: var(--color-violet-700);
+  --color-primary-800: var(--color-violet-800);
+  --color-primary-900: var(--color-violet-900);
+  --color-primary-950: var(--color-violet-950);
+
+  /* base/neutral palette */
+  --color-base-50: var(--color-zinc-50);
+  --color-base-100: var(--color-zinc-100);
+  --color-base-200: var(--color-zinc-200);
+  --color-base-300: var(--color-zinc-300);
+  --color-base-400: var(--color-zinc-400);
+  --color-base-500: var(--color-zinc-500);
+  --color-base-600: var(--color-zinc-600);
+  --color-base-700: var(--color-zinc-700);
+  --color-base-800: var(--color-zinc-800);
+  --color-base-900: var(--color-zinc-900);
+  --color-base-950: var(--color-zinc-950);
+
+  /* breakpoints (adds `xs`; the rest mirror Tailwind defaults so they're explicit) */
+  --breakpoint-xs: 400px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* font families — `--font-sans` is wired to Inter (loaded in fonts.css) */
+  --font-sans:
+    "InterVariable", "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono:
+    "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+
+  /* animation tokens — the Marquee primitive's seamless-loop scroll (see ui/marquee/Marquee.astro).
+     `--marquee-duration` is the per-instance speed knob (set by the `speed` variant). Each track
+     shifts one full copy width + one gap (`-100% - gap`); with identical copies laid side by side the
+     next copy is already in place when one scrolls out, so the loop has no seam. `--marquee-gap` must
+     match the flex gap between/within the copies so the maths line up. */
+  --animate-marquee: marquee var(--marquee-duration, 30s) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--marquee-duration, 30s) linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--marquee-gap, 1rem)));
+    }
+  }
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--marquee-gap, 1rem)));
+    }
+  }
+}
+
+/* "inline" is required so these resolve to the runtime vars, not literal values.
+   https://github.com/tailwindlabs/tailwindcss/discussions/15122#discussioncomment-11356322 */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-outline: var(--outline);
+
+  --radius-xs: calc(var(--radius) - 0.375rem);
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 0.25rem);
+  --radius-2xl: calc(var(--radius) + 0.5rem);
+  --radius-3xl: calc(var(--radius) + 1rem);
+}

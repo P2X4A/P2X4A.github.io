@@ -1,0 +1,145 @@
+/**
+ * * Global stylesheet — the single CSS entry point (imported once in BaseLayout).
+ *
+ * Token architecture lives across two files:
+ *   - tailwind-theme.css  → LAYER 1 palette aliases + LAYER 3 `@theme inline` bridge
+ *   - this file           → LAYER 2 semantic runtime vars (`:root` / `.dark`) that flip with the theme
+ */
+@import url("./fonts.css");
+
+@import "tailwindcss";
+
+/* class-based dark mode: toggle `.dark` on <html> (BaseHead sets it pre-paint) */
+@variant dark (&:where(.dark, .dark *));
+
+/* LAYER 1 + 3 token definitions */
+@import "./tailwind-theme.css";
+
+/* motion catalog: keyframes + `animate-*` utilities + the global reduced-motion guard (owned,
+   dependency-free port of tailwind-animations — see motion/index.css) */
+@import "./motion/index.css";
+
+/* explicit layer order */
+@layer theme, base, components, utilities;
+
+@layer base {
+  /* LAYER 2 — semantic vars mapped onto the palette aliases. Edit these to retheme. */
+  :root {
+    --background: var(--color-base-50);
+    --foreground: var(--color-base-900);
+    --card: var(--color-base-50);
+    --card-foreground: var(--color-base-950);
+    --primary: var(--color-primary-700);
+    --primary-foreground: var(--color-base-50);
+    --secondary: var(--color-base-700);
+    --secondary-foreground: var(--color-base-50);
+    --muted: var(--color-base-100);
+    --muted-foreground: var(--color-base-600);
+    --accent: var(--color-base-200);
+    --accent-foreground: var(--color-base-900);
+    --info: var(--color-sky-300);
+    --info-foreground: var(--color-sky-950);
+    --success: var(--color-green-300);
+    --success-foreground: var(--color-green-950);
+    --warning: var(--color-amber-300);
+    --warning-foreground: var(--color-amber-950);
+    --error: var(--color-red-700);
+    --error-foreground: var(--color-base-50);
+    --border: var(--color-base-300);
+    --input: var(--color-base-100);
+    --outline: var(--color-base-950);
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: var(--color-base-950);
+    --foreground: var(--color-base-100);
+    --card: var(--color-base-900);
+    --card-foreground: var(--color-base-100);
+    --primary: var(--color-primary-400);
+    --primary-foreground: var(--color-base-950);
+    --secondary: var(--color-base-300);
+    --secondary-foreground: var(--color-base-950);
+    --muted: var(--color-base-900);
+    --muted-foreground: var(--color-base-400);
+    --accent: var(--color-base-800);
+    --accent-foreground: var(--color-base-100);
+    --info: var(--color-sky-300);
+    --info-foreground: var(--color-sky-950);
+    --success: var(--color-green-300);
+    --success-foreground: var(--color-green-950);
+    --warning: var(--color-amber-300);
+    --warning-foreground: var(--color-amber-950);
+    --error: var(--color-red-800);
+    --error-foreground: var(--color-base-50);
+    --border: var(--color-base-800);
+    --input: var(--color-base-800);
+    --outline: var(--color-base-50);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply bg-background text-foreground scheme-light dark:scheme-dark;
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    /* reserve scrollbar space to prevent layout shift */
+    scrollbar-gutter: stable;
+    font-feature-settings:
+      "liga" 1,
+      "calt" 1;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /* shared typographic + layout primitives (used via @apply across many elements) */
+  .h1 {
+    @apply text-3xl font-medium md:text-4xl;
+  }
+  .h2 {
+    @apply text-3xl font-medium;
+  }
+  .h3 {
+    @apply text-xl font-medium;
+  }
+
+  .description {
+    @apply text-base-700 dark:text-base-300 md:text-lg;
+  }
+
+  .site-container {
+    @apply mx-auto max-w-[1100px] px-4;
+  }
+
+  /* form inputs (newsletter, contact, etc.) */
+  .form__input {
+    @apply border-base-300 bg-base-100 hover:border-primary-500 dark:border-base-600/60 dark:bg-base-800 w-full rounded-md border px-3 py-2 transition;
+    @apply focus:border-primary-500 focus-visible:ring-primary-500/50 outline-none focus-visible:ring-2;
+
+    &::placeholder {
+      @apply text-base-400;
+    }
+  }
+}
+
+@layer utilities {
+  /* visible focus ring for keyboard users */
+  .primary-focus {
+    @apply focus-visible:outline-primary-500 focus:outline-hidden focus-visible:rounded-xs focus-visible:outline-2;
+  }
+
+  /* gradient text for tags / accent headings */
+  .main-text-gradient {
+    @apply from-primary-800 to-primary-600 dark:from-primary-400 dark:to-primary-200 bg-gradient-to-r bg-clip-text text-transparent;
+  }
+}
