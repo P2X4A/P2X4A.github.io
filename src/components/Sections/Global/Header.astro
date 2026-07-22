@@ -4,8 +4,8 @@
 // Cross-page chrome, rendered once in BaseLayout. Reproduces Figma node 5:110 (the dark frame):
 // a full-bleed pixel bar (black bottom border + `shadow-pixel`), the brand on the left, the primary
 // nav on the right. Nav links use the `retro` NavLink variant — Press Start 2P, uppercase, green on
-// hover/active with a leading ► pointer (HOME is shown active in the mock). Below `lg` the nav
-// collapses into a pink 8-bit "MENU" button → Sheet drawer. Tokens only, so light mode is free.
+// hover/active with a leading ► pointer. Below `lg` the nav collapses into a pink 8-bit "MENU"
+// button → Sheet drawer (the four Press Start labels fit the desktop bar at `lg`). Tokens only.
 //
 // Reuses existing pieces — ui/nav, ui/sheet (opened/closed via its `_dialog` data hooks), the pink
 // `.pixel-btn` (global.css), and ui/theme-toggle. No new primitives. The MENU / CLOSE controls are

@@ -3,20 +3,22 @@ import { z } from "astro/zod";
 import { defineCollection, reference } from "astro:content";
 
 /**
- * Content collections. Entries live directly under the collection dir:
- *   src/data/blog/<slug>/index.md   (entry id => "<slug>")
- * (If you re-add i18n, nest per-locale folders — `<locale>/<slug>` ids — and restore a
- * language filter; the removed helpers are in git history.)
+ * Blog — the "Latest Posts" listing (Figma node 76:4) + per-post article pages (node 5:128).
+ * Entries live at src/data/blog/<slug>/index.mdx (entry id => "<slug>").
  *
- * .mdx posts render via `@astrojs/mdx`, already wired in astro.config.mjs.
+ * Unlike `projects` (whose detail is fixed slots), the blog article body is genuine free-form prose
+ * — headings, lists, blockquotes, code — so it IS the MDX body (rendered via `render()` → `<Content />`,
+ * styled by the `.blog-prose` class). Frontmatter carries only what the layout lays out in slots:
+ * the byline (`authors`), the retro `category` tag (drives the card + article badge tone via
+ * postCards.categoryMeta), the footer `tags`, and the hero image. `pubDate` sorts the listing.
  */
 const blogCollection = defineCollection({
   loader: glob({ pattern: "**/[^_]*{md,mdx}", base: "./src/data/blog" }),
   schema: ({ image }) =>
     z.object({
-      title: z.string(),
-      description: z.string(),
-      authors: z.array(reference("authors")),
+      title: z.string(), // card title + article H1 + SEO title
+      description: z.string(), // card excerpt + SEO meta description
+      authors: z.array(reference("authors")), // byline (avatar + name); referenced ids must exist
       pubDate: z
         .string()
         .or(z.date())
@@ -25,11 +27,12 @@ const blogCollection = defineCollection({
         .string()
         .optional()
         .transform((str) => (str ? new Date(str) : undefined)),
-      // optional in the starter so example posts need no bundled asset; make it required for real blogs
-      heroImage: image().optional(),
-      categories: z.array(z.string()).optional(),
-      // To pair posts across locales (for a content-aware language switcher), add an optional
-      // `mappingKey: z.string().optional()` here and give both translations the same value.
+      // required for a real blog (seo.md): the card thumbnail AND the article hero banner
+      heroImage: image(),
+      heroImageAlt: z.string(),
+      // the retro category tag ("Quest" / "Lore" / "Tech" / "Guide" / "Dev Log") — see categoryMeta
+      category: z.string(),
+      tags: z.array(z.string()).default([]), // footer hashtags (#pixel, #gamedev)
       draft: z.boolean().optional(),
     }),
 });

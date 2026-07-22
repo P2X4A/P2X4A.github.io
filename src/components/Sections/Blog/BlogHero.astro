@@ -1,0 +1,24 @@
+---
+// src/components/Sections/Blog/BlogHero.astro — the listing hero panel (Figma "Hero Panel", node
+// 76:25): a MISSION CONTROL tag, the LATEST POSTS H1, and the Dev Dispatches blurb. Static page copy
+// (reproduced verbatim from the mock), so it takes no props. Above the fold → no <Reveal>. Reuses the
+// shared ui/pixel-panel surface + the ui/badge pixel variant; tokens only, so the light theme flips.
+import { Badge } from "@components/ui/badge";
+import { PixelPanel } from "@components/ui/pixel-panel";
+---
+
+<PixelPanel
+  as="section"
+  elevated
+  aria-labelledby="blog-hero-heading"
+  class="flex flex-col items-start gap-4 p-6 sm:p-8 md:p-9"
+>
+  <Badge pixel variant="info">Mission Control</Badge>
+
+  <h1 id="blog-hero-heading" class="h1 text-info text-balance">Latest Posts</h1>
+
+  <p class="text-muted-foreground max-w-3xl text-base text-balance">
+    Dev Dispatches — Field Notes from the Code Frontier. Real-time logging of web operations, vintage
+    architectures, and unconventional full-stack implementations.
+  </p>
+</PixelPanel>

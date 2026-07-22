@@ -125,6 +125,56 @@
     @apply text-base-700 dark:text-base-200 md:text-lg;
   }
 
+  /* Blog article body — styles the rendered MDX (<Content />) on /blog/<slug>/ (see BlogArticle.astro).
+     GLOBAL (not scoped): the markup comes from MDX, which Astro's scoped styles can't reach. Tokens
+     only, so it flips with the theme — except the fenced code block, which stays a fixed-dark Shiki
+     panel in both themes (the scoreboard precedent). Headings inline the .h2/.h3 utilities because a
+     custom @layer class can't itself be `@apply`-ed. */
+  .blog-prose {
+    @apply text-muted-foreground text-base leading-relaxed;
+
+    & > * + * {
+      @apply mt-6;
+    }
+    & a {
+      @apply text-info hover:text-success underline underline-offset-2 transition-colors;
+    }
+    & strong {
+      @apply text-info font-bold;
+    }
+    & h2 {
+      @apply font-display text-info mt-8 flex items-center gap-3 text-lg leading-tight uppercase md:text-2xl md:leading-8;
+    }
+    /* the retro ► selector — a green right-triangle via clip-path (no glyph, so it's font-safe). */
+    & h2::before {
+      content: "";
+      @apply bg-success block h-3 w-2 shrink-0;
+      clip-path: polygon(0 0, 100% 50%, 0 100%);
+    }
+    & h3 {
+      @apply font-display text-secondary mt-6 text-sm leading-6 uppercase md:text-base;
+    }
+    & ul {
+      @apply flex flex-col gap-3;
+    }
+    & li {
+      @apply relative pl-6;
+    }
+    & li::before {
+      content: "";
+      @apply bg-info absolute top-2.5 left-0 size-2;
+    }
+    & blockquote {
+      @apply border-secondary bg-muted/40 text-foreground border-l-4 py-3 pr-4 pl-5 italic;
+    }
+    & :not(pre) > code {
+      @apply bg-muted border-border border-2 px-1.5 py-0.5 text-sm;
+    }
+    & pre {
+      @apply border-border overflow-x-auto border-4 p-4 text-sm;
+    }
+  }
+
   .site-container {
     @apply mx-auto max-w-[1100px] px-4;
   }
