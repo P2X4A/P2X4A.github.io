@@ -1,0 +1,83 @@
+---
+// src/components/Sections/About/Hero.astro — Figma "Hero" (node 5:280).
+//
+// The profile hero panel: a DEV 01 tag, the H1, a two-paragraph bio, the two CTAs, and a retro
+// "scoreboard" stats strip (CLASS / LVL / XP / STARS). Second section, still near the fold → NO
+// <Reveal>. Tokens only.
+//
+// COPY: the bio is the mock's two paragraphs verbatim (meaningful, not lorem). The stats strip is
+// retro flavour (typed local), same as the home Stats scoreboard.
+//
+// BUTTONS: the mock has no CTA here, but per the brief the CTAs use `.pixel-btn` — the site's
+// dependency-free port of the CodePen "Pure CSS 8bit Button Style" (Maximuz/BdqXXN). VIEW PROJECTS
+// jumps to the Project Log; GET IN TOUCH points at the intended /contact/ route (404 until built,
+// same precedent as the nav). Flagged in the handoff for a cheap veto.
+import { Badge } from "@components/ui/badge";
+
+// The strip sits on a FIXED-dark base (`bg-base-700`, does not flip) so it reads as a scoreboard on
+// the light lavender ground too — the same call the home Stats strip makes. Colours are chosen to
+// pass on that dark strip in BOTH themes: success/secondary don't drop out, and the blue is the
+// fixed `primary-300` alias (semantic `text-info` would flip to a deep blue that fails on dark).
+const strip = [
+  { text: "Class: Full-Stack Dev", color: "text-success" },
+  { text: "Lvl: 8+", color: "text-primary-300" },
+  { text: "XP: 8.5K", color: "text-secondary" },
+  { text: "Stars: 2.1K", color: "text-success" },
+] as const;
+---
+
+<section aria-labelledby="about-hero-heading">
+  <div
+    class="bg-card border-border shadow-pixel-lg flex flex-col items-start gap-4 border-4 p-6 sm:p-8 md:p-9"
+  >
+    <Badge pixel variant="info">Dev 01</Badge>
+
+    <h1 id="about-hero-heading" class="h1 text-info text-balance">The Full-Stack Dev</h1>
+
+    <div class="text-muted-foreground flex flex-col gap-4 text-base">
+      <p>
+        Welcome to the mainframe. I'm a full-stack developer with 8+ years of experience building
+        scalable web applications, APIs, and tools. This profile serves as a chronological log of my
+        projects, open-source contributions, and the systems I've shipped.
+      </p>
+      <p>
+        I'm passionate about clean code, automated testing, and shipping fast. I write about modern
+        frontend patterns, backend architecture, and the tools that keep my workflow efficient.
+      </p>
+    </div>
+
+    <div class="flex flex-col gap-4 pt-1 sm:flex-row">
+      <a
+        href="#project-log-heading"
+        class="pixel-btn pixel-btn--blue px-5 py-4 text-sm uppercase sm:text-base"
+      >
+        View Projects
+      </a>
+      <a href="/contact/" class="pixel-btn px-5 py-4 text-sm uppercase sm:text-base">
+        Get in Touch
+      </a>
+    </div>
+
+    <div
+      class="bg-base-700 border-border shadow-pixel mt-2 flex w-full flex-col items-center gap-2 border-4 p-4 lg:flex-row lg:justify-between lg:gap-4"
+    >
+      {
+        strip.map((stat, i) => (
+          <Fragment>
+            {i > 0 && (
+              <span class="bg-base-400 hidden h-3.5 w-1 shrink-0 lg:block" aria-hidden="true" />
+            )}
+            <p
+              class:list={[
+                "font-display text-xs whitespace-nowrap uppercase sm:text-sm",
+                stat.color,
+              ]}
+            >
+              {stat.text}
+            </p>
+          </Fragment>
+        ))
+      }
+    </div>
+  </div>
+</section>
