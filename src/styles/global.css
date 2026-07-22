@@ -44,7 +44,7 @@
     --accent-foreground: var(--color-base-900);
     --info: var(--color-primary-700); /* #1f6cc0 deep blue — the brand wordmark on light */
     --info-foreground: var(--color-primary-50);
-    --success: #2f9e57; /* green tuned to read on the light ground */
+    --success: var(--color-success-600); /* #2f9e57 green tuned to read on the light ground */
     --success-foreground: #ffffff;
     --warning: #b8760a;
     --warning-foreground: #2a1c00;
@@ -72,8 +72,8 @@
     --accent-foreground: var(--color-base-100);
     --info: var(--color-primary-300); /* #99cbff airy blue */
     --info-foreground: var(--color-primary-950);
-    --success: #63de86;
-    --success-foreground: #00401b;
+    --success: var(--color-success-400); /* #63de86 */
+    --success-foreground: var(--color-success-900); /* #00401b */
     --warning: #ffd166;
     --warning-foreground: #2a1c00;
     --error: var(--color-secondary-300); /* #ff9da8 */
@@ -219,14 +219,14 @@
     --pixel-btn-ink: var(--color-primary-900); /* #00395e navy ink on blue */
     --pixel-btn-depth: var(--color-primary-700);
   }
-  /* the Figma contact SEND MESSAGE green. There is no `--color-success-*` ramp (success is a
-     semantic that flips), and the pixel button is fixed in BOTH themes like the pink/blue faces —
-     so these are the mock's literal greens, the same way `.dark`'s `--success` literals are set. */
+  /* the Figma contact SEND MESSAGE green — the action-green counterpart to `--blue`. Points at the
+     fixed `--color-success-*` palette ramp (NOT the semantic `--success`, which flips per theme),
+     so the button reads identically in both themes like the pink/blue faces. */
   .pixel-btn--green {
-    --pixel-btn-face: #63de86; /* the mock's SEND MESSAGE face */
-    --pixel-btn-face-hover: #7be89a;
-    --pixel-btn-ink: #00401b; /* dark green ink on green */
-    --pixel-btn-depth: #2f9e57;
+    --pixel-btn-face: var(--color-success-400); /* #63de86 the mock's SEND MESSAGE face */
+    --pixel-btn-face-hover: var(--color-success-300);
+    --pixel-btn-ink: var(--color-success-900); /* #00401b dark green ink on green */
+    --pixel-btn-depth: var(--color-success-600);
   }
   .pixel-btn:hover,
   .pixel-btn:focus-visible {

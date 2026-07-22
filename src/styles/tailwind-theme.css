@@ -42,6 +42,24 @@
   --color-secondary-900: #45001a;
   --color-secondary-950: #2c000d;
 
+  /* SUCCESS — the retro green. The one STATUS colour promoted to a full ramp (warning/error stay
+     semantic-only until something needs them) because the pixel SEND MESSAGE button needs fixed,
+     non-flipping green anchors — `--success` the semantic flips per theme, so the button can't use
+     it. Anchored on the Figma greens: `-400` #63de86 (dark success + button face), `-600` #2f9e57
+     (light success + button depth), `-900` #00401b (dark ink on green). The semantic `--success`
+     (global.css) reads these, so the values live in one place. */
+  --color-success-50: #e6fbef;
+  --color-success-100: #c2f5d6;
+  --color-success-200: #90ecb6;
+  --color-success-300: #7be89a;
+  --color-success-400: #63de86;
+  --color-success-500: #40cd6d;
+  --color-success-600: #2f9e57;
+  --color-success-700: #237c44;
+  --color-success-800: #145c31;
+  --color-success-900: #00401b;
+  --color-success-950: #002d12;
+
   /* BASE / ink — the single cool navy ramp both themes are cut from. DARK uses the deep end for
      surfaces (`-900` page, `-800` panels, `-700` input, `-600` tags) + the light end for text
      (`-100`/`-200`). LIGHT is the reverse: the light end for surfaces (`-100` page, `-50` cards,
