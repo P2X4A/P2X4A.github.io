@@ -21,9 +21,10 @@ import { actions, isInputError } from "astro:actions";
 
 const result = Astro.getActionResult(actions.contact);
 const success = result?.data?.ok === true;
-const inputError = result?.error && isInputError(result.error) ? result.error : undefined;
-const fieldErrors: Record<string, string[] | undefined> = inputError?.fields ?? {};
-const formError = result?.error && !isInputError(result.error) ? result.error.message : undefined;
+const error = result?.error;
+const fieldErrors: Record<string, string[] | undefined> =
+  error && isInputError(error) ? error.fields : {};
+const formError = error && !isInputError(error) ? error.message : undefined;
 
 // Render timestamp for the time gate. Request-time because /contact/ is prerender:false.
 const renderedAt = Date.now();
@@ -108,38 +109,26 @@ const fieldClass = [
       <form method="POST" action={actions.contact} class="flex flex-col gap-4">
         {FIELDS.map((field) => {
           const err = fieldErrors[field.name]?.[0];
-          const describedBy = err ? `${field.name}-error` : undefined;
+          // Shared across both control types; only the element + its one unique attr differ below.
+          const attrs = {
+            id: field.name,
+            name: field.name,
+            placeholder: field.placeholder,
+            autocomplete: field.autocomplete,
+            required: true,
+            maxlength: field.maxlength,
+            "aria-invalid": err ? true : undefined,
+            "aria-describedby": err ? `${field.name}-error` : undefined,
+          };
           return (
             <div class="flex flex-col gap-2">
               <Label for={field.name} class="text-info font-display text-xs uppercase">
                 {field.label}
               </Label>
               {field.as === "textarea" ? (
-                <Textarea
-                  id={field.name}
-                  name={field.name}
-                  placeholder={field.placeholder}
-                  autocomplete={field.autocomplete}
-                  required
-                  minlength={10}
-                  maxlength={field.maxlength}
-                  aria-invalid={err ? "true" : undefined}
-                  aria-describedby={describedBy}
-                  class={`${fieldClass} min-h-[120px] py-3`}
-                />
+                <Textarea {...attrs} minlength={10} class={`${fieldClass} min-h-[120px] py-3`} />
               ) : (
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type={field.type}
-                  placeholder={field.placeholder}
-                  autocomplete={field.autocomplete}
-                  required
-                  maxlength={field.maxlength}
-                  aria-invalid={err ? "true" : undefined}
-                  aria-describedby={describedBy}
-                  class={`${fieldClass} h-14`}
-                />
+                <Input {...attrs} type={field.type} class={`${fieldClass} h-14`} />
               )}
               {err && (
                 <p id={`${field.name}-error`} role="alert" class="text-error text-xs">
