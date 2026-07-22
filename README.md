@@ -56,10 +56,10 @@ where it starts.
 Collections are defined in `src/content.config.ts` (Zod), so bad frontmatter fails the build with
 the entry named. Entries live one folder deep, and the folder name is the slug.
 
-| Collection | Location            | Holds                                                                            |
-| :--------- | :------------------ | :------------------------------------------------------------------------------- |
+| Collection | Location            | Holds                                                                                                                 |
+| :--------- | :------------------ | :-------------------------------------------------------------------------------------------------------------------- |
 | `blog`     | `src/data/blog/`    | Posts: `title`, `description`, `authors[]`, `pubDate`, and optional `heroImage`, `updatedDate`, `categories`, `draft` |
-| `authors`  | `src/data/authors/` | Bylines, referenced by posts                                                      |
+| `authors`  | `src/data/authors/` | Bylines, referenced by posts                                                                                          |
 
 Both ship empty. Add a folder with an `index.md`/`index.mdx` to create an entry.
 

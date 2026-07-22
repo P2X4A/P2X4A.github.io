@@ -23,59 +23,64 @@
 @layer theme, base, components, utilities;
 
 @layer base {
-  /* LAYER 2 — semantic vars mapped onto the palette aliases. Edit these to retheme. */
+  /* LAYER 2 — semantic vars mapped onto the palette aliases. Edit these to retheme.
+     8-BitQuest is a committed retro pixel theme cut from ONE cool navy ramp. `.dark` is the
+     Figma-accurate dark (navy surfaces, light ink). `:root` is the LIGHT mode — a soft inversion
+     of dark, NOT cream and NOT stark white: the page sits on a light lavender-blue, cards lift to
+     near-white, ink is navy, and the blue/pink/green accents are deepened for contrast on a light
+     ground. Both keep the pixel signature: pure-black borders + sharp corners (--radius: 0). */
   :root {
-    --background: var(--color-base-50);
-    --foreground: var(--color-base-900);
-    --card: var(--color-base-50);
-    --card-foreground: var(--color-base-950);
-    --primary: var(--color-primary-700);
-    --primary-foreground: var(--color-base-50);
-    --secondary: var(--color-base-700);
-    --secondary-foreground: var(--color-base-50);
-    --muted: var(--color-base-100);
-    --muted-foreground: var(--color-base-600);
-    --accent: var(--color-base-200);
+    --background: var(--color-base-100); /* #e1e1f7 soft lavender-blue (not white) */
+    --foreground: var(--color-base-900); /* #101222 navy ink */
+    --card: var(--color-base-50); /* #f4f4fb raised near-white panel */
+    --card-foreground: var(--color-base-900);
+    --primary: var(--color-primary-600); /* #2b8ae0 action blue, deepened for the light ground */
+    --primary-foreground: #ffffff;
+    --secondary: var(--color-secondary-200); /* #ffb2ba pink */
+    --secondary-foreground: var(--color-secondary-800); /* #670120 */
+    --muted: var(--color-base-200); /* #bfc7d3 muted blue-grey */
+    --muted-foreground: var(--color-base-500); /* #3f4358 */
+    --accent: var(--color-base-200); /* #bfc7d3 */
     --accent-foreground: var(--color-base-900);
-    --info: var(--color-sky-300);
-    --info-foreground: var(--color-sky-950);
-    --success: var(--color-green-300);
-    --success-foreground: var(--color-green-950);
-    --warning: var(--color-amber-300);
-    --warning-foreground: var(--color-amber-950);
-    --error: var(--color-red-700);
-    --error-foreground: var(--color-base-50);
-    --border: var(--color-base-300);
-    --input: var(--color-base-100);
-    --outline: var(--color-base-950);
+    --info: var(--color-primary-700); /* #1f6cc0 deep blue — the brand wordmark on light */
+    --info-foreground: var(--color-primary-50);
+    --success: #2f9e57; /* green tuned to read on the light ground */
+    --success-foreground: #ffffff;
+    --warning: #b8760a;
+    --warning-foreground: #2a1c00;
+    --error: var(--color-secondary-600); /* #892037 maroon reads as danger */
+    --error-foreground: var(--color-secondary-50);
+    --border: #000000; /* pixel borders are always pure black */
+    --input: var(--color-base-50); /* near-white field on the lavender ground */
+    --outline: var(--color-primary-600);
 
-    --radius: 0.5rem;
+    --radius: 0; /* sharp pixel corners — no rounding anywhere */
   }
 
   .dark {
-    --background: var(--color-base-950);
-    --foreground: var(--color-base-100);
-    --card: var(--color-base-900);
+    --background: var(--color-base-900); /* #101222 page */
+    --foreground: var(--color-base-100); /* #e1e1f7 heading text */
+    --card: var(--color-base-800); /* #1c1e2f panel */
     --card-foreground: var(--color-base-100);
-    --primary: var(--color-primary-400);
-    --primary-foreground: var(--color-base-950);
-    --secondary: var(--color-base-300);
-    --secondary-foreground: var(--color-base-950);
-    --muted: var(--color-base-900);
-    --muted-foreground: var(--color-base-400);
-    --accent: var(--color-base-800);
+    --primary: var(--color-primary-500); /* #41a6f6 action blue */
+    --primary-foreground: var(--color-primary-900); /* #00395e */
+    --secondary: var(--color-secondary-200); /* #ffb2ba pink */
+    --secondary-foreground: var(--color-secondary-800); /* #670120 */
+    --muted: var(--color-base-700); /* #272939 stats strip / input */
+    --muted-foreground: var(--color-base-200); /* #bfc7d3 body text */
+    --accent: var(--color-base-600); /* #323445 thumbnails / tags */
     --accent-foreground: var(--color-base-100);
-    --info: var(--color-sky-300);
-    --info-foreground: var(--color-sky-950);
-    --success: var(--color-green-300);
-    --success-foreground: var(--color-green-950);
-    --warning: var(--color-amber-300);
-    --warning-foreground: var(--color-amber-950);
-    --error: var(--color-red-800);
-    --error-foreground: var(--color-base-50);
-    --border: var(--color-base-800);
-    --input: var(--color-base-800);
-    --outline: var(--color-base-50);
+    --info: var(--color-primary-300); /* #99cbff airy blue */
+    --info-foreground: var(--color-primary-950);
+    --success: #63de86;
+    --success-foreground: #00401b;
+    --warning: #ffd166;
+    --warning-foreground: #2a1c00;
+    --error: var(--color-secondary-300); /* #ff9da8 */
+    --error-foreground: var(--color-secondary-950);
+    --border: #000000; /* pixel borders are always pure black */
+    --input: var(--color-base-700);
+    --outline: var(--color-primary-400);
   }
 
   * {
@@ -102,19 +107,22 @@
 }
 
 @layer components {
-  /* shared typographic + layout primitives (used via @apply across many elements) */
+  /* shared typographic primitives. Headings are the pixel face (Press Start 2P via `font-display`),
+     uppercase, tuned to the Figma scale (H1 32 / H2 24 / H3 16 at md) and stepped down on mobile so
+     the wide pixel glyphs don't overflow narrow screens. Press Start 2P has a single weight, so no
+     `font-medium`. Body copy is Space Mono (the site default from --font-sans). */
   .h1 {
-    @apply text-3xl font-medium md:text-4xl;
+    @apply font-display text-xl leading-tight tracking-[-0.03em] uppercase sm:text-2xl md:text-[2rem] md:leading-[2.5rem];
   }
   .h2 {
-    @apply text-3xl font-medium;
+    @apply font-display text-lg leading-tight uppercase md:text-2xl md:leading-8;
   }
   .h3 {
-    @apply text-xl font-medium;
+    @apply font-display text-sm leading-6 uppercase md:text-base;
   }
 
   .description {
-    @apply text-base-700 dark:text-base-300 md:text-lg;
+    @apply text-base-700 dark:text-base-200 md:text-lg;
   }
 
   .site-container {
@@ -123,12 +131,67 @@
 
   /* form inputs (newsletter, contact, etc.) */
   .form__input {
-    @apply border-base-300 bg-base-100 hover:border-primary-500 dark:border-base-600/60 dark:bg-base-800 w-full rounded-md border px-3 py-2 transition;
+    @apply border-base-300 bg-input hover:border-primary-500 dark:border-base-600/60 w-full rounded-md border px-3 py-2 transition;
     @apply focus:border-primary-500 focus-visible:ring-primary-500/50 outline-none focus-visible:ring-2;
 
     &::placeholder {
       @apply text-base-400;
     }
+  }
+
+  /* Retro 8-bit button — a dependency-free port of the CodePen "Pure CSS 8bit Button Style"
+     (Maximuz/BdqXXN). A flat face with an inset darker shadow for depth and a notched black pixel
+     border drawn by two pseudo-elements (the corners stay clipped, NES-style). Hover deepens the
+     shadow; :active presses it inward — instant, no transition (authentic snap; nothing for
+     reduced-motion to worry about). Same in both themes (the accent tokens don't flip).
+     The colour is parameterised by four CSS vars (defaulting to the theme PINK); the `--blue`
+     modifier repoints them to the action blue for the Figma READ BLOG / EMAIL ME CTAs. Used by the
+     header toggle + MENU button and the hero/contact CTAs; size it with height / width / padding
+     utilities at the call site. */
+  .pixel-btn {
+    --pixel-btn-face: var(--color-secondary-200); /* #ffb2ba flat face */
+    --pixel-btn-face-hover: var(--color-secondary-300); /* #ff9da8 */
+    --pixel-btn-ink: var(--color-secondary-800); /* #670120 dark ink on pink */
+    --pixel-btn-depth: var(--color-secondary-400); /* inset shadow colour */
+    @apply font-display relative inline-flex cursor-pointer items-center justify-center;
+    background-color: var(--pixel-btn-face);
+    color: var(--pixel-btn-ink);
+    box-shadow: inset -4px -4px 0 0 var(--pixel-btn-depth);
+  }
+  .pixel-btn--blue {
+    --pixel-btn-face: var(--color-primary-500); /* #41a6f6 action blue */
+    --pixel-btn-face-hover: var(--color-primary-400);
+    --pixel-btn-ink: var(--color-primary-900); /* #00395e navy ink on blue */
+    --pixel-btn-depth: var(--color-primary-700);
+  }
+  .pixel-btn:hover,
+  .pixel-btn:focus-visible {
+    background-color: var(--pixel-btn-face-hover);
+    box-shadow: inset -6px -6px 0 0 var(--pixel-btn-depth);
+  }
+  .pixel-btn:focus-visible {
+    outline: 3px solid var(--outline);
+    outline-offset: 5px;
+  }
+  .pixel-btn:active {
+    box-shadow: inset 4px 4px 0 0 var(--pixel-btn-depth);
+  }
+  /* the notched black frame: :before draws the top/bottom bars, :after the left/right ones */
+  .pixel-btn::before,
+  .pixel-btn::after {
+    @apply pointer-events-none absolute h-full w-full;
+    content: "";
+    box-sizing: content-box;
+  }
+  .pixel-btn::before {
+    @apply top-[-4px] left-0;
+    border-top: 4px solid var(--border);
+    border-bottom: 4px solid var(--border);
+  }
+  .pixel-btn::after {
+    @apply top-0 left-[-4px];
+    border-right: 4px solid var(--border);
+    border-left: 4px solid var(--border);
   }
 }
 

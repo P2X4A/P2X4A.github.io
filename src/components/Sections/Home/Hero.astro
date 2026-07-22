@@ -1,32 +1,37 @@
 ---
-// Home hero. Layout-free section: src/pages/index.astro owns BaseLayout + SEO and
-// composes the page from Sections/Home.
-import siteData from "@config/siteData.json";
+// src/components/Sections/Home/Hero.astro — Figma "Header - Hero Panel" (node 5:4).
+//
+// A pixel panel (card surface, 4px black frame, `shadow-pixel-lg`) holding the PLAYER 1 tag, the H1,
+// an intro line, and the two CTAs: READ BLOG (blue pixel button) + SAY HI (pink). Above the fold, so
+// no scroll-reveal (a scroll-timeline element already in view renders mid-progress). Tokens only.
+//
+// Copy: the intro is the Figma line verbatim; the H1 replaces the mock's placeholder "WELCOME HERO"
+// with a real on-brand headline that ties to the PLAYER 1 tag. Routes are the site's intended ones
+// (blog/contact 404 until built — same precedent as the nav/footer).
+import { Badge } from "@components/ui/badge";
 ---
 
-<section
-  class="site-container flex min-h-[100lvh] flex-col items-center justify-center gap-8 py-20 text-center"
->
-  <h1 class="h1 max-w-3xl text-balance">
-    <span class="main-text-gradient">{siteData.name}</span>
-  </h1>
+<section aria-labelledby="hero-heading">
+  <div
+    class="bg-card border-border shadow-pixel-lg flex flex-col items-start gap-4 border-4 p-6 sm:p-8 md:p-9"
+  >
+    <Badge pixel variant="info">Player 1</Badge>
 
-  <p class="description max-w-2xl text-balance">
-    A lean Astro 7 starter — Tailwind v4 tokens, typed config-driven content, ready to extend.
-  </p>
+    <h1 id="hero-heading" class="h1 text-info text-balance">Welcome, Player One</h1>
 
-  <div class="flex flex-wrap items-center justify-center gap-3">
-    <a
-      href="https://docs.astro.build"
-      class="primary-focus bg-primary text-primary-foreground rounded-lg px-5 py-2.5 font-medium transition hover:opacity-90"
-    >
-      Astro docs
-    </a>
-    <a
-      href="https://tailwindcss.com/docs"
-      class="primary-focus border-border text-foreground hover:bg-muted rounded-lg border px-5 py-2.5 font-medium transition"
-    >
-      Tailwind docs
-    </a>
+    <p class="text-muted-foreground max-w-2xl text-base text-balance">
+      Level up your knowledge with our latest dev logs, tutorials, and retro tech explorations. Press
+      start to begin your journey.
+    </p>
+
+    <div class="flex flex-col gap-4 pt-2 sm:flex-row">
+      <a
+        href="/blog/"
+        class="pixel-btn pixel-btn--blue px-5 py-4 text-sm uppercase sm:text-base"
+      >
+        Read Blog
+      </a>
+      <a href="/contact/" class="pixel-btn px-5 py-4 text-sm uppercase sm:text-base"> Say Hi </a>
+    </div>
   </div>
 </section>

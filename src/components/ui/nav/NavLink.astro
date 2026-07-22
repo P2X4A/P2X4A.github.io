@@ -23,6 +23,14 @@ export const navLink = tv({
         "rounded-md px-3 py-1.5 not-aria-[current=page]:hover:bg-muted aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground",
       segment:
         "rounded-md px-3 py-1.5 not-aria-[current=page]:hover:bg-muted/60 aria-[current=page]:bg-muted aria-[current=page]:text-foreground",
+      // The 8-BitQuest pixel-menu link (header, Figma 5:110): Press Start 2P, uppercase, and green
+      // (`text-success`) on hover/active. `group` + `relative` + the reserved `pl-6` let the caller
+      // drop an absolutely-positioned ► pointer into the slot that fades in on hover/active with no
+      // reflow — see Sections/Global/Header.astro.
+      retro: [
+        "group relative px-2 py-1 pl-6 font-display text-[16px] leading-6 uppercase",
+        "text-foreground not-aria-[current=page]:hover:text-success aria-[current=page]:text-success",
+      ],
     },
   },
   defaultVariants: { variant: "underline" },

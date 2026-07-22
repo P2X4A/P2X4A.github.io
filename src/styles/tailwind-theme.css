@@ -13,31 +13,51 @@
  * `bg-violet-700`/`text-zinc-300`, which bypass theming + dark mode.
  */
 @theme {
-  /* primary palette — rebrand by repointing these to another Tailwind ramp */
-  --color-primary-50: var(--color-violet-50);
-  --color-primary-100: var(--color-violet-100);
-  --color-primary-200: var(--color-violet-200);
-  --color-primary-300: var(--color-violet-300);
-  --color-primary-400: var(--color-violet-400);
-  --color-primary-500: var(--color-violet-500);
-  --color-primary-600: var(--color-violet-600);
-  --color-primary-700: var(--color-violet-700);
-  --color-primary-800: var(--color-violet-800);
-  --color-primary-900: var(--color-violet-900);
-  --color-primary-950: var(--color-violet-950);
+  /* PRIMARY — the retro action/heading blue. Anchored on the two Figma blues:
+     `-300` #99cbff (headings/links, the airy blue) and `-500` #41a6f6 (buttons/badges).
+     Rebrand by repointing these hexes; the semantic `--primary` (global.css) reads `-500`. */
+  --color-primary-50: #eaf4ff;
+  --color-primary-100: #cfe4ff;
+  --color-primary-200: #b3d6ff;
+  --color-primary-300: #99cbff;
+  --color-primary-400: #62b4f8;
+  --color-primary-500: #41a6f6;
+  --color-primary-600: #2b8ae0;
+  --color-primary-700: #1f6cc0;
+  --color-primary-800: #114e90;
+  --color-primary-900: #00395e;
+  --color-primary-950: #003354;
 
-  /* base/neutral palette */
-  --color-base-50: var(--color-zinc-50);
-  --color-base-100: var(--color-zinc-100);
-  --color-base-200: var(--color-zinc-200);
-  --color-base-300: var(--color-zinc-300);
-  --color-base-400: var(--color-zinc-400);
-  --color-base-500: var(--color-zinc-500);
-  --color-base-600: var(--color-zinc-600);
-  --color-base-700: var(--color-zinc-700);
-  --color-base-800: var(--color-zinc-800);
-  --color-base-900: var(--color-zinc-900);
-  --color-base-950: var(--color-zinc-950);
+  /* SECONDARY — the retro pink. `-200` #ffb2ba (SAY HI button / accents), `-600` #892037
+     (LORE badge bg), `-800` #670120 (dark text on pink). */
+  --color-secondary-50: #fff1f3;
+  --color-secondary-100: #ffdfe3;
+  --color-secondary-200: #ffb2ba;
+  --color-secondary-300: #ff9da8;
+  --color-secondary-400: #f4677a;
+  --color-secondary-500: #d83f56;
+  --color-secondary-600: #892037;
+  --color-secondary-700: #6d182b;
+  --color-secondary-800: #670120;
+  --color-secondary-900: #45001a;
+  --color-secondary-950: #2c000d;
+
+  /* BASE / ink — the single cool navy ramp both themes are cut from. DARK uses the deep end for
+     surfaces (`-900` page, `-800` panels, `-700` input, `-600` tags) + the light end for text
+     (`-100`/`-200`). LIGHT is the reverse: the light end for surfaces (`-100` page, `-50` cards,
+     `-200` muted) + the deep end for ink (`-900`). No separate light palette — light mode is a
+     cool inversion of dark, not a cream "paper" theme. */
+  --color-base-50: #f4f4fb;
+  --color-base-100: #e1e1f7;
+  --color-base-200: #bfc7d3;
+  --color-base-300: #89919c;
+  --color-base-400: #5c6377;
+  --color-base-500: #3f4358;
+  --color-base-600: #323445;
+  --color-base-700: #272939;
+  --color-base-800: #1c1e2f;
+  --color-base-900: #101222;
+  --color-base-950: #0b0d1c;
 
   /* breakpoints (adds `xs`; the rest mirror Tailwind defaults so they're explicit) */
   --breakpoint-xs: 400px;
@@ -47,12 +67,25 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
 
-  /* font families — `--font-sans` is wired to Inter (loaded in fonts.css) */
+  /* font families (loaded in fonts.css). The design is a two-face system:
+       --font-display → Press Start 2P, the pixel heading face (`font-display` utility; drives .h1–.h3)
+       --font-sans    → Space Mono, the body face (the site default, set on <html>)
+       --font-mono    → Space Mono too (body and "code" are the same mono here) */
+  --font-display: "Press Start 2P", "Space Mono", ui-monospace, "Courier New", monospace;
   --font-sans:
-    "InterVariable", "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    "Space Mono", ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono",
+    "Courier New", monospace;
   --font-mono:
-    "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace";
+    "Space Mono", ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono",
+    "Courier New", monospace;
+
+  /* PIXEL SHADOW — the signature hard offset shadow (zero blur, pure black), the retro
+     "sticker" depth on every panel/card/button/badge. Always black in both themes: it is the
+     theme's own mark, not a themeable value (same ownership rule as the black borders).
+       shadow-pixel     → cards, buttons, badges, stats strip
+       shadow-pixel-lg  → the hero panel */
+  --shadow-pixel: 4px 4px 0 0 #000;
+  --shadow-pixel-lg: 8px 8px 0 0 #000;
 
   /* animation tokens — the Marquee primitive's seamless-loop scroll (see ui/marquee/Marquee.astro).
      `--marquee-duration` is the per-instance speed knob (set by the `speed` variant). Each track

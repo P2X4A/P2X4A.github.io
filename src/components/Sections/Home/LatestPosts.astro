@@ -1,0 +1,56 @@
+---
+// src/components/Sections/Home/LatestPosts.astro — Figma "Latest Posts Section" (node 5:31).
+//
+// Data-only section: the shared heading + 1/2/3-col card grid lives in <CardGrid>. This file just
+// supplies the three post cards.
+//
+// CONTENT: placeholder demo posts. The `blog` collection ships empty and no /blog route exists yet
+// (a deliberate later-build per the project docs), so these are a typed local list, not `getCollection`.
+// Swap for `getCollection("blog")` when the blog lands; hrefs are the intended /blog/<slug>/ routes
+// (404 until then — same precedent as the nav/footer). Category → ui/badge tone; LORE has no
+// semantic token so it takes a fixed maroon (secondary-600) via `badgeClass`.
+import { type ContentCardProps } from "@components/Cards/ContentCard.astro";
+import cssGrid from "@images/demo/post-css-grid.jpg";
+import floppyDisk from "@images/demo/post-floppy-disk.jpg";
+import retroDeploy from "@images/demo/post-retro-deploy.jpg";
+
+import CardGrid from "./CardGrid.astro";
+
+const posts: readonly ContentCardProps[] = [
+  {
+    title: "Building the Ultimate CSS Grid",
+    description:
+      "A deep dive into constructing robust, responsive layouts using native CSS grid, without relying on external frameworks.",
+    href: "/blog/building-the-ultimate-css-grid/",
+    image: cssGrid,
+    imageAlt: "A glowing sword rising from a pedestal in a crystal cave",
+    badgeLabel: "Quest",
+    badgeVariant: "success",
+    cta: "Read",
+  },
+  {
+    title: "History of the Floppy Disk",
+    description:
+      "Exploring the rise and fall of the iconic storage medium that shaped a generation of computing and gaming.",
+    href: "/blog/history-of-the-floppy-disk/",
+    image: floppyDisk,
+    imageAlt: "A retro CRT monitor showing a pixel-art game menu",
+    badgeLabel: "Lore",
+    badgeClass: "bg-secondary-600 text-secondary-100",
+    cta: "Read",
+  },
+  {
+    title: "Deploying with Retro Tools",
+    description:
+      "How we maintain a modern CI/CD pipeline while pretending it's 1995. A look into our unconventional devops setup.",
+    href: "/blog/deploying-with-retro-tools/",
+    image: retroDeploy,
+    imageAlt: "An isometric illustration of a green-lit server room",
+    badgeLabel: "Tech",
+    badgeVariant: "primary",
+    cta: "Read",
+  },
+];
+---
+
+<CardGrid headingId="latest-posts-heading" title="Latest Posts" items={posts} />

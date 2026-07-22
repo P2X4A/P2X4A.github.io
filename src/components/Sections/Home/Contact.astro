@@ -1,0 +1,68 @@
+---
+// src/components/Sections/Home/Contact.astro — Figma "Contact Section" (node 14:137).
+//
+// Section heading + a centred prompt, two pixel CTAs (EMAIL ME blue / LET'S TALK pink), and a row of
+// social chips (PixelChip links). Below-the-fold → <Reveal>. Buttons stack on phones. Tokens only.
+//
+// WIRING (real, not transcribed): EMAIL ME → mailto author email; socials pull from siteData
+// (author.twitter builds the X url; github/linkedin from sameAs, else the platform root — the same
+// derivation the footer uses). LET'S TALK → the intended /contact/ route (404 until built).
+import type { IconName } from "@components/svg/icons";
+import { Reveal } from "@components/ui/reveal";
+import siteData from "@config/siteData.json";
+import { socialUrl } from "@js/social";
+
+import PixelChip from "./PixelChip.astro";
+import SectionHeading from "./SectionHeading.astro";
+
+// Twitter prefers the author handle, then a sameAs match, then the platform root.
+const twitterUrl = siteData.author.twitter
+  ? `https://x.com/${siteData.author.twitter}`
+  : socialUrl(siteData.sameAs, ["x.com", "twitter.com"], "https://x.com/");
+
+const socials: readonly { icon: IconName; label: string; href: string }[] = [
+  { icon: "github", label: "GitHub", href: socialUrl(siteData.sameAs, "github.com", "https://github.com/") },
+  { icon: "x-01", label: "Twitter/X", href: twitterUrl },
+  {
+    icon: "linkedin",
+    label: "LinkedIn",
+    href: socialUrl(siteData.sameAs, "linkedin.com", "https://www.linkedin.com/"),
+  },
+];
+---
+
+<Reveal as="section" aria-labelledby="contact-heading" class="flex flex-col gap-6">
+  <SectionHeading id="contact-heading" title="Contact" />
+
+  <div class="flex flex-col items-center gap-6 text-center">
+    <p class="text-muted-foreground max-w-2xl text-base">
+      Want to chat about a project, a retro build, or just share a favorite game?
+    </p>
+
+    <div class="flex flex-col gap-4 sm:flex-row">
+      <a
+        href={`mailto:${siteData.author.email}`}
+        class="pixel-btn pixel-btn--blue px-5 py-4 text-sm uppercase sm:text-base"
+      >
+        Email Me
+      </a>
+      <a href="/contact/" class="pixel-btn px-5 py-4 text-sm uppercase sm:text-base"> Let's Talk </a>
+    </div>
+
+    <ul class="flex flex-wrap justify-center gap-4">
+      {
+        socials.map((social) => (
+          <li>
+            <PixelChip
+              icon={social.icon}
+              label={social.label}
+              href={social.href}
+              ariaLabel={`${social.label} profile`}
+              external
+            />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Reveal>
