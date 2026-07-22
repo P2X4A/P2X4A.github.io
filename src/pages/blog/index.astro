@@ -1,0 +1,23 @@
+---
+// Blog listing (/blog/). Thin route shell: owns BaseLayout + SEO and composes the Figma
+// "blog-listing-page" frame (node 76:4) — the BlogHero panel + the shared CardGrid, fed from the
+// `blog` collection (newest first, drafts dropped). Same `.site-container` shell/rhythm as the other
+// pages. This is the page the header nav's BLOG link points at.
+import { getSortedPosts } from "@components/Sections/Blog/blogData";
+import BlogHero from "@components/Sections/Blog/BlogHero.astro";
+import { toPostCard } from "@components/Sections/Blog/postCards";
+import CardGrid from "@components/Sections/Home/CardGrid.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+const cards = (await getSortedPosts()).map(toPostCard);
+---
+
+<BaseLayout
+  title="Latest Posts — 8-BitQuest"
+  description="Dev Dispatches — field notes from the code frontier: web operations, vintage architectures, and unconventional full-stack builds, cataloged as retro archive modules."
+>
+  <div class="site-container flex flex-col gap-10 py-8 md:gap-12 md:py-12">
+    <BlogHero />
+    <CardGrid headingId="archive-modules-heading" title="Archive Modules" items={cards} />
+  </div>
+</BaseLayout>

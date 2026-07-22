@@ -7,14 +7,14 @@ import { type NavItemProps } from "./types/configDataTypes";
  * to match `astro.config.mjs` `trailingSlash: "always"`. `as const satisfies` keeps the literal
  * types while checking the shape.
  *
- * The link set matches the Figma frames (nodes 72:7 / 72:191): HOME · PROJECTS · ABOUT · CONTACT.
- * PROJECTS took the slot the mock gives it (the frames omit Blog); `/`, `/projects/`, and `/about/`
- * are live pages, `/contact/` is the one intended route that still 404s until it lands. Blog stays
- * reachable off the home READ BLOG CTA + the footer RSS link — it just isn't top-nav chrome here.
+ * Order: ABOUT · PROJECTS · BLOG · CONTACT. Home is intentionally not a nav item — the brand wordmark
+ * (Header.astro `<a href="/">`) is the home link, the common logo-as-home pattern. `/about/`,
+ * `/projects/`, and `/blog/` are live pages; `/contact/` is the one intended route that still 404s
+ * until it lands. Four Press Start labels fit the desktop bar at `lg` (measured).
  */
 export const navItems = [
-  { label: "Home", href: "/" },
-  { label: "Projects", href: "/projects/" },
   { label: "About", href: "/about/" },
+  { label: "Projects", href: "/projects/" },
+  { label: "Blog", href: "/blog/" },
   { label: "Contact", href: "/contact/" },
 ] as const satisfies readonly NavItemProps[];

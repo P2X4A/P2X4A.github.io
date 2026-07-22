@@ -58,6 +58,12 @@ const jsonLd = serializeJsonLd([...siteNodes, ...(schema ?? [])]);
 <link rel="icon" href="/favicon.ico" sizes="any" />
 
 <link rel="sitemap" href="/sitemap-index.xml" />
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={`${siteData.name} — Blog`}
+  href="/rss.xml"
+/>
 
 <!-- SEO -->
 <title>{title}</title>
