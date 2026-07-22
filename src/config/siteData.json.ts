@@ -2,10 +2,10 @@ import { type SiteDataProps } from "./types/configDataTypes";
 
 // Site metadata. Edit with your project's details.
 const siteData: SiteDataProps = {
-  name: "Astro Boiler",
-  title: "Astro Boiler — Astro 7 + Tailwind v4 starter",
+  name: "8-BitQuest",
+  title: "8-BitQuest — retro pixel-art dev portfolio",
   description:
-    "A lean Astro 7 starter with a CSS-first Tailwind v4 token architecture and typed, config-driven content, ready to grow into your own template.",
+    "A retro 8-bit, pixel-art developer portfolio built on Astro 7 and a CSS-first Tailwind v4 token system.",
 
   author: {
     name: "Your Name",
@@ -15,7 +15,7 @@ const siteData: SiteDataProps = {
 
   defaultImage: {
     src: "/og.jpg",
-    alt: "Astro Boiler",
+    alt: "8-BitQuest",
   },
 
   // social/profile URLs, surfaced as the Organization `sameAs` in JSON-LD (see @js/schema).

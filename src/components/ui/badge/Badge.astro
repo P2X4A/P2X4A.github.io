@@ -19,11 +19,19 @@ export const badge = tv({
       warning: "bg-warning text-warning-foreground",
       error: "bg-error text-error-foreground",
     },
+    // `pixel` is the 8-BitQuest retro treatment (Figma "Background+Border" tag: PLAYER 1 / QUEST /
+    // LORE / TECH / PROJECT). Same opt-in-variant pattern as ui/nav's `retro`. It re-tunes the shell
+    // only — 2px black frame, chunkier padding, bold uppercase Space Mono — and reuses the tone
+    // `variant` for colour. tailwind-merge (via tv) lets these win over the base px/py/font-weight.
+    pixel: { true: "border-2 border-border px-2.5 py-1 font-bold tracking-wide uppercase", false: "" },
   },
   defaultVariants: { variant: "primary" },
 });
 
-const { variant, class: className, ...rest } = Astro.props;
+/** The badge tone names — consumed by content-aware cards that map a category to a tone. */
+export type BadgeVariant = NonNullable<VariantProps<typeof badge>["variant"]>;
+
+const { variant, pixel, class: className, ...rest } = Astro.props;
 ---
 
-<span class={badge({ variant, class: className })} data-slot="badge" {...rest}><slot /></span>
+<span class={badge({ variant, pixel, class: className })} data-slot="badge" {...rest}><slot /></span>
