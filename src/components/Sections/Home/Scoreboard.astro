@@ -1,0 +1,52 @@
+---
+// src/components/Sections/Home/Scoreboard.astro
+//
+// The retro scoreboard strip (Figma "Stats Strip"): Press Start stats split by short pixel-bar
+// separators. Shared by the home Stats section and the About Hero panel — it owns the seam logic
+// (the `{i > 0}` separator between items) in ONE place so the two can't drift. The strip stacks to a
+// centred column on narrow screens and spreads to a justified row at `stackAt` (the home's three
+// stats release at `sm`; the About Hero's four longer ones need more room, so they stay stacked
+// until `lg`). Tokens only.
+//
+// The base sets only structure; the consumer passes the fixed-dark bg, padding, gap, and text size
+// via `class` (a plain Astro component doesn't tailwind-merge, so the base deliberately owns none of
+// those to avoid a conflicting-utility clash). Text size / `whitespace` set on the container are
+// inherited by the stat <p>s.
+interface Props {
+  stats: readonly { text: string; color: string }[];
+  /** Breakpoint at which the strip switches from a stacked column to a spread row. */
+  stackAt?: "sm" | "lg";
+  /** Container styling: bg token, padding, gap, text size, width/margin. Merged after the base. */
+  class?: string;
+}
+const { stats, stackAt = "sm", class: className } = Astro.props as Props;
+
+// Whole static classes per breakpoint (a `${bp}:` prefix can't be interpolated — see tailwind.md).
+const rowLayout = {
+  sm: "sm:flex-row sm:justify-between",
+  lg: "lg:flex-row lg:justify-between",
+} as const;
+const separatorShow = { sm: "sm:block", lg: "lg:block" } as const;
+---
+
+<div
+  class:list={[
+    "border-border shadow-pixel flex flex-col items-center border-4",
+    rowLayout[stackAt],
+    className,
+  ]}
+>
+  {
+    stats.map((stat, i) => (
+      <Fragment>
+        {i > 0 && (
+          <span
+            class:list={["bg-base-400 hidden h-3.5 w-1 shrink-0", separatorShow[stackAt]]}
+            aria-hidden="true"
+          />
+        )}
+        <p class:list={["font-display uppercase", stat.color]}>{stat.text}</p>
+      </Fragment>
+    ))
+  }
+</div>

@@ -20,16 +20,17 @@ const skills: readonly { name: string; icon: IconName; tone: Tone }[] = [
   { name: "React", icon: "component", tone: "info" },
 ];
 
-// Whole static classes per tone (never interpolate a class name — invisible to the compiler).
-const tagClass: Record<Tone, string> = {
-  success: "border-success text-success",
-  secondary: "border-secondary text-secondary",
-  info: "border-info text-info",
-};
-const iconClass: Record<Tone, string> = {
+// Whole static classes per tone (never interpolate a class name — invisible to the compiler). The
+// tag composes both; the icon takes just the text colour — one source for each so they can't drift.
+const toneText: Record<Tone, string> = {
   success: "text-success",
   secondary: "text-secondary",
   info: "text-info",
+};
+const toneBorder: Record<Tone, string> = {
+  success: "border-success",
+  secondary: "border-secondary",
+  info: "border-info",
 };
 ---
 
@@ -43,12 +44,13 @@ const iconClass: Record<Tone, string> = {
           <span
             class:list={[
               "bg-border border-2 px-2 py-1 text-xs font-bold uppercase",
-              tagClass[skill.tone],
+              toneBorder[skill.tone],
+              toneText[skill.tone],
             ]}
           >
             {skill.name}
           </span>
-          <Icon name={skill.icon} class:list={["size-8", iconClass[skill.tone]]} />
+          <Icon name={skill.icon} class:list={["size-8", toneText[skill.tone]]} />
           <span class="font-display text-foreground text-center text-sm uppercase">
             {skill.name}
           </span>

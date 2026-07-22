@@ -8,80 +8,69 @@
 // CONTENT: the titles/excerpts are the mock's demo copy (meaningful, typed local — no projects
 // collection ships). Status → ui/badge tone: [COMPLETE] → success (green), [IN PROGRESS] → warning
 // (amber). hrefs are the intended /projects/<slug>/ routes (404 until built, same nav precedent).
-// ponytail: thumbnails REUSE the six shared demo images (each appears once here, once in
-// Achievements) rather than the mock's per-card art — the home-page placeholder precedent, kept lean
-// (no Sharp, no 12 new assets). Alts describe the actual image; swap art + copy for real projects.
+// Thumbnails spread from the shared `demoThumbs` (each appears once here, once in Achievements) —
+// placeholder art to swap for real projects; image + alt live in one place so they can't drift.
 import { type ContentCardProps } from "@components/Cards/ContentCard.astro";
 import CardGrid from "@components/Sections/Home/CardGrid.astro";
-import cssGrid from "@images/demo/post-css-grid.jpg";
-import floppyDisk from "@images/demo/post-floppy-disk.jpg";
-import retroDeploy from "@images/demo/post-retro-deploy.jpg";
-import cliQuest from "@images/demo/project-cli-quest.png";
-import pixelArt from "@images/demo/project-pixel-art.png";
-import retroChat from "@images/demo/project-retro-chat.png";
+
+import { demoThumbs } from "./demoThumbs";
 
 const projects: readonly ContentCardProps[] = [
   {
+    ...demoThumbs.retroChat,
     title: "Built a real-time chat app with React + Node.js",
     description:
       "Implemented WebSockets, Redis pub/sub, and automated testing for a production chat platform.",
     href: "/projects/realtime-chat-app/",
-    image: retroChat,
-    imageAlt: "A pixel-art chat application interface labelled Chatting App v1.0",
     badgeLabel: "[Complete]",
     badgeVariant: "success",
     cta: "View",
   },
   {
+    ...demoThumbs.retroDeploy,
     title: "Migrated a monolith to microservices on AWS",
     description:
       "Designed service boundaries, API gateways, and CI/CD pipelines for a distributed system.",
     href: "/projects/monolith-to-microservices/",
-    image: retroDeploy,
-    imageAlt: "An isometric illustration of a green-lit server room",
     badgeLabel: "[Complete]",
     badgeVariant: "success",
     cta: "View",
   },
   {
+    ...demoThumbs.cliQuest,
     title: "Open source CLI tool with 2k+ stars on GitHub",
     description:
       "A Node.js CLI that automates dev workflows and ships with zero-config support for TypeScript and Docker.",
     href: "/projects/open-source-cli/",
-    image: cliQuest,
-    imageAlt: "A retro terminal running a text adventure on a CRT monitor",
     badgeLabel: "[Complete]",
     badgeVariant: "success",
     cta: "View",
   },
   {
+    ...demoThumbs.pixelArt,
     title: "Building a web-based observability dashboard",
     description: "Integrating Prometheus, Grafana, and alerting rules for a high-traffic API.",
     href: "/projects/observability-dashboard/",
-    image: pixelArt,
-    imageAlt: "A pixel-art sprite editor with a colour palette and canvas grid",
     badgeLabel: "[In Progress]",
     badgeVariant: "warning",
     cta: "View",
   },
   {
+    ...demoThumbs.cssGrid,
     title: "Deployed a headless CMS with Next.js + Vercel",
     description:
       "Built a content platform with server components, incremental static generation, and edge caching.",
     href: "/projects/headless-cms/",
-    image: cssGrid,
-    imageAlt: "A glowing sword rising from a pedestal in a crystal cave",
     badgeLabel: "[Complete]",
     badgeVariant: "success",
     cta: "View",
   },
   {
+    ...demoThumbs.floppyDisk,
     title: "Optimizing database performance with indexing",
     description:
       "Analyzing query plans, adding indexes, and reducing latency for a high-concurrency database.",
     href: "/projects/database-performance/",
-    image: floppyDisk,
-    imageAlt: "A retro CRT monitor showing a pixel-art game menu",
     badgeLabel: "[In Progress]",
     badgeVariant: "warning",
     cta: "View",

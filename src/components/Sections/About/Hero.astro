@@ -12,10 +12,12 @@
 // dependency-free port of the CodePen "Pure CSS 8bit Button Style" (Maximuz/BdqXXN). VIEW PROJECTS
 // jumps to the Project Log; GET IN TOUCH points at the intended /contact/ route (404 until built,
 // same precedent as the nav). Flagged in the handoff for a cheap veto.
+import Scoreboard from "@components/Sections/Home/Scoreboard.astro";
 import { Badge } from "@components/ui/badge";
 
 // The strip sits on a FIXED-dark base (`bg-base-700`, does not flip) so it reads as a scoreboard on
-// the light lavender ground too — the same call the home Stats strip makes. Colours are chosen to
+// the light lavender ground too — the same call the home Stats strip makes. It reuses the shared
+// <Scoreboard> shell, stacking until `lg` (four longer stats need the room). Colours are chosen to
 // pass on that dark strip in BOTH themes: success/secondary don't drop out, and the blue is the
 // fixed `primary-300` alias (semantic `text-info` would flip to a deep blue that fails on dark).
 const strip = [
@@ -58,26 +60,10 @@ const strip = [
       </a>
     </div>
 
-    <div
-      class="bg-base-700 border-border shadow-pixel mt-2 flex w-full flex-col items-center gap-2 border-4 p-4 lg:flex-row lg:justify-between lg:gap-4"
-    >
-      {
-        strip.map((stat, i) => (
-          <Fragment>
-            {i > 0 && (
-              <span class="bg-base-400 hidden h-3.5 w-1 shrink-0 lg:block" aria-hidden="true" />
-            )}
-            <p
-              class:list={[
-                "font-display text-xs whitespace-nowrap uppercase sm:text-sm",
-                stat.color,
-              ]}
-            >
-              {stat.text}
-            </p>
-          </Fragment>
-        ))
-      }
-    </div>
+    <Scoreboard
+      stats={strip}
+      stackAt="lg"
+      class="bg-base-700 mt-2 w-full gap-2 p-4 text-xs whitespace-nowrap sm:text-sm lg:gap-4"
+    />
   </div>
 </section>
