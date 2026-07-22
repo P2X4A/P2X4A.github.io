@@ -20,6 +20,7 @@
 //     → siteData.sameAs, else the platform root; RSS → the intended /rss.xml).
 import { PixelIcon, type PixelIconName } from "@components/svg/pixel-icons";
 import siteData from "@config/siteData.json";
+import { socialUrl } from "@js/social";
 
 const year = new Date().getFullYear();
 const copyright = `© ${year} — Game Over`;
@@ -27,15 +28,20 @@ const copyright = `© ${year} — Game Over`;
 // Social row (Figma 5:96, glyphs swapped to the pixel set). `name` is validated against the
 // pixel-icon registry; destinations pull from siteData.sameAs where present.
 type SocialLink = { name: PixelIconName; label: string; href: string; external?: boolean };
-const linkedinUrl =
-  siteData.sameAs?.find((u) => u.includes("linkedin.com")) ?? "https://www.linkedin.com/";
-const youtubeUrl =
-  siteData.sameAs?.find((u) => u.includes("youtube.com")) ?? "https://www.youtube.com/";
-
 const socialLinks: readonly SocialLink[] = [
-  { name: "linkedin", label: "LinkedIn", href: linkedinUrl, external: true },
+  {
+    name: "linkedin",
+    label: "LinkedIn",
+    href: socialUrl(siteData.sameAs, "linkedin.com", "https://www.linkedin.com/"),
+    external: true,
+  },
   { name: "rss", label: "RSS feed", href: "/rss.xml" },
-  { name: "youtube", label: "YouTube", href: youtubeUrl, external: true },
+  {
+    name: "youtube",
+    label: "YouTube",
+    href: socialUrl(siteData.sameAs, "youtube.com", "https://www.youtube.com/"),
+    external: true,
+  },
   { name: "email", label: "Email", href: `mailto:${siteData.author.email}` },
 ];
 

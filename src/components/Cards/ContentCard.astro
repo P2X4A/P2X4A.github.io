@@ -16,7 +16,7 @@
 import { Icon } from "@components/svg/icons";
 import { Badge, type BadgeVariant } from "@components/ui/badge";
 
-interface Props {
+export interface ContentCardProps {
   href: string;
   image: ImageMetadata;
   imageAlt: string;
@@ -43,7 +43,7 @@ const {
   description,
   tags,
   cta = "Read",
-} = Astro.props as Props;
+} = Astro.props as ContentCardProps;
 ---
 
 <a

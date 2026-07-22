@@ -10,22 +10,24 @@
 import type { IconName } from "@components/svg/icons";
 import { Reveal } from "@components/ui/reveal";
 import siteData from "@config/siteData.json";
+import { socialUrl } from "@js/social";
 
 import PixelChip from "./PixelChip.astro";
 import SectionHeading from "./SectionHeading.astro";
 
-const githubUrl = siteData.sameAs?.find((u) => u.includes("github.com")) ?? "https://github.com/";
-const linkedinUrl =
-  siteData.sameAs?.find((u) => u.includes("linkedin.com")) ?? "https://www.linkedin.com/";
+// Twitter prefers the author handle, then a sameAs match, then the platform root.
 const twitterUrl = siteData.author.twitter
   ? `https://x.com/${siteData.author.twitter}`
-  : (siteData.sameAs?.find((u) => u.includes("x.com") || u.includes("twitter.com")) ??
-    "https://x.com/");
+  : socialUrl(siteData.sameAs, ["x.com", "twitter.com"], "https://x.com/");
 
 const socials: readonly { icon: IconName; label: string; href: string }[] = [
-  { icon: "github", label: "GitHub", href: githubUrl },
+  { icon: "github", label: "GitHub", href: socialUrl(siteData.sameAs, "github.com", "https://github.com/") },
   { icon: "x-01", label: "Twitter/X", href: twitterUrl },
-  { icon: "linkedin", label: "LinkedIn", href: linkedinUrl },
+  {
+    icon: "linkedin",
+    label: "LinkedIn",
+    href: socialUrl(siteData.sameAs, "linkedin.com", "https://www.linkedin.com/"),
+  },
 ];
 ---
 
