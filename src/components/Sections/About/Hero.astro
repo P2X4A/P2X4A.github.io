@@ -16,16 +16,16 @@ import Scoreboard from "@components/Sections/Home/Scoreboard.astro";
 import { Badge } from "@components/ui/badge";
 import { PixelPanel } from "@components/ui/pixel-panel";
 
-// The strip sits on a FIXED-dark base (`bg-base-700`, does not flip) so it reads as a scoreboard on
-// the light lavender ground too — the same call the home Stats strip makes. It reuses the shared
-// <Scoreboard> shell, stacking until `lg` (four longer stats need the room). Colours are chosen to
-// pass on that dark strip in BOTH themes: success/secondary don't drop out, and the blue is the
-// fixed `primary-300` alias (semantic `text-info` would flip to a deep blue that fails on dark).
+// The strip sits on the theme-aware `bg-muted` (a light-blue scoreboard in light mode, the dark
+// #272939 panel in dark) — the same call the home Stats strip makes. It reuses the shared <Scoreboard>
+// shell, stacking until `lg` (four longer stats need the room). Each colour is a light/dark PAIR so it
+// reads on BOTH grounds: deepened green/pink for the light strip, the neon shades under `dark:` for the
+// dark one; the blue rides the flipping `text-info` (deep blue on light, airy primary-300 on dark).
 const strip = [
-  { text: "Class: Full-Stack Dev", color: "text-success" },
-  { text: "Lvl: 8+", color: "text-primary-300" },
-  { text: "XP: 8.5K", color: "text-secondary" },
-  { text: "Stars: 2.1K", color: "text-success" },
+  { text: "Class: Full-Stack Dev", color: "text-success-700 dark:text-success" },
+  { text: "Lvl: 8+", color: "text-info" },
+  { text: "XP: 8.5K", color: "text-secondary-700 dark:text-secondary" },
+  { text: "Stars: 2.1K", color: "text-success-700 dark:text-success" },
 ] as const;
 ---
 
@@ -63,6 +63,6 @@ const strip = [
   <Scoreboard
     stats={strip}
     stackAt="lg"
-    class="bg-base-700 mt-2 w-full gap-2 p-4 text-xs whitespace-nowrap sm:text-sm lg:gap-4"
+    class="bg-muted mt-2 w-full gap-2 p-4 text-xs whitespace-nowrap sm:text-sm lg:gap-4"
   />
 </PixelPanel>

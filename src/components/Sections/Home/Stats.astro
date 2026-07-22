@@ -1,23 +1,22 @@
 ---
 // src/components/Sections/Home/Stats.astro — Figma "Stats Strip" (node 5:20).
 //
-// A retro scoreboard: three neon Press Start stats split by short pixel dividers. The mock maps the
-// strip to `bg-muted` (dark #272939), but muted flips to a LIGHT grey-blue in light mode where the
-// green/blue stats fail contrast — so the strip stays dark in BOTH themes (`bg-base-800`, a fixed
-// palette anchor). On the light lavender page it reads as an intentional dark scoreboard. The strip
-// shell (separator seam + stacking) is the shared <Scoreboard>; this file owns only the data + skin.
+// A retro scoreboard: three neon Press Start stats split by short pixel dividers. This is the mock's
+// `bg-muted` strip — muted is theme-aware, so it's a light-blue scoreboard in light mode and the dark
+// #272939 panel in dark. Each stat colour is a light/dark PAIR so it reads on BOTH grounds: deepened
+// green/pink for the light strip, the neon shades under `dark:` for the dark strip (blue rides the
+// flipping `text-info`). The strip shell (separator seam + stacking) is the shared <Scoreboard>.
 //
-// Stats are retro flavour (no real source yet), same as the footer's "GAME OVER" — a typed local
-// list. Colours are tokens that read on the dark strip in both themes (secondary is fixed pink).
+// Stats are retro flavour (no real source yet), same as the footer's "GAME OVER" — a typed local list.
 import Scoreboard from "./Scoreboard.astro";
 
 const stats = [
-  { text: "Posts: 42", color: "text-success" },
-  { text: "Years: 03", color: "text-secondary" },
+  { text: "Posts: 42", color: "text-success-700 dark:text-success" },
+  { text: "Years: 03", color: "text-secondary-700 dark:text-secondary" },
   { text: "Coffee: 9000+", color: "text-info" },
 ] as const;
 ---
 
 <section aria-label="8-BitQuest by the numbers">
-  <Scoreboard stats={stats} class="bg-base-800 gap-3 px-5 py-4 text-sm sm:gap-4 sm:text-base" />
+  <Scoreboard stats={stats} class="bg-muted gap-3 px-5 py-4 text-sm sm:gap-4 sm:text-base" />
 </section>
