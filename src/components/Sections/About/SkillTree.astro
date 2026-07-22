@@ -11,6 +11,7 @@
 // TechStack picked (React→component, JS→code, Python→flash), so the two pages can't drift.
 import SectionHeading from "@components/Sections/Home/SectionHeading.astro";
 import { Icon, type IconName } from "@components/svg/icons";
+import { PixelPanel } from "@components/ui/pixel-panel";
 import { Reveal } from "@components/ui/reveal";
 
 type Tone = "success" | "secondary" | "info";
@@ -40,7 +41,7 @@ const toneBorder: Record<Tone, string> = {
   <ul class="grid gap-6 sm:grid-cols-3">
     {
       skills.map((skill) => (
-        <li class="bg-card text-card-foreground border-border shadow-pixel flex flex-col items-center gap-3 border-4 p-4">
+        <PixelPanel as="li" class="flex flex-col items-center gap-3 p-4">
           <span
             class:list={[
               "bg-border border-2 px-2 py-1 text-xs font-bold uppercase",
@@ -54,7 +55,7 @@ const toneBorder: Record<Tone, string> = {
           <span class="font-display text-foreground text-center text-sm uppercase">
             {skill.name}
           </span>
-        </li>
+        </PixelPanel>
       ))
     }
   </ul>

@@ -8,12 +8,9 @@
 // /projects/<slug>/ detail page.
 import CardGrid from "@components/Sections/Home/CardGrid.astro";
 import { toProjectCard } from "@components/Sections/Project/projectCards";
-import { getCollection } from "astro:content";
+import { getSortedProjects } from "@components/Sections/Project/projectData";
 
-const featured = (await getCollection("projects", ({ data }) => data.draft !== true))
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 3)
-  .map(toProjectCard);
+const featured = (await getSortedProjects()).slice(0, 3).map(toProjectCard);
 ---
 
 <CardGrid headingId="featured-projects-heading" title="Featured Projects" items={featured} />

@@ -5,14 +5,11 @@
 // as index.astro & about.astro. This is the page the header nav's PROJECTS link points at.
 import CardGrid from "@components/Sections/Home/CardGrid.astro";
 import { toProjectCard } from "@components/Sections/Project/projectCards";
+import { getSortedProjects } from "@components/Sections/Project/projectData";
 import ProjectsHero from "@components/Sections/Project/ProjectsHero.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
 
-const projects = (await getCollection("projects", ({ data }) => data.draft !== true)).sort(
-  (a, b) => a.data.order - b.data.order,
-);
-const cards = projects.map(toProjectCard);
+const cards = (await getSortedProjects()).map(toProjectCard);
 ---
 
 <BaseLayout

@@ -7,13 +7,13 @@
 //   • content split — left 2/3: Overview (slot) + System Features; right 1/3: SYS_SPECS + ARC_MAP
 //   • Challenges & Solutions                          (node 72:257)
 //
-// Reuses PixelPanel (the pixel surface), ui/badge (pixel variant), the svg/icons registry, the .h1/
-// .h3 heading classes, and .primary-focus. Tokens only, so the light theme flips for free.
+// Reuses ui/pixel-panel (the pixel surface), ui/badge (pixel variant), the svg/icons registry, the
+// .h1/.h3 heading classes, and .primary-focus. Tokens only, so the light theme flips for free.
 import { Icon } from "@components/svg/icons";
 import { Badge } from "@components/ui/badge";
+import { PixelPanel } from "@components/ui/pixel-panel";
 import type { CollectionEntry } from "astro:content";
 
-import PixelPanel from "./PixelPanel.astro";
 import { statusMeta } from "./projectCards";
 
 interface Props {

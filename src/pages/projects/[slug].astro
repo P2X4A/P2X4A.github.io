@@ -5,12 +5,13 @@
 // links off the SAME id — so the grid links and the generated routes can never drift. The glob
 // loader gives single-segment ids (`<slug>` for `<slug>/index.mdx`), so a plain `[slug]` param fits.
 import ProjectArticle from "@components/Sections/Project/ProjectArticle.astro";
+import { getSortedProjects } from "@components/Sections/Project/projectData";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import type { GetStaticPaths } from "astro";
-import { type CollectionEntry, getCollection, render } from "astro:content";
+import { type CollectionEntry, render } from "astro:content";
 
 export const getStaticPaths = (async () => {
-  const projects = await getCollection("projects", ({ data }) => data.draft !== true);
+  const projects = await getSortedProjects();
   return projects.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
 }) satisfies GetStaticPaths;
 
