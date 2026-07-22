@@ -9,7 +9,7 @@
 //
 // Reuses PixelPanel (the pixel surface), ui/badge (pixel variant), the svg/icons registry, the .h1/
 // .h3 heading classes, and .primary-focus. Tokens only, so the light theme flips for free.
-import { Icon, type IconName, iconNames } from "@components/svg/icons";
+import { Icon } from "@components/svg/icons";
 import { Badge } from "@components/ui/badge";
 import type { CollectionEntry } from "astro:content";
 
@@ -20,25 +20,10 @@ interface Props {
   project: CollectionEntry<"projects">["data"];
 }
 const { project } = Astro.props as Props;
-const {
-  title,
-  tagline,
-  status,
-  moduleId,
-  specs,
-  features,
-  archIcon,
-  archCaption,
-  challenge,
-  solution,
-} = project;
+const { title, tagline, status, moduleId, specs, features, archCaption, challenge, solution } =
+  project;
 
 const { label: statusLabel, variant: statusVariant } = statusMeta(status);
-
-// ARC_MAP glyph comes from frontmatter but must be a real registry name — guard it (house type-guard
-// idiom) and fall back to a sensible default rather than trusting the string blindly.
-const isIconName = (n: string): n is IconName => (iconNames as readonly string[]).includes(n);
-const archIconName: IconName = archIcon && isIconName(archIcon) ? archIcon : "server-05";
 ---
 
 <div class="flex flex-col gap-8">
@@ -78,7 +63,7 @@ const archIconName: IconName = archIcon && isIconName(archIcon) ? archIcon : "se
       <!-- Overview Card — heading + the rendered MDX body (node 72:220) -->
       <PixelPanel class="flex flex-col gap-4 p-6 sm:p-7">
         <h2 class="h3 text-secondary">Project Overview</h2>
-        <div class="text-muted-foreground text-base leading-relaxed [&>p]:my-0 [&>p+p]:mt-4">
+        <div class="text-muted-foreground space-y-4 text-base leading-relaxed">
           <slot />
         </div>
       </PixelPanel>
@@ -119,13 +104,14 @@ const archIconName: IconName = archIcon && isIconName(archIcon) ? archIcon : "se
         </dl>
       </PixelPanel>
 
-      <!-- Architecture Card (node 72:251) — a framed diagram box: glyph + caption -->
+      <!-- Architecture Card (node 72:251) — a framed diagram box: a fixed decorative glyph + the
+           per-project caption (which carries the differentiation). -->
       <PixelPanel class="flex flex-col gap-4 p-6">
         <h2 class="font-display text-info text-xs uppercase sm:text-sm">ARC_MAP</h2>
         <div
           class="border-border text-muted-foreground flex flex-col items-center justify-center gap-3 border-2 p-8"
         >
-          <Icon name={archIconName} class="text-info size-10" />
+          <Icon name="git-branch-02" class="text-info size-10" />
           <span class="text-center text-xs font-bold tracking-wide uppercase">{archCaption}</span>
         </div>
       </PixelPanel>

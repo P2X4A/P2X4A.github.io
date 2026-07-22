@@ -59,7 +59,6 @@ const projectsCollection = defineCollection({
       tech: z.array(z.string()), // flat tag pills on the card
       specs: z.array(z.object({ label: z.string(), value: z.string() })), // SYS_SPECS rows
       features: z.array(z.object({ lead: z.string(), text: z.string() })), // SYSTEM FEATURES list
-      archIcon: z.string().optional(), // ARC_MAP glyph — an svg/icons name (guarded at render)
       archCaption: z.string(), // ARC_MAP caption, e.g. "[Packet Switching Engine]"
       challenge: z.object({ title: z.string(), body: z.string() }),
       solution: z.object({ title: z.string(), body: z.string() }),

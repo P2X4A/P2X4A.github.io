@@ -2,10 +2,8 @@
 // Project detail (/projects/<slug>/). Thin route shell: owns BaseLayout + SEO and composes the Figma
 // "project-realtime-chat" frame (node 72:191) via <ProjectArticle>, one instance per collection
 // entry. `getStaticPaths` keys each route on the entry id, and `toProjectCard` builds the listing
-// links off the SAME id — so the grid links and the generated routes can never drift.
-//
-// `[...slug]` (rest param) is used defensively: whatever id the glob loader assigns (a bare
-// `<slug>` for `<slug>/index.mdx`), the param carries it verbatim and matches the href.
+// links off the SAME id — so the grid links and the generated routes can never drift. The glob
+// loader gives single-segment ids (`<slug>` for `<slug>/index.mdx`), so a plain `[slug]` param fits.
 import ProjectArticle from "@components/Sections/Project/ProjectArticle.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import type { GetStaticPaths } from "astro";
