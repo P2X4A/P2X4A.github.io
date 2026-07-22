@@ -1,0 +1,61 @@
+---
+// src/components/Sections/About/SkillTree.astro — Figma "Skill Tree Section" (node 5:331).
+//
+// Section heading + three centred "skill cards" (tag + icon + name). Distinct from the home
+// TechStack's inline PixelChips: these are larger vertical cards, so the layout is reproduced here
+// (used once → an inline map, not a new component). Below the fold → <Reveal>. Tokens only.
+//
+// The tag is the mock's inverted pixel tag (black surface + a coloured frame/label), so it doesn't
+// map to the ui/badge `pixel` variant (tone bg + dark ink) — it's a small whole-class tone map here.
+// CONTENT: retro flavour (typed local); icons reuse the same stroke `svg/icons` glyphs the home
+// TechStack picked (React→component, JS→code, Python→flash), so the two pages can't drift.
+import SectionHeading from "@components/Sections/Home/SectionHeading.astro";
+import { Icon, type IconName } from "@components/svg/icons";
+import { Reveal } from "@components/ui/reveal";
+
+type Tone = "success" | "secondary" | "info";
+const skills: readonly { name: string; icon: IconName; tone: Tone }[] = [
+  { name: "JavaScript", icon: "code-01", tone: "success" },
+  { name: "Python", icon: "flash-on", tone: "secondary" },
+  { name: "React", icon: "component", tone: "info" },
+];
+
+// Whole static classes per tone (never interpolate a class name — invisible to the compiler). The
+// tag composes both; the icon takes just the text colour — one source for each so they can't drift.
+const toneText: Record<Tone, string> = {
+  success: "text-success",
+  secondary: "text-secondary",
+  info: "text-info",
+};
+const toneBorder: Record<Tone, string> = {
+  success: "border-success",
+  secondary: "border-secondary",
+  info: "border-info",
+};
+---
+
+<Reveal as="section" aria-labelledby="skill-tree-heading" class="flex flex-col gap-6">
+  <SectionHeading id="skill-tree-heading" title="Tech Stack" />
+
+  <ul class="grid gap-6 sm:grid-cols-3">
+    {
+      skills.map((skill) => (
+        <li class="bg-card text-card-foreground border-border shadow-pixel flex flex-col items-center gap-3 border-4 p-4">
+          <span
+            class:list={[
+              "bg-border border-2 px-2 py-1 text-xs font-bold uppercase",
+              toneBorder[skill.tone],
+              toneText[skill.tone],
+            ]}
+          >
+            {skill.name}
+          </span>
+          <Icon name={skill.icon} class:list={["size-8", toneText[skill.tone]]} />
+          <span class="font-display text-foreground text-center text-sm uppercase">
+            {skill.name}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</Reveal>

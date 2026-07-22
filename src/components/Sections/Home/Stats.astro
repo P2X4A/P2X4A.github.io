@@ -4,10 +4,13 @@
 // A retro scoreboard: three neon Press Start stats split by short pixel dividers. The mock maps the
 // strip to `bg-muted` (dark #272939), but muted flips to a LIGHT grey-blue in light mode where the
 // green/blue stats fail contrast — so the strip stays dark in BOTH themes (`bg-base-800`, a fixed
-// palette anchor). On the light lavender page it reads as an intentional dark scoreboard.
+// palette anchor). On the light lavender page it reads as an intentional dark scoreboard. The strip
+// shell (separator seam + stacking) is the shared <Scoreboard>; this file owns only the data + skin.
 //
 // Stats are retro flavour (no real source yet), same as the footer's "GAME OVER" — a typed local
 // list. Colours are tokens that read on the dark strip in both themes (secondary is fixed pink).
+import Scoreboard from "./Scoreboard.astro";
+
 const stats = [
   { text: "Posts: 42", color: "text-success" },
   { text: "Years: 03", color: "text-secondary" },
@@ -16,18 +19,5 @@ const stats = [
 ---
 
 <section aria-label="8-BitQuest by the numbers">
-  <div
-    class="bg-base-800 border-border shadow-pixel flex flex-col items-center gap-3 border-4 px-5 py-4 sm:flex-row sm:justify-between sm:gap-4"
-  >
-    {
-      stats.map((stat, i) => (
-        <Fragment>
-          {i > 0 && (
-            <span class="bg-base-400 hidden h-3.5 w-1 shrink-0 sm:block" aria-hidden="true" />
-          )}
-          <p class:list={["font-display text-sm uppercase sm:text-base", stat.color]}>{stat.text}</p>
-        </Fragment>
-      ))
-    }
-  </div>
+  <Scoreboard stats={stats} class="bg-base-800 gap-3 px-5 py-4 text-sm sm:gap-4 sm:text-base" />
 </section>

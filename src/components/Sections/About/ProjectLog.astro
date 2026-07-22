@@ -1,0 +1,81 @@
+---
+// src/components/Sections/About/ProjectLog.astro — Figma "Quest Log Section" (node 25:61).
+//
+// Data-only section: the shared heading + 1/2/3-col card grid live in <CardGrid>; this file supplies
+// the six project cards. Each is a ContentCard (thumbnail + status tag + Press Start title + excerpt
+// + VIEW link) — the exact shell the home Featured Projects uses, reused wholesale.
+//
+// CONTENT: the titles/excerpts are the mock's demo copy (meaningful, typed local — no projects
+// collection ships). Status → ui/badge tone: [COMPLETE] → success (green), [IN PROGRESS] → warning
+// (amber). hrefs are the intended /projects/<slug>/ routes (404 until built, same nav precedent).
+// Thumbnails spread from the shared `demoThumbs` (each appears once here, once in Achievements) —
+// placeholder art to swap for real projects; image + alt live in one place so they can't drift.
+import { type ContentCardProps } from "@components/Cards/ContentCard.astro";
+import CardGrid from "@components/Sections/Home/CardGrid.astro";
+
+import { demoThumbs } from "./demoThumbs";
+
+const projects: readonly ContentCardProps[] = [
+  {
+    ...demoThumbs.retroChat,
+    title: "Built a real-time chat app with React + Node.js",
+    description:
+      "Implemented WebSockets, Redis pub/sub, and automated testing for a production chat platform.",
+    href: "/projects/realtime-chat-app/",
+    badgeLabel: "[Complete]",
+    badgeVariant: "success",
+    cta: "View",
+  },
+  {
+    ...demoThumbs.retroDeploy,
+    title: "Migrated a monolith to microservices on AWS",
+    description:
+      "Designed service boundaries, API gateways, and CI/CD pipelines for a distributed system.",
+    href: "/projects/monolith-to-microservices/",
+    badgeLabel: "[Complete]",
+    badgeVariant: "success",
+    cta: "View",
+  },
+  {
+    ...demoThumbs.cliQuest,
+    title: "Open source CLI tool with 2k+ stars on GitHub",
+    description:
+      "A Node.js CLI that automates dev workflows and ships with zero-config support for TypeScript and Docker.",
+    href: "/projects/open-source-cli/",
+    badgeLabel: "[Complete]",
+    badgeVariant: "success",
+    cta: "View",
+  },
+  {
+    ...demoThumbs.pixelArt,
+    title: "Building a web-based observability dashboard",
+    description: "Integrating Prometheus, Grafana, and alerting rules for a high-traffic API.",
+    href: "/projects/observability-dashboard/",
+    badgeLabel: "[In Progress]",
+    badgeVariant: "warning",
+    cta: "View",
+  },
+  {
+    ...demoThumbs.cssGrid,
+    title: "Deployed a headless CMS with Next.js + Vercel",
+    description:
+      "Built a content platform with server components, incremental static generation, and edge caching.",
+    href: "/projects/headless-cms/",
+    badgeLabel: "[Complete]",
+    badgeVariant: "success",
+    cta: "View",
+  },
+  {
+    ...demoThumbs.floppyDisk,
+    title: "Optimizing database performance with indexing",
+    description:
+      "Analyzing query plans, adding indexes, and reducing latency for a high-concurrency database.",
+    href: "/projects/database-performance/",
+    badgeLabel: "[In Progress]",
+    badgeVariant: "warning",
+    cta: "View",
+  },
+];
+---
+
+<CardGrid headingId="project-log-heading" title="Project Log" items={projects} />
