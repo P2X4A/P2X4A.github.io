@@ -16,28 +16,24 @@ export interface CategoryMeta {
   class?: string;
 }
 
+/** category (lower-cased) → tone. LORE has no semantic token, so it takes a fixed maroon `class`. */
+const CATEGORY_TONES: Record<string, Pick<CategoryMeta, "variant" | "class">> = {
+  quest: { variant: "success" },
+  tech: { variant: "primary" },
+  guide: { variant: "warning" },
+  lore: { variant: "secondary", class: "bg-secondary-600 text-secondary-100" },
+  "dev log": { variant: "info" },
+};
+
 /**
  * A post's `category` → its retro badge: bracketed label + a ui/badge tone. The Figma "[QUEST]" /
- * "[LORE]" / "[TECH]" / "[GUIDE]" tags. LORE has no semantic token, so it takes a fixed maroon via
- * `class` (same call as the home Latest Posts + LORE precedent). Unknown categories fall back to blue.
+ * "[LORE]" / "[TECH]" / "[GUIDE]" tags. Unknown categories fall back to blue.
  *
  * @param category the entry's `category` field (case-insensitive match)
  * @returns the badge label, tone variant, and optional colour override
  */
 export function categoryMeta(category: string): CategoryMeta {
-  const key = category.trim().toLowerCase();
-  const tone: Pick<CategoryMeta, "variant" | "class"> =
-    key === "quest"
-      ? { variant: "success" }
-      : key === "tech"
-        ? { variant: "primary" }
-        : key === "guide"
-          ? { variant: "warning" }
-          : key === "lore"
-            ? { variant: "secondary", class: "bg-secondary-600 text-secondary-100" }
-            : key === "dev log"
-              ? { variant: "info" }
-              : { variant: "primary" };
+  const tone = CATEGORY_TONES[category.trim().toLowerCase()] ?? { variant: "primary" };
   return { label: `[${category}]`, ...tone };
 }
 
