@@ -1,0 +1,71 @@
+---
+// src/components/Sections/Home/FeaturedProjects.astro — Figma "Featured Projects Section" (node 14:34).
+//
+// Section heading + a 3-up grid of project cards (ContentCard, with tag pills + a "VIEW →" link).
+// Same responsive grid as Latest Posts. Below-the-fold → <Reveal>.
+//
+// CONTENT: placeholder demo projects (typed local; no projects collection ships). hrefs are the
+// intended /projects/<slug>/ routes (404 until built — same precedent as the blog links). All use
+// the primary "PROJECT" tag.
+import ContentCard from "@components/Cards/ContentCard.astro";
+import { Reveal } from "@components/ui/reveal";
+import cliQuest from "@images/demo/project-cli-quest.png";
+import pixelArt from "@images/demo/project-pixel-art.png";
+import retroChat from "@images/demo/project-retro-chat.png";
+
+import SectionHeading from "./SectionHeading.astro";
+
+const projects = [
+  {
+    title: "Retro Chat App",
+    description:
+      "A real-time chat app built with React, Node.js, and WebSocket. Pixel-perfect UI and retro sound effects.",
+    href: "/projects/retro-chat-app/",
+    image: retroChat,
+    imageAlt: "A pixel-art chat application interface labelled Chatting App v1.0",
+    tags: ["React", "Node.js", "WebSocket"],
+  },
+  {
+    title: "Pixel Art Generator",
+    description:
+      "Generate pixel art sprites and tilesets with a simple web interface. Export PNGs and JSON maps.",
+    href: "/projects/pixel-art-generator/",
+    image: pixelArt,
+    imageAlt: "A pixel-art sprite editor with a colour palette and canvas grid",
+    tags: ["Canvas", "Python", "PNG"],
+  },
+  {
+    title: "CLI Quest Engine",
+    description:
+      "A text-based adventure engine for the terminal. Write quests in JSON and play them in seconds.",
+    href: "/projects/cli-quest-engine/",
+    image: cliQuest,
+    imageAlt: "A retro terminal running a text adventure on a CRT monitor",
+    tags: ["Node.js", "JSON", "CLI"],
+  },
+];
+---
+
+<Reveal as="section" aria-labelledby="featured-projects-heading" class="flex flex-col gap-6">
+  <SectionHeading id="featured-projects-heading" title="Featured Projects" />
+
+  <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      projects.map((project) => (
+        <li>
+          <ContentCard
+            href={project.href}
+            image={project.image}
+            imageAlt={project.imageAlt}
+            badgeLabel="Project"
+            badgeVariant="primary"
+            title={project.title}
+            description={project.description}
+            tags={project.tags}
+            cta="View"
+          />
+        </li>
+      ))
+    }
+  </ul>
+</Reveal>

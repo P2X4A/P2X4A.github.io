@@ -1,0 +1,44 @@
+---
+// src/components/Sections/Home/PixelChip.astro
+//
+// The Figma "Stack Badge" / "Social" chip (nodes 14:10, 14:151): a pixel-bordered card box with a
+// small line icon + a bold uppercase Space Mono label. Two consumers, one shell:
+//   • Tech Stack — static labels (no `href`) → renders a <span>.
+//   • Contact socials — links (`href` present) → renders an <a> that goes green on hover, the house
+//     active/hover colour (same as the nav / footer).
+// Icons come from the existing stroke `svg/icons` registry (reused, not re-drawn). Tokens only.
+import { Icon, type IconName } from "@components/svg/icons";
+import type { HTMLAttributes } from "astro/types";
+
+interface Props {
+  icon: IconName;
+  label: string;
+  /** When set, the chip is a link (Contact socials); otherwise a static span (Tech Stack). */
+  href?: string;
+  /** Accessible name when the visible label isn't enough (e.g. "Twitter/X profile"). */
+  ariaLabel?: string;
+  external?: boolean;
+}
+const { icon, label, href, ariaLabel, external } = Astro.props as Props;
+
+const Tag = href ? "a" : "span";
+const attrs: HTMLAttributes<"a"> = href
+  ? {
+      href,
+      "aria-label": ariaLabel ?? label,
+      ...(external ? { target: "_blank", rel: "noopener noreferrer" } : {}),
+    }
+  : {};
+
+// Card-surface chip: black pixel frame + offset shadow, both themes. Links add the green hover.
+const base =
+  "bg-card text-card-foreground border-border shadow-pixel inline-flex items-center gap-2 border-4 px-3 py-2";
+const interactive = href
+  ? "primary-focus hover:text-success motion-reduce:transition-none transition-colors"
+  : "";
+---
+
+<Tag class:list={[base, interactive]} data-slot="pixel-chip" {...attrs}>
+  <Icon name={icon} class="size-[18px]" />
+  <span class="text-sm font-bold uppercase">{label}</span>
+</Tag>
