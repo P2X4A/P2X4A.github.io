@@ -26,8 +26,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           # Matches the `engines.node` floor in package.json — the same floor that makes
-          # `--experimental-strip-types` in scripts/test.mjs legal.
-          node-version: 22.12.0
+          # `--experimental-strip-types` in scripts/test.mjs legal (and that pnpm 11 requires).
+          node-version: 22.13.0
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
