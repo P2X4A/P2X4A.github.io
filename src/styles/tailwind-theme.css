@@ -97,13 +97,14 @@
     "Space Mono", ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono",
     "Courier New", monospace;
 
-  /* PIXEL SHADOW — the signature hard offset shadow (zero blur, pure black), the retro
-     "sticker" depth on every panel/card/button/badge. Always black in both themes: it is the
-     theme's own mark, not a themeable value (same ownership rule as the black borders).
+  /* PIXEL SHADOW — the signature hard offset shadow (zero blur), the retro "sticker" depth on
+     every panel/card/button/badge. The COLOR is theme-aware via `--pixel-shadow` (global.css):
+     pure black in dark mode, a soft slate-navy in light mode (the SAME color as `--border`, so the
+     border and its shadow read as one gentler mark). Falls back to black if the var is ever missing.
        shadow-pixel     → cards, buttons, badges, stats strip
        shadow-pixel-lg  → the hero panel */
-  --shadow-pixel: 4px 4px 0 0 #000;
-  --shadow-pixel-lg: 8px 8px 0 0 #000;
+  --shadow-pixel: 4px 4px 0 0 var(--pixel-shadow, #000);
+  --shadow-pixel-lg: 8px 8px 0 0 var(--pixel-shadow, #000);
 
   /* animation tokens — the Marquee primitive's seamless-loop scroll (see ui/marquee/Marquee.astro).
      `--marquee-duration` is the per-instance speed knob (set by the `speed` variant). Each track

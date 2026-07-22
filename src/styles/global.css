@@ -30,17 +30,24 @@
      near-white, ink is navy, and the blue/pink/green accents are deepened for contrast on a light
      ground. Both keep the pixel signature: pure-black borders + sharp corners (--radius: 0). */
   :root {
-    --background: var(--color-base-100); /* #e1e1f7 soft lavender-blue (not white) */
+    /* LIGHT — a crisp "retro desktop": a clean, cool light-blue ground with pure-white
+       window-panels (cards) that pop against it, navy ink, and the blue/pink/green accents
+       deepened for contrast. This de-purples the old dull lavender and opens up the
+       ground↔card value gap so panels actually lift (the black pixel border no longer has
+       to carry all the separation). The light neutrals are tuned literals here on purpose:
+       the shared navy ramp's light end leans violet (it is cut for dark-mode text), so light
+       mode gets its own cleaner blue. Accents stay tokenised. */
+    --background: #d6e3f4; /* clean light retro-blue desktop (was #e1e1f7 lavender) */
     --foreground: var(--color-base-900); /* #101222 navy ink */
-    --card: var(--color-base-50); /* #f4f4fb raised near-white panel */
+    --card: #ffffff; /* crisp white window panel — pops against the blue ground */
     --card-foreground: var(--color-base-900);
     --primary: var(--color-primary-600); /* #2b8ae0 action blue, deepened for the light ground */
     --primary-foreground: #ffffff;
     --secondary: var(--color-secondary-200); /* #ffb2ba pink */
     --secondary-foreground: var(--color-secondary-800); /* #670120 */
-    --muted: var(--color-base-200); /* #bfc7d3 muted blue-grey */
-    --muted-foreground: var(--color-base-500); /* #3f4358 */
-    --accent: var(--color-base-200); /* #bfc7d3 */
+    --muted: #c3d5ef; /* light-blue muted surface (tags, chips, code) — was flat grey */
+    --muted-foreground: var(--color-base-600); /* #323445 — a touch darker for contrast on light */
+    --accent: #c3d5ef;
     --accent-foreground: var(--color-base-900);
     --info: var(--color-primary-700); /* #1f6cc0 deep blue — the brand wordmark on light */
     --info-foreground: var(--color-primary-50);
@@ -50,9 +57,10 @@
     --warning-foreground: #2a1c00;
     --error: var(--color-secondary-600); /* #892037 maroon reads as danger */
     --error-foreground: var(--color-secondary-50);
-    --border: #000000; /* pixel borders are always pure black */
-    --input: var(--color-base-50); /* near-white field on the lavender ground */
+    --border: #6a769a; /* soft slate-navy — SAME color as the pixel shadow below (dark keeps #000) */
+    --input: #ffffff; /* crisp white field on the blue ground */
     --outline: var(--color-primary-600);
+    --pixel-shadow: #6a769a; /* light-mode pixel shadow — matches --border exactly */
 
     --radius: 0; /* sharp pixel corners — no rounding anywhere */
   }
@@ -78,9 +86,10 @@
     --warning-foreground: #2a1c00;
     --error: var(--color-secondary-300); /* #ff9da8 */
     --error-foreground: var(--color-secondary-950);
-    --border: #000000; /* pixel borders are always pure black */
+    --border: #000000; /* pixel borders stay pure black on the dark navy ground */
     --input: var(--color-base-700);
     --outline: var(--color-primary-400);
+    --pixel-shadow: #000000; /* the signature hard black pixel shadow, dark mode */
   }
 
   * {

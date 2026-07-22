@@ -5,8 +5,10 @@
 // TechStack's inline PixelChips: these are larger vertical cards, so the layout is reproduced here
 // (used once → an inline map, not a new component). Below the fold → <Reveal>. Tokens only.
 //
-// The tag is the mock's inverted pixel tag (black surface + a coloured frame/label), so it doesn't
-// map to the ui/badge `pixel` variant (tone bg + dark ink) — it's a small whole-class tone map here.
+// The tag is a small pixel tag: a WHITE surface in light mode (dark keeps the mock's inverted black
+// surface), with a coloured frame + label. It doesn't map to the ui/badge `pixel` variant (tone bg +
+// dark ink) — it's a small whole-class tone map here. On the white light surface the green/pink tones
+// are deepened to their -700 step for contrast; the neon shades ride under `dark:` for the dark tag.
 // CONTENT: retro flavour (typed local); icons reuse the same stroke `svg/icons` glyphs the home
 // TechStack picked (React→component, JS→code, Python→flash), so the two pages can't drift.
 import SectionHeading from "@components/Sections/Home/SectionHeading.astro";
@@ -23,14 +25,16 @@ const skills: readonly { name: string; icon: IconName; tone: Tone }[] = [
 
 // Whole static classes per tone (never interpolate a class name — invisible to the compiler). The
 // tag composes both; the icon takes just the text colour — one source for each so they can't drift.
+// Light/dark pairs: the deepened -700 tones read on the white light-mode tag (and card), the neon
+// semantics ride under `dark:` for the inverted dark tag. `info` already flips deep→airy, no pair.
 const toneText: Record<Tone, string> = {
-  success: "text-success",
-  secondary: "text-secondary",
+  success: "text-success-700 dark:text-success",
+  secondary: "text-secondary-700 dark:text-secondary",
   info: "text-info",
 };
 const toneBorder: Record<Tone, string> = {
-  success: "border-success",
-  secondary: "border-secondary",
+  success: "border-success-700 dark:border-success",
+  secondary: "border-secondary-700 dark:border-secondary",
   info: "border-info",
 };
 ---
@@ -44,7 +48,7 @@ const toneBorder: Record<Tone, string> = {
         <PixelPanel as="li" class="flex flex-col items-center gap-3 p-4">
           <span
             class:list={[
-              "bg-border border-2 px-2 py-1 text-xs font-bold uppercase",
+              "bg-card dark:bg-border border-2 px-2 py-1 text-xs font-bold uppercase",
               toneBorder[skill.tone],
               toneText[skill.tone],
             ]}
