@@ -110,14 +110,19 @@
   /* shared typographic primitives. Headings are the pixel face (Press Start 2P via `font-display`),
      uppercase, tuned to the Figma scale (H1 32 / H2 24 / H3 16 at md) and stepped down on mobile so
      the wide pixel glyphs don't overflow narrow screens. Press Start 2P has a single weight, so no
-     `font-medium`. Body copy is Space Mono (the site default from --font-sans). */
+     `font-medium`. Body copy is Space Mono (the site default from --font-sans).
+     The blog article body (`.blog-prose`) has no class hooks on its MDX-rendered headings, so it
+     shares these definitions via the grouped selectors below (a custom @layer class can't be
+     `@apply`-ed) and layers on only its own colour/spacing/pointer. */
   .h1 {
     @apply font-display text-xl leading-tight tracking-[-0.03em] uppercase sm:text-2xl md:text-[2rem] md:leading-[2.5rem];
   }
-  .h2 {
+  .h2,
+  .blog-prose h2 {
     @apply font-display text-lg leading-tight uppercase md:text-2xl md:leading-8;
   }
-  .h3 {
+  .h3,
+  .blog-prose h3 {
     @apply font-display text-sm leading-6 uppercase md:text-base;
   }
 
@@ -128,8 +133,8 @@
   /* Blog article body — styles the rendered MDX (<Content />) on /blog/<slug>/ (see BlogArticle.astro).
      GLOBAL (not scoped): the markup comes from MDX, which Astro's scoped styles can't reach. Tokens
      only, so it flips with the theme — except the fenced code block, which stays a fixed-dark Shiki
-     panel in both themes (the scoreboard precedent). Headings inline the .h2/.h3 utilities because a
-     custom @layer class can't itself be `@apply`-ed. */
+     panel in both themes (the scoreboard precedent). Headings reuse the shared .h2/.h3 face (grouped
+     selectors above); here they add only colour, spacing, and the ► pointer. */
   .blog-prose {
     @apply text-muted-foreground text-base leading-relaxed;
 
@@ -143,7 +148,7 @@
       @apply text-info font-bold;
     }
     & h2 {
-      @apply font-display text-info mt-8 flex items-center gap-3 text-lg leading-tight uppercase md:text-2xl md:leading-8;
+      @apply text-info mt-8 flex items-center gap-3;
     }
     /* the retro ► selector — a green right-triangle via clip-path (no glyph, so it's font-safe). */
     & h2::before {
@@ -152,7 +157,7 @@
       clip-path: polygon(0 0, 100% 50%, 0 100%);
     }
     & h3 {
-      @apply font-display text-secondary mt-6 text-sm leading-6 uppercase md:text-base;
+      @apply text-secondary mt-6;
     }
     & ul {
       @apply flex flex-col gap-3;
