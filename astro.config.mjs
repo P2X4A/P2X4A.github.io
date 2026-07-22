@@ -1,5 +1,6 @@
 // @ts-check
 import mdx from "@astrojs/mdx";
+import node from "@astrojs/node";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
@@ -30,6 +31,15 @@ if (isProductionDeploy && site.includes("example.com")) {
 export default defineConfig({
   site,
 
+  // The site is static EXCEPT one page: `/contact/` sets `export const prerender = false` because
+  // it receives the Resend form POST and re-renders itself with the result (the grafio pattern).
+  // That single on-demand route is the only thing this Node server ever runs; every other route
+  // still prerenders to HTML. `mode: "standalone"` emits a self-contained Node server (dist/server +
+  // dist/client) that fits the Dokploy/Traefik/Docker setup this project deploys behind — swap it for
+  // `@astrojs/netlify` / `@astrojs/vercel` in two lines if the host changes (nothing else knows which
+  // adapter is mounted). Drop the contact form and remove this line to go fully static again.
+  adapter: node({ mode: "standalone" }),
+
   // One canonical URL shape: the directory build emits trailing slashes, and canonical + OG agree
   // on that shape (see the project docs).
   trailingSlash: "always",
@@ -37,9 +47,14 @@ export default defineConfig({
   // mdx() renders .mdx content.
   // sitemap filter: never list noindex pages — the dev-only /examples catalog and 404s
   // both set `noindex` in the markup, so a sitemap entry for them would contradict it.
+  // customPages: the sitemap can't enumerate the on-demand `/contact/` route (it emits no static
+  // file), so it's added by hand — the one manual entry seo.md prescribes for SSR routes.
   integrations: [
     mdx(),
-    sitemap({ filter: (page) => !page.includes("/examples/") && !page.includes("/404/") }),
+    sitemap({
+      filter: (page) => !page.includes("/examples/") && !page.includes("/404/"),
+      customPages: [new URL("/contact/", site).href],
+    }),
   ],
 
   vite: {

@@ -1,0 +1,183 @@
+---
+// src/components/Sections/Contact/Form.astro — Figma "ContactFormCard" (node 9:31).
+//
+// The one server-driven piece of 8-BitQuest: a native <form method="POST"> bound to the `contact`
+// Astro action (accept: "form"), so it works with JavaScript disabled. The server validates
+// (contactSchema), runs the spam gates, sends via Resend, and /contact/ re-renders with the result —
+// success replaces the card; validation errors show per-field; everything else shows in one alert.
+// See src/actions/index.ts + src/js/contact.ts (the grafio pattern).
+//
+// Reuse: the shared pixel surface (PixelPanel) + the Input / Textarea / Label primitives, re-skinned
+// to the pixel field look (bg-accent + a 4px black frame) via a shared class. Per the grafio styling
+// trap, the override carries SHAPE only, never a border COLOUR that would beat a validation state —
+// here the black frame is the theme's invariant (borders are always black), so the error affordance
+// is the red message + aria-invalid ring, not a recoloured border.
+import { Badge } from "@components/ui/badge";
+import { Input } from "@components/ui/input";
+import { Label } from "@components/ui/label";
+import { PixelPanel } from "@components/ui/pixel-panel";
+import { Textarea } from "@components/ui/textarea";
+import { actions, isInputError } from "astro:actions";
+
+const result = Astro.getActionResult(actions.contact);
+const success = result?.data?.ok === true;
+const inputError = result?.error && isInputError(result.error) ? result.error : undefined;
+const fieldErrors: Record<string, string[] | undefined> = inputError?.fields ?? {};
+const formError = result?.error && !isInputError(result.error) ? result.error.message : undefined;
+
+// Render timestamp for the time gate. Request-time because /contact/ is prerender:false.
+const renderedAt = Date.now();
+
+const FIELDS = [
+  {
+    name: "name",
+    label: "Your Name",
+    placeholder: "e.g. ALEX CHEN",
+    as: "input",
+    type: "text",
+    autocomplete: "name",
+    maxlength: 100,
+  },
+  {
+    name: "email",
+    label: "Email Address",
+    placeholder: "e.g. PLAYER1@GENESIS.COM",
+    as: "input",
+    type: "email",
+    autocomplete: "email",
+    maxlength: 254,
+  },
+  {
+    name: "subject",
+    label: "Subject",
+    placeholder: "e.g. TUTORIAL INQUIRY",
+    as: "input",
+    type: "text",
+    autocomplete: "off",
+    maxlength: 150,
+  },
+  {
+    name: "message",
+    label: "Message Transmission",
+    placeholder: "TYPE YOUR TRANSMISSION HERE...",
+    as: "textarea",
+    autocomplete: "off",
+    maxlength: 5000,
+  },
+] as const;
+
+// SHAPE only (see the header note): the pixel field surface + focus/invalid rings. No border colour.
+const fieldClass = [
+  "bg-accent border-border rounded-none border-4 px-4 text-sm placeholder:text-muted-foreground",
+  "aria-[invalid=true]:ring-3 aria-[invalid=true]:ring-error/60",
+].join(" ");
+---
+
+{
+  success ? (
+    <PixelPanel
+      elevated
+      role="status"
+      tabindex="-1"
+      data-contact-status
+      class="primary-focus flex flex-col items-start gap-3 p-8"
+    >
+      <Badge pixel variant="success">
+        Transmission Sent
+      </Badge>
+      <h2 class="h3 text-foreground">Message sent.</h2>
+      <p class="text-muted-foreground text-sm">
+        Thanks — your transmission reached the array. We'll beam a reply back to your inbox.
+      </p>
+    </PixelPanel>
+  ) : (
+    <PixelPanel elevated class="flex flex-col gap-6 p-6 sm:p-8">
+      <h2 class="text-secondary font-display text-base uppercase sm:text-lg">Send Message</h2>
+
+      {formError && (
+        <p
+          role="alert"
+          tabindex="-1"
+          data-contact-status
+          class="border-error text-error bg-error/10 primary-focus border-2 p-3 text-sm"
+        >
+          {formError}
+        </p>
+      )}
+
+      <form method="POST" action={actions.contact} class="flex flex-col gap-4">
+        {FIELDS.map((field) => {
+          const err = fieldErrors[field.name]?.[0];
+          const describedBy = err ? `${field.name}-error` : undefined;
+          return (
+            <div class="flex flex-col gap-2">
+              <Label for={field.name} class="text-info font-display text-xs uppercase">
+                {field.label}
+              </Label>
+              {field.as === "textarea" ? (
+                <Textarea
+                  id={field.name}
+                  name={field.name}
+                  placeholder={field.placeholder}
+                  autocomplete={field.autocomplete}
+                  required
+                  minlength={10}
+                  maxlength={field.maxlength}
+                  aria-invalid={err ? "true" : undefined}
+                  aria-describedby={describedBy}
+                  class={`${fieldClass} min-h-[120px] py-3`}
+                />
+              ) : (
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  autocomplete={field.autocomplete}
+                  required
+                  maxlength={field.maxlength}
+                  aria-invalid={err ? "true" : undefined}
+                  aria-describedby={describedBy}
+                  class={`${fieldClass} h-14`}
+                />
+              )}
+              {err && (
+                <p id={`${field.name}-error`} role="alert" class="text-error text-xs">
+                  {err}
+                </p>
+              )}
+            </div>
+          );
+        })}
+
+        {/* Honeypot: off-screen (not display:none) so bots that skip the invisible fill it, and
+            aria-hidden + tabindex=-1 keep it away from humans and assistive tech. */}
+        <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+          <label for="_gotcha">Leave this field empty</label>
+          <input id="_gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+        </div>
+
+        {/* Time gate: the render timestamp, compared server-side against MIN_FILL_MS. */}
+        <input type="hidden" name="_ts" value={renderedAt} />
+
+        <button
+          type="submit"
+          class="pixel-btn pixel-btn--green mt-2 self-start px-6 py-3 text-sm uppercase sm:text-base"
+        >
+          Send Message
+        </button>
+      </form>
+    </PixelPanel>
+  )
+}
+
+<script>
+  // Move focus to the success/error region after a submit — on the view-transition swap AND on a
+  // full no-JS re-render (the immediate call). No preventDefault: the router owns the submit.
+  function focusContactStatus() {
+    const el = document.querySelector("[data-contact-status]");
+    if (el instanceof HTMLElement) el.focus();
+  }
+  document.addEventListener("astro:after-swap", focusContactStatus);
+  focusContactStatus();
+</script>
