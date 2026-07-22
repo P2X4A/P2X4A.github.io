@@ -10,8 +10,8 @@
 //
 // BUTTONS: the mock has no CTA here, but per the brief the CTAs use `.pixel-btn` — the site's
 // dependency-free port of the CodePen "Pure CSS 8bit Button Style" (Maximuz/BdqXXN). VIEW PROJECTS
-// jumps to the Project Log; GET IN TOUCH points at the intended /contact/ route (404 until built,
-// same precedent as the nav). Flagged in the handoff for a cheap veto.
+// links to the /projects/ page (the Project Log is now its own route, no longer a section here);
+// GET IN TOUCH points at the intended /contact/ route (404 until built, same precedent as the nav).
 import Scoreboard from "@components/Sections/Home/Scoreboard.astro";
 import { Badge } from "@components/ui/badge";
 
@@ -50,7 +50,7 @@ const strip = [
 
     <div class="flex flex-col gap-4 pt-1 sm:flex-row">
       <a
-        href="#project-log-heading"
+        href="/projects/"
         class="pixel-btn pixel-btn--blue px-5 py-4 text-sm uppercase sm:text-base"
       >
         View Projects

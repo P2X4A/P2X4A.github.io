@@ -7,12 +7,14 @@ import { type NavItemProps } from "./types/configDataTypes";
  * to match `astro.config.mjs` `trailingSlash: "always"`. `as const satisfies` keeps the literal
  * types while checking the shape.
  *
- * NOTE: only `/` ships today. `/blog/`, `/about/`, and `/contact/` are the site's intended routes
- * and will 404 until their pages land (the blog route is a deliberate later-build per the project docs).
+ * The link set matches the Figma frames (nodes 72:7 / 72:191): HOME · PROJECTS · ABOUT · CONTACT.
+ * PROJECTS took the slot the mock gives it (the frames omit Blog); `/`, `/projects/`, and `/about/`
+ * are live pages, `/contact/` is the one intended route that still 404s until it lands. Blog stays
+ * reachable off the home READ BLOG CTA + the footer RSS link — it just isn't top-nav chrome here.
  */
 export const navItems = [
   { label: "Home", href: "/" },
-  { label: "Blog", href: "/blog/" },
+  { label: "Projects", href: "/projects/" },
   { label: "About", href: "/about/" },
   { label: "Contact", href: "/contact/" },
 ] as const satisfies readonly NavItemProps[];
