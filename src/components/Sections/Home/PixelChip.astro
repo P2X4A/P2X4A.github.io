@@ -8,6 +8,7 @@
 //     active/hover colour (same as the nav / footer).
 // Icons come from the existing stroke `svg/icons` registry (reused, not re-drawn). Tokens only.
 import { Icon, type IconName } from "@components/svg/icons";
+import { PixelPanel } from "@components/ui/pixel-panel";
 import type { HTMLAttributes } from "astro/types";
 
 interface Props {
@@ -30,15 +31,17 @@ const attrs: HTMLAttributes<"a"> = href
     }
   : {};
 
-// Card-surface chip: black pixel frame + offset shadow, both themes. Links add the green hover.
-const base =
-  "bg-card text-card-foreground border-border shadow-pixel inline-flex items-center gap-2 border-4 px-3 py-2";
+// The pixel surface (frame + offset shadow, both themes) comes from ui/pixel-panel; the chip adds
+// only its inline layout and, on links, the green house hover colour.
 const interactive = href
   ? "primary-focus hover:text-success motion-reduce:transition-none transition-colors"
   : "";
+const chipClass = ["inline-flex items-center gap-2 px-3 py-2", interactive]
+  .filter(Boolean)
+  .join(" ");
 ---
 
-<Tag class:list={[base, interactive]} data-slot="pixel-chip" {...attrs}>
+<PixelPanel as={Tag} class={chipClass} data-slot="pixel-chip" {...attrs}>
   <Icon name={icon} class="size-[18px]" />
   <span class="text-sm font-bold uppercase">{label}</span>
-</Tag>
+</PixelPanel>

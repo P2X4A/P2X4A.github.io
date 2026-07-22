@@ -7,6 +7,7 @@
 //
 // CONTENT: the mock's demo gear (retro flavour, typed local) — swap for a real setup.
 import SectionHeading from "@components/Sections/Home/SectionHeading.astro";
+import { PixelPanel } from "@components/ui/pixel-panel";
 import { Reveal } from "@components/ui/reveal";
 
 const gear = [
@@ -21,9 +22,7 @@ const gear = [
 <Reveal as="section" aria-labelledby="gear-heading" class="flex flex-col gap-6">
   <SectionHeading id="gear-heading" title="Setup / Gear" />
 
-  <dl
-    class="bg-card text-card-foreground border-border shadow-pixel flex flex-col gap-3 border-4 p-5 sm:p-6"
-  >
+  <PixelPanel as="dl" class="flex flex-col gap-3 p-5 sm:p-6">
     {
       gear.map((row) => (
         <div class="flex items-center justify-between gap-4 text-xs font-bold uppercase sm:text-sm">
@@ -32,5 +31,5 @@ const gear = [
         </div>
       ))
     }
-  </dl>
+  </PixelPanel>
 </Reveal>

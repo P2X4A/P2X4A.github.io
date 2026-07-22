@@ -9,6 +9,7 @@
 // CONTENT: the role, years, and skill %s are placeholder demo (the mock's retro flavour) — a typed
 // local list to swap for a real profile. Avatar is the shared demo asset (plain <img>, no Sharp).
 import SectionHeading from "@components/Sections/Home/SectionHeading.astro";
+import { PixelPanel } from "@components/ui/pixel-panel";
 import avatar from "@images/about-avatar.png";
 
 const specs = [
@@ -42,9 +43,7 @@ const bars = [
       />
     </div>
 
-    <dl
-      class="bg-card text-card-foreground border-border shadow-pixel flex min-w-0 flex-1 flex-col gap-4 border-4 p-5 sm:p-6"
-    >
+    <PixelPanel as="dl" class="flex min-w-0 flex-1 flex-col gap-4 p-5 sm:p-6">
       {
         specs.map((spec) => (
           <div class="flex items-center justify-between gap-4 text-xs font-bold uppercase sm:text-sm">
@@ -67,6 +66,6 @@ const bars = [
           </div>
         ))
       }
-    </dl>
+    </PixelPanel>
   </div>
 </section>

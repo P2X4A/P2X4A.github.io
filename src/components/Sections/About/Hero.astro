@@ -10,10 +10,11 @@
 //
 // BUTTONS: the mock has no CTA here, but per the brief the CTAs use `.pixel-btn` — the site's
 // dependency-free port of the CodePen "Pure CSS 8bit Button Style" (Maximuz/BdqXXN). VIEW PROJECTS
-// jumps to the Project Log; GET IN TOUCH points at the intended /contact/ route (404 until built,
-// same precedent as the nav). Flagged in the handoff for a cheap veto.
+// links to the /projects/ page (the Project Log is now its own route, no longer a section here);
+// GET IN TOUCH points at the intended /contact/ route (404 until built, same precedent as the nav).
 import Scoreboard from "@components/Sections/Home/Scoreboard.astro";
 import { Badge } from "@components/ui/badge";
+import { PixelPanel } from "@components/ui/pixel-panel";
 
 // The strip sits on a FIXED-dark base (`bg-base-700`, does not flip) so it reads as a scoreboard on
 // the light lavender ground too — the same call the home Stats strip makes. It reuses the shared
@@ -28,42 +29,40 @@ const strip = [
 ] as const;
 ---
 
-<section aria-labelledby="about-hero-heading">
-  <div
-    class="bg-card border-border shadow-pixel-lg flex flex-col items-start gap-4 border-4 p-6 sm:p-8 md:p-9"
-  >
-    <Badge pixel variant="info">Dev 01</Badge>
+<PixelPanel
+  as="section"
+  elevated
+  aria-labelledby="about-hero-heading"
+  class="flex flex-col items-start gap-4 p-6 sm:p-8 md:p-9"
+>
+  <Badge pixel variant="info">Dev 01</Badge>
 
-    <h1 id="about-hero-heading" class="h1 text-info text-balance">The Full-Stack Dev</h1>
+  <h1 id="about-hero-heading" class="h1 text-info text-balance">The Full-Stack Dev</h1>
 
-    <div class="text-muted-foreground flex flex-col gap-4 text-base">
-      <p>
-        Welcome to the mainframe. I'm a full-stack developer with 8+ years of experience building
-        scalable web applications, APIs, and tools. This profile serves as a chronological log of my
-        projects, open-source contributions, and the systems I've shipped.
-      </p>
-      <p>
-        I'm passionate about clean code, automated testing, and shipping fast. I write about modern
-        frontend patterns, backend architecture, and the tools that keep my workflow efficient.
-      </p>
-    </div>
-
-    <div class="flex flex-col gap-4 pt-1 sm:flex-row">
-      <a
-        href="#project-log-heading"
-        class="pixel-btn pixel-btn--blue px-5 py-4 text-sm uppercase sm:text-base"
-      >
-        View Projects
-      </a>
-      <a href="/contact/" class="pixel-btn px-5 py-4 text-sm uppercase sm:text-base">
-        Get in Touch
-      </a>
-    </div>
-
-    <Scoreboard
-      stats={strip}
-      stackAt="lg"
-      class="bg-base-700 mt-2 w-full gap-2 p-4 text-xs whitespace-nowrap sm:text-sm lg:gap-4"
-    />
+  <div class="text-muted-foreground flex flex-col gap-4 text-base">
+    <p>
+      Welcome to the mainframe. I'm a full-stack developer with 8+ years of experience building
+      scalable web applications, APIs, and tools. This profile serves as a chronological log of my
+      projects, open-source contributions, and the systems I've shipped.
+    </p>
+    <p>
+      I'm passionate about clean code, automated testing, and shipping fast. I write about modern
+      frontend patterns, backend architecture, and the tools that keep my workflow efficient.
+    </p>
   </div>
-</section>
+
+  <div class="flex flex-col gap-4 pt-1 sm:flex-row">
+    <a href="/projects/" class="pixel-btn pixel-btn--blue px-5 py-4 text-sm uppercase sm:text-base">
+      View Projects
+    </a>
+    <a href="/contact/" class="pixel-btn px-5 py-4 text-sm uppercase sm:text-base">
+      Get in Touch
+    </a>
+  </div>
+
+  <Scoreboard
+    stats={strip}
+    stackAt="lg"
+    class="bg-base-700 mt-2 w-full gap-2 p-4 text-xs whitespace-nowrap sm:text-sm lg:gap-4"
+  />
+</PixelPanel>

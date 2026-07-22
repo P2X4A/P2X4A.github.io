@@ -1,56 +1,16 @@
 ---
 // src/components/Sections/Home/FeaturedProjects.astro — Figma "Featured Projects Section" (node 14:34).
 //
-// Data-only section: the shared heading + 1/2/3-col card grid lives in <CardGrid>. This file just
-// supplies the three project cards (tag pills + a "VIEW →" link, all the primary "PROJECT" tag).
-//
-// CONTENT: placeholder demo projects (typed local; no projects collection ships). hrefs are the
-// intended /projects/<slug>/ routes (404 until built — same precedent as the blog links).
-import { type ContentCardProps } from "@components/Cards/ContentCard.astro";
-import cliQuest from "@images/demo/project-cli-quest.png";
-import pixelArt from "@images/demo/project-pixel-art.png";
-import retroChat from "@images/demo/project-retro-chat.png";
+// Data-only section: the shared heading + 1/2/3-col card grid live in <CardGrid>. The cards are now
+// read from the `projects` collection (the first three by `order`, drafts dropped) and mapped through
+// the shared `toProjectCard`, so the home grid, the /projects/ grid, and the detail routes all share
+// one source — no more hand-kept demo list with slugs that 404. Each card links to its real
+// /projects/<slug>/ detail page.
+import CardGrid from "@components/Sections/Home/CardGrid.astro";
+import { toProjectCard } from "@components/Sections/Project/projectCards";
+import { getSortedProjects } from "@components/Sections/Project/projectData";
 
-import CardGrid from "./CardGrid.astro";
-
-const projects: readonly ContentCardProps[] = [
-  {
-    title: "Retro Chat App",
-    description:
-      "A real-time chat app built with React, Node.js, and WebSocket. Pixel-perfect UI and retro sound effects.",
-    href: "/projects/retro-chat-app/",
-    image: retroChat,
-    imageAlt: "A pixel-art chat application interface labelled Chatting App v1.0",
-    badgeLabel: "Project",
-    badgeVariant: "primary",
-    tags: ["React", "Node.js", "WebSocket"],
-    cta: "View",
-  },
-  {
-    title: "Pixel Art Generator",
-    description:
-      "Generate pixel art sprites and tilesets with a simple web interface. Export PNGs and JSON maps.",
-    href: "/projects/pixel-art-generator/",
-    image: pixelArt,
-    imageAlt: "A pixel-art sprite editor with a colour palette and canvas grid",
-    badgeLabel: "Project",
-    badgeVariant: "primary",
-    tags: ["Canvas", "Python", "PNG"],
-    cta: "View",
-  },
-  {
-    title: "CLI Quest Engine",
-    description:
-      "A text-based adventure engine for the terminal. Write quests in JSON and play them in seconds.",
-    href: "/projects/cli-quest-engine/",
-    image: cliQuest,
-    imageAlt: "A retro terminal running a text adventure on a CRT monitor",
-    badgeLabel: "Project",
-    badgeVariant: "primary",
-    tags: ["Node.js", "JSON", "CLI"],
-    cta: "View",
-  },
-];
+const featured = (await getSortedProjects()).slice(0, 3).map(toProjectCard);
 ---
 
-<CardGrid headingId="featured-projects-heading" title="Featured Projects" items={projects} />
+<CardGrid headingId="featured-projects-heading" title="Featured Projects" items={featured} />
