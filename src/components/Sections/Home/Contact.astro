@@ -8,7 +8,7 @@
 // author email; socials pull from siteData (author.twitter builds the X url; github/linkedin from
 // sameAs, else the platform root — the same derivation the footer uses). LET'S TALK → /contact/.
 import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
-import type { IconName } from "@components/svg/icons";
+import type { PixelIconName } from "@components/svg/pixel-icons";
 import { Reveal } from "@components/ui/reveal";
 import portfolioData from "@config/portfolioData.json";
 import siteData from "@config/siteData.json";
@@ -21,13 +21,13 @@ const twitterUrl = siteData.author.twitter
   ? `https://x.com/${siteData.author.twitter}`
   : socialUrl(siteData.sameAs, ["x.com", "twitter.com"], "https://x.com/");
 
-const socials: readonly { icon: IconName; label: string; href: string }[] = [
+const socials: readonly { icon: PixelIconName; label: string; href: string }[] = [
   {
     icon: "github",
     label: "GitHub",
     href: socialUrl(siteData.sameAs, "github.com", "https://github.com/"),
   },
-  { icon: "x-01", label: "Twitter/X", href: twitterUrl },
+  { icon: "twitter", label: "Twitter/X", href: twitterUrl },
   {
     icon: "linkedin",
     label: "LinkedIn",

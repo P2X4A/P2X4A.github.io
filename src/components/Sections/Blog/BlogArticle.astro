@@ -7,9 +7,9 @@
 //   • article panel — category tag, H1, meta row (avatar · date · read · byline), hero banner,
 //     the MDX body (.blog-prose), footer tags + ◄PREV NEXT► nav   (node 5:139)
 //
-// Reuses ui/pixel-panel (the surface), ui/badge (pixel variant), ui/breadcrumb, the svg/icons
+// Reuses ui/pixel-panel (the surface), ui/badge (pixel variant), ui/breadcrumb, the svg/pixel-icons
 // registry, and .primary-focus. Tokens only, so the light theme flips for free.
-import { Icon } from "@components/svg/icons";
+import { PixelIcon } from "@components/svg/pixel-icons";
 import { Badge } from "@components/ui/badge";
 import {
   Breadcrumb,
@@ -125,7 +125,7 @@ const {
               rel="prev"
               class="primary-focus text-info hover:text-success inline-flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase transition-colors"
             >
-              <Icon name="arrow-left" class="size-3.5" />
+              <PixelIcon name="arrow-left" class="size-3.5" />
               Prev
             </a>
           )
@@ -138,7 +138,7 @@ const {
               class="primary-focus text-info hover:text-success inline-flex items-center gap-1.5 text-xs font-bold tracking-wide uppercase transition-colors"
             >
               Next
-              <Icon name="arrow-right" class="size-3.5" />
+              <PixelIcon name="arrow-right" class="size-3.5" />
             </a>
           )
         }

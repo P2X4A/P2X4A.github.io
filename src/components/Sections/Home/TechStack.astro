@@ -8,20 +8,20 @@
 // existing stroke `svg/icons` registry (reused, not re-drawn) — the set has no exact `layers`/`cloud`
 // glyph, so React→component and AWS→globe are deliberate nearest-matches (easy to veto).
 import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
-import type { IconName } from "@components/svg/icons";
+import type { PixelIconName } from "@components/svg/pixel-icons";
 import { Reveal } from "@components/ui/reveal";
 
 import PixelChip from "./PixelChip.astro";
 
-const stack: readonly { label: string; icon: IconName }[] = [
-  { label: "JavaScript", icon: "code-01" },
+const stack: readonly { label: string; icon: PixelIconName }[] = [
+  { label: "JavaScript", icon: "code" },
   { label: "React", icon: "component" },
-  { label: "Node.js", icon: "server-01" },
-  { label: "Python", icon: "flash-on" },
-  { label: "Docker", icon: "package-01" },
+  { label: "Node.js", icon: "server" },
+  { label: "Python", icon: "flash" },
+  { label: "Docker", icon: "package" },
   { label: "AWS", icon: "globe" },
-  { label: "Git", icon: "git-branch-01" },
-  { label: "TypeScript", icon: "type-01" },
+  { label: "Git", icon: "git-branch" },
+  { label: "TypeScript", icon: "type" },
 ];
 ---
 

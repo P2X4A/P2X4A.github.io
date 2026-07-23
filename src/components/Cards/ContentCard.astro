@@ -8,9 +8,9 @@
 // tags, and the CTA word differ. The blog "More Quests" cards share the same PixelCardLink shell.
 //
 // Not built on ui/card: that primitive is a <div> with a 1px border, whereas this needs <a>/<article>
-// semantics and the pixel structure. Uses the ui/badge `pixel` variant + the stroke `Icon`; tokens
-// only, so the light theme flips free.
-import { Icon } from "@components/svg/icons";
+// semantics and the pixel structure. Uses the ui/badge `pixel` variant + the pixel `PixelIcon`
+// (svg/pixel-icons); tokens only, so the light theme flips free.
+import { PixelIcon } from "@components/svg/pixel-icons";
 import { Badge, type BadgeVariant } from "@components/ui/badge";
 
 import PixelCardLink from "./PixelCardLink.astro";
@@ -71,7 +71,7 @@ const {
       class="text-info group-hover:text-success mt-auto inline-flex items-center gap-2 pt-1 text-sm font-bold uppercase"
     >
       {cta}
-      <Icon
+      <PixelIcon
         name="arrow-right"
         class="size-4 transition-transform group-hover:translate-x-1 motion-reduce:transition-none"
       />

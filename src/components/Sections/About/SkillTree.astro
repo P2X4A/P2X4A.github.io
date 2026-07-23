@@ -12,14 +12,14 @@
 // CONTENT: retro flavour (typed local); icons reuse the same stroke `svg/icons` glyphs the home
 // TechStack picked (React→component, JS→code, Python→flash), so the two pages can't drift.
 import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
-import { Icon, type IconName } from "@components/svg/icons";
+import { PixelIcon, type PixelIconName } from "@components/svg/pixel-icons";
 import { PixelPanel } from "@components/ui/pixel-panel";
 import { Reveal } from "@components/ui/reveal";
 
 type Tone = "success" | "secondary" | "info";
-const skills: readonly { name: string; icon: IconName; tone: Tone }[] = [
-  { name: "JavaScript", icon: "code-01", tone: "success" },
-  { name: "Python", icon: "flash-on", tone: "secondary" },
+const skills: readonly { name: string; icon: PixelIconName; tone: Tone }[] = [
+  { name: "JavaScript", icon: "code", tone: "success" },
+  { name: "Python", icon: "flash", tone: "secondary" },
   { name: "React", icon: "component", tone: "info" },
 ];
 
@@ -55,7 +55,7 @@ const toneBorder: Record<Tone, string> = {
           >
             {skill.name}
           </span>
-          <Icon name={skill.icon} class:list={["size-8", toneText[skill.tone]]} />
+          <PixelIcon name={skill.icon} class:list={["size-8", toneText[skill.tone]]} />
           <span class="font-display text-foreground text-center text-sm uppercase">
             {skill.name}
           </span>
