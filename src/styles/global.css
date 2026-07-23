@@ -41,7 +41,7 @@
     --foreground: var(--color-base-900); /* #101222 navy ink */
     --card: #ffffff; /* crisp white window panel — pops against the blue ground */
     --card-foreground: var(--color-base-900);
-    --primary: var(--color-primary-600); /* #2b8ae0 action blue, deepened for the light ground */
+    --primary: var(--color-primary-700); /* #1f6cc0 action blue, deepened for the light ground */
     --primary-foreground: #ffffff;
     --secondary: var(--color-secondary-200); /* #ffb2ba pink */
     --secondary-foreground: var(--color-secondary-800); /* #670120 */
@@ -49,17 +49,17 @@
     --muted-foreground: var(--color-base-600); /* #323445 — a touch darker for contrast on light */
     --accent: #c3d5ef;
     --accent-foreground: var(--color-base-900);
-    --info: var(--color-primary-700); /* #1f6cc0 deep blue — the brand wordmark on light */
+    --info: var(--color-primary-800); /* #114e90 deep blue — the brand wordmark on light */
     --info-foreground: var(--color-primary-50);
-    --success: var(--color-success-600); /* #2f9e57 green tuned to read on the light ground */
+    --success: var(--color-success-700); /* #237c44 green tuned to read on the light ground */
     --success-foreground: #ffffff;
     --warning: #b8760a;
-    --warning-foreground: #2a1c00;
+    --warning-foreground: var(--color-base-900); /* #101222 navy ink reads on the amber ground */
     --error: var(--color-secondary-600); /* #892037 maroon reads as danger */
     --error-foreground: var(--color-secondary-50);
     --border: #6a769a; /* soft slate-navy — SAME color as the pixel shadow below (dark keeps #000) */
     --input: #ffffff; /* crisp white field on the blue ground */
-    --outline: var(--color-primary-600);
+    --outline: var(--color-primary-800); /* deep-blue focus ring — reads on light */
     --pixel-shadow: #6a769a; /* light-mode pixel shadow — matches --border exactly */
 
     --radius: 0; /* sharp pixel corners — no rounding anywhere */
@@ -166,7 +166,7 @@
       clip-path: polygon(0 0, 100% 50%, 0 100%);
     }
     & h3 {
-      @apply text-secondary mt-6;
+      @apply text-secondary-700 dark:text-secondary mt-6;
     }
     & ul {
       @apply flex flex-col gap-3;
@@ -191,16 +191,6 @@
 
   .site-container {
     @apply mx-auto max-w-[1100px] px-4;
-  }
-
-  /* form inputs (newsletter, contact, etc.) */
-  .form__input {
-    @apply border-base-300 bg-input hover:border-primary-500 dark:border-base-600/60 w-full rounded-md border px-3 py-2 transition;
-    @apply focus:border-primary-500 focus-visible:ring-primary-500/50 outline-none focus-visible:ring-2;
-
-    &::placeholder {
-      @apply text-base-400;
-    }
   }
 
   /* Retro 8-bit button — a dependency-free port of the CodePen "Pure CSS 8bit Button Style"
@@ -271,7 +261,7 @@
 @layer utilities {
   /* visible focus ring for keyboard users */
   .primary-focus {
-    @apply focus-visible:outline-primary-500 focus:outline-hidden focus-visible:rounded-xs focus-visible:outline-2;
+    @apply focus-visible:outline-outline focus:outline-hidden focus-visible:rounded-xs focus-visible:outline-2;
   }
 
   /* gradient text for tags / accent headings */
