@@ -34,7 +34,7 @@ follow it.
 ```
 src/components/ui/<name>/
 ├── <Name>.astro      # the component + its exported tv() config
-└── index.ts          # re-exports { <Name>, <Name>Variants } and a default
+└── index.ts          # re-exports { <Name>, <name> } (component + its recipe) and a default
 ```
 
 ```astro
@@ -58,12 +58,11 @@ const { size, class: className, ...rest } = Astro.props;
 ```
 
 ```ts
-// index.ts
+// index.ts — re-export the component and its bare recipe by name (a compound primitive re-exports
+// every part component and every part recipe; consumers import the recipe to compose/extend it).
 import Field, { field } from "./Field.astro";
 
-const FieldVariants = { field };
-
-export { Field, FieldVariants };
+export { Field, field };
 export default Field;
 ```
 

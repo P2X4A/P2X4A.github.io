@@ -3,8 +3,8 @@
  *
  * Kept in its own file so it can ALSO be imported into a `.astro` <style> block.
  * Two jobs here:
- *   1. `@theme`        — palette aliases: name your brand on top of Tailwind's scale,
- *                        so a rebrand is one edit per ramp (swap violet -> your color).
+ *   1. `@theme`        — the brand palette ramps as direct hex (primary / base / status),
+ *                        so a rebrand is repointing these hexes (one edit per ramp).
  *   2. `@theme inline` — bridge the semantic runtime vars (defined in global.css) to
  *                        utilities, so `bg-background`/`text-primary` resolve to the
  *                        `:root`/`.dark` variables and flip with the theme.

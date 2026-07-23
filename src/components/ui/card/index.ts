@@ -7,26 +7,22 @@ import CardHeader, { cardHeader } from "./CardHeader.astro";
 import CardImage, { cardImage } from "./CardImage.astro";
 import CardTitle, { cardTitle } from "./CardTitle.astro";
 
-const CardVariants = {
-  card,
-  cardImage,
-  cardHeader,
-  cardTitle,
-  cardDescription,
-  cardAction,
-  cardContent,
-  cardFooter,
-};
-
 export {
   Card,
+  card,
   CardAction,
+  cardAction,
   CardContent,
+  cardContent,
   CardDescription,
+  cardDescription,
   CardFooter,
+  cardFooter,
   CardHeader,
+  cardHeader,
   CardImage,
+  cardImage,
   CardTitle,
-  CardVariants,
+  cardTitle,
 };
 export default Card;

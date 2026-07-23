@@ -1,6 +1,4 @@
 import Marquee, { marquee } from "./Marquee.astro";
 
-const MarqueeVariants = { marquee };
-
-export { Marquee, MarqueeVariants };
+export { Marquee, marquee };
 export default Marquee;

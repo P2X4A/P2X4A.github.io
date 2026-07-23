@@ -6,16 +6,18 @@ import DialogHeader, { dialogHeader } from "./DialogHeader.astro";
 import DialogTitle, { dialogTitle } from "./DialogTitle.astro";
 import DialogTrigger from "./DialogTrigger.astro";
 
-const DialogVariants = { dialog, dialogHeader, dialogFooter, dialogTitle, dialogDescription };
-
 export {
   Dialog,
+  dialog,
   DialogClose,
   DialogDescription,
+  dialogDescription,
   DialogFooter,
+  dialogFooter,
   DialogHeader,
+  dialogHeader,
   DialogTitle,
+  dialogTitle,
   DialogTrigger,
-  DialogVariants,
 };
 export default Dialog;

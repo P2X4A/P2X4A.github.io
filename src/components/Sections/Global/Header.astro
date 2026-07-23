@@ -10,13 +10,12 @@
 // Reuses existing pieces — ui/nav, ui/sheet (opened/closed via its `_dialog` data hooks), the pink
 // `.pixel-btn` (global.css), and ui/theme-toggle. No new primitives. The MENU / CLOSE controls are
 // worded (no icons). Content is wired from config: brand = siteData.name, links = navData.
-import { Nav, NavItem, NavLink } from "@components/ui/nav";
+import HeaderNavLinks from "@components/Sections/Global/HeaderNavLinks.astro";
+import { Nav } from "@components/ui/nav";
 import { Sheet } from "@components/ui/sheet";
 import { ThemeToggle } from "@components/ui/theme-toggle";
-import { navItems } from "@config/navData.json";
 import siteData from "@config/siteData.json";
 import heroAvatar from "@images/hero-avatar.jpg";
-import { isActive } from "@js/nav";
 
 const pathname = Astro.url.pathname;
 ---
@@ -68,26 +67,7 @@ const pathname = Astro.url.pathname;
            the whole nav landmark is display:none (not just visually hidden). -->
       <div class="hidden lg:contents">
         <Nav aria-label="Primary" class="gap-6 xl:gap-8">
-          {
-            navItems.map((item) => (
-              <NavItem>
-                <NavLink
-                  variant="retro"
-                  href={item.href}
-                  aria-current={isActive(pathname, item.href) ? "page" : undefined}
-                >
-                  <svg
-                    class="fill-success pointer-events-none absolute top-1/2 left-1.5 h-3.5 w-2.5 -translate-y-1/2 opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-aria-[current=page]:opacity-100"
-                    viewBox="0 0 10.41 13.02"
-                    aria-hidden="true"
-                  >
-                    <path d="M10.41 6.64 0 13.02V0Z" />
-                  </svg>
-                  {item.label}
-                </NavLink>
-              </NavItem>
-            ))
-          }
+          <HeaderNavLinks pathname={pathname} />
         </Nav>
       </div>
 
@@ -124,27 +104,7 @@ const pathname = Astro.url.pathname;
     </div>
 
     <Nav orientation="vertical" aria-label="Primary" class="gap-2">
-      {
-        navItems.map((item) => (
-          <NavItem class="w-full">
-            <NavLink
-              variant="retro"
-              href={item.href}
-              class="w-full"
-              aria-current={isActive(pathname, item.href) ? "page" : undefined}
-            >
-              <svg
-                class="fill-success pointer-events-none absolute top-1/2 left-1.5 h-3.5 w-2.5 -translate-y-1/2 opacity-0 transition-opacity duration-100 group-hover:opacity-100 group-aria-[current=page]:opacity-100"
-                viewBox="0 0 10.41 13.02"
-                aria-hidden="true"
-              >
-                <path d="M10.41 6.64 0 13.02V0Z" />
-              </svg>
-              {item.label}
-            </NavLink>
-          </NavItem>
-        ))
-      }
+      <HeaderNavLinks pathname={pathname} fullWidth />
     </Nav>
   </Sheet>
 </header>

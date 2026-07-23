@@ -3,6 +3,11 @@ dist/
 # generated types
 .astro/
 
+# stray root artifacts — accidental build-output redirects (real HTML lives in dist/ or as .astro)
+# and loose authoring notes (real ones live in tasks/). Keeps a `pnpm build > g.html` typo out of git.
+/*.html
+/audit-prompt.md
+
 # dependencies
 node_modules/
 

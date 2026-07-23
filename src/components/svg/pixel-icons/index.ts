@@ -1,8 +1,6 @@
 import PixelIcon, { pixelIcon } from "./PixelIcon.astro";
 import { type PixelIconName, pixelIconNames } from "./pixelIcons";
 
-const PixelIconVariants = { pixelIcon };
-
-export { PixelIcon, pixelIconNames, PixelIconVariants };
+export { PixelIcon, pixelIcon, pixelIconNames };
 export type { PixelIconName };
 export default PixelIcon;

@@ -1,6 +1,4 @@
 import Switch, { switchTrack } from "./Switch.astro";
 
-const SwitchVariants = { switchTrack };
-
-export { Switch, SwitchVariants };
+export { Switch, switchTrack };
 export default Switch;

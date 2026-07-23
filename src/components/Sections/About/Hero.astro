@@ -1,9 +1,10 @@
 ---
 // src/components/Sections/About/Hero.astro — Figma "Hero" (node 5:280).
 //
-// The profile hero panel: a DEV 01 tag, the H1, a two-paragraph bio, the two CTAs, and a retro
-// "scoreboard" stats strip (CLASS / LVL / XP / STARS). Second section, still near the fold → NO
-// <Reveal>. Tokens only.
+// The profile hero: the shared Global/HeroPanel (DEV 01 tag + H1) with a two-paragraph bio, the two
+// CTAs, and a retro "scoreboard" stats strip (CLASS / LVL / XP / STARS) passed through its slot. It
+// omits HeroPanel's `intro` because its body is the multi-paragraph bio, not a single line. Second
+// section, still near the fold → NO <Reveal>. Tokens only.
 //
 // COPY: the tag, H1, bio, and stats strip come from portfolioData (profile.* / stats.profile) —
 // buyer-editable; the strip's per-stat colours stay here (presentational).
@@ -12,9 +13,8 @@
 // dependency-free port of the CodePen "Pure CSS 8bit Button Style" (Maximuz/BdqXXN). VIEW PROJECTS
 // links to the /projects/ page (the Project Log is now its own route, no longer a section here);
 // GET IN TOUCH points at the /contact/ route.
+import HeroPanel from "@components/Sections/Global/HeroPanel.astro";
 import Scoreboard from "@components/Sections/Global/Scoreboard.astro";
-import { Badge } from "@components/ui/badge";
-import { PixelPanel } from "@components/ui/pixel-panel";
 import portfolioData from "@config/portfolioData.json";
 
 const { tagline, heading, bio } = portfolioData.profile;
@@ -37,16 +37,7 @@ const strip = portfolioData.stats.profile.map((text, i) => ({
 }));
 ---
 
-<PixelPanel
-  as="section"
-  elevated
-  aria-labelledby="about-hero-heading"
-  class="flex flex-col items-start gap-4 p-6 sm:p-8 md:p-9"
->
-  <Badge pixel variant="info">{tagline}</Badge>
-
-  <h1 id="about-hero-heading" class="h1 text-info text-balance">{heading}</h1>
-
+<HeroPanel headingId="about-hero-heading" tagline={tagline} heading={heading}>
   <div class="text-muted-foreground flex flex-col gap-4 text-base">
     {bio.map((para) => <p>{para}</p>)}
   </div>
@@ -65,4 +56,4 @@ const strip = portfolioData.stats.profile.map((text, i) => ({
     stackAt="lg"
     class="bg-muted mt-2 w-full gap-2 p-4 text-xs whitespace-nowrap sm:text-sm lg:gap-4"
   />
-</PixelPanel>
+</HeroPanel>

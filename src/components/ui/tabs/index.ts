@@ -3,7 +3,5 @@ import TabsContent, { tabsContent } from "./TabsContent.astro";
 import TabsList, { tabsList } from "./TabsList.astro";
 import TabsTrigger, { tabsTrigger } from "./TabsTrigger.astro";
 
-const TabsVariants = { tabs, tabsList, tabsTrigger, tabsContent };
-
-export { Tabs, TabsContent, TabsList, TabsTrigger, TabsVariants };
+export { Tabs, tabs, TabsContent, tabsContent, TabsList, tabsList, TabsTrigger, tabsTrigger };
 export default Tabs;

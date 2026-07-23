@@ -9,8 +9,10 @@
 // surface), with a coloured frame + label. It doesn't map to the ui/badge `pixel` variant (tone bg +
 // dark ink) — it's a small whole-class tone map here. On the white light surface the green/pink tones
 // are deepened to their -700 step for contrast; the neon shades ride under `dark:` for the dark tag.
-// CONTENT: retro flavour (typed local); icons reuse the same stroke `svg/icons` glyphs the home
-// TechStack picked (React→component, JS→code, Python→flash), so the two pages can't drift.
+// CONTENT: retro flavour (typed local) — a curated three, using the same pixel `svg/pixel-icons`
+// glyphs the home TechStack picked (JS→code, Python→flash, React→component). NOTE: this is an
+// independent literal from TechStack's (three toned cards here vs eight chips there, a different
+// curation), so the two are NOT kept in sync automatically — edit both if you want them aligned.
 import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
 import { PixelIcon, type PixelIconName } from "@components/svg/pixel-icons";
 import { PixelPanel } from "@components/ui/pixel-panel";

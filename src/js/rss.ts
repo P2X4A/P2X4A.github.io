@@ -5,7 +5,7 @@
  * hand-rolled like everything else in <head>, no @astrojs/rss. See the project docs.
  */
 
-/** Escape the five XML predefined entities so a title/description can't break the document. */
+/** Escape the five XML predefined entities so a title/description/URL can't break the document. */
 export function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -36,8 +36,8 @@ export interface RssChannel {
 export function renderRssItem(item: RssItem): string {
   return `    <item>
       <title>${escapeXml(item.title)}</title>
-      <link>${item.url}</link>
-      <guid isPermaLink="true">${item.url}</guid>
+      <link>${escapeXml(item.url)}</link>
+      <guid isPermaLink="true">${escapeXml(item.url)}</guid>
       <description>${escapeXml(item.description)}</description>
       <pubDate>${item.pubDate.toUTCString()}</pubDate>
     </item>`;
@@ -49,7 +49,7 @@ export function renderRssFeed(channel: RssChannel, items: readonly RssItem[]): s
 <rss version="2.0">
   <channel>
     <title>${escapeXml(channel.title)}</title>
-    <link>${channel.link}</link>
+    <link>${escapeXml(channel.link)}</link>
     <description>${escapeXml(channel.description)}</description>
     <language>${channel.language}</language>
 ${items.map(renderRssItem).join("\n")}

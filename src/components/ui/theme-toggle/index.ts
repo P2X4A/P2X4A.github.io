@@ -1,6 +1,4 @@
 import ThemeToggle, { themeToggle } from "./ThemeToggle.astro";
 
-const ThemeToggleVariants = { themeToggle };
-
-export { ThemeToggle, ThemeToggleVariants };
+export { ThemeToggle, themeToggle };
 export default ThemeToggle;
