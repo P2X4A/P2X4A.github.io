@@ -1,15 +1,18 @@
 # Cards — composed card components
 
-A **card** here is a content-aware composition (BlogCard, PricingCard, TeamCard, …) built from the
-`ui/card` primitives (`Card`, `CardImage`, `CardHeader`, `CardTitle`, `CardDescription`,
-`CardContent`, `CardFooter`, `CardAction`). The primitive stays generic in `src/components/ui/card/`;
-what lands in this folder knows about a data shape (a `CollectionEntry<"blog">`, a pricing tier)
-and is what sections map over.
+A **card** here is a content-aware composition — it renders a content shape (a blog post, a project)
+and is what sections map over. It builds on the `ui/` primitives; the content awareness is the part a
+generic primitive can't have.
 
 ```
 src/components/Cards/
-└── <Name>Card.astro   # PascalCase, one file per card; typed props for its data shape
+├── ContentCard.astro    # post/project card: badge + title + excerpt + optional tags + a "READ →"/"VIEW →" CTA
+└── PixelCardLink.astro  # the shared hover-lift <a> shell (ui/pixel-panel surface + thumbnail tile)
 ```
 
-Empty on purpose (YAGNI) — the folder exists so the first card added to a project has one obvious
-home instead of being inlined into a section.
+`ContentCard` renders the normalized card shape that `@js/postCards` (`toPostCard`) and `@js/projectCards`
+(`toProjectCard`) build from the collections — posts and projects share the `PixelCardLink` shell, so only
+the badge tone, the optional tags, and the CTA verb differ. Both build on **`ui/pixel-panel`** (via
+`PixelCardLink`), **not** `ui/card`: the pixel cards need `<a>`/`<article>` semantics and the pixel
+structure the generic `ui/card` `<div>` doesn't give. Add the next card here (PascalCase, typed props for
+its data shape) so it has one obvious home instead of being inlined into a section.
