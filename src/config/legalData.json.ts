@@ -2,7 +2,7 @@ import { type LegalData } from "./types/configDataTypes";
 
 // Legal content. Placeholder template text — replace it with your own terms and
 // privacy policy, reviewed by a qualified legal professional, before you launch.
-const legalData: LegalData = {
+const legalData = {
   terms: {
     title: "Terms & Conditions",
     description: "The terms and conditions governing your use of this website.",
@@ -129,6 +129,6 @@ const legalData: LegalData = {
       },
     ],
   },
-};
+} satisfies LegalData;
 
 export default legalData;

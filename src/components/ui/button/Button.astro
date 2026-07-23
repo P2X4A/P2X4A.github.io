@@ -10,7 +10,7 @@ type Props = HTMLAttributes<"button"> & VariantProps<typeof button> & { href?: s
 export const button = tv({
   base: [
     "inline-flex items-center justify-center gap-2 rounded-md font-medium whitespace-nowrap",
-    "transition-all outline-none focus-visible:ring-3 focus-visible:ring-outline/50",
+    "transition-all outline-none focus-visible:ring-3 focus-visible:ring-outline",
     "disabled:pointer-events-none disabled:opacity-50",
     // Icon children never intercept the click and never get squeezed in the flex row.
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",

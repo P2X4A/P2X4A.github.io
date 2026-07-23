@@ -7,14 +7,20 @@
 // green/pink for the light strip, the neon shades under `dark:` for the dark strip (blue rides the
 // flipping `text-info`). The strip shell (separator seam + stacking) is the shared <Scoreboard>.
 //
-// Stats are retro flavour (no real source yet), same as the footer's "GAME OVER" — a typed local list.
-import Scoreboard from "./Scoreboard.astro";
+// Stat TEXT comes from portfolioData.stats.home (buyer-editable, retro flavour); the per-stat accent
+// colours are presentational and pair by order — keep this list aligned if you add/remove a stat.
+import Scoreboard from "@components/Sections/Global/Scoreboard.astro";
+import portfolioData from "@config/portfolioData.json";
 
-const stats = [
-  { text: "Posts: 42", color: "text-success-700 dark:text-success" },
-  { text: "Years: 03", color: "text-secondary-700 dark:text-secondary" },
-  { text: "Coffee: 9000+", color: "text-info" },
-] as const;
+const colors = [
+  "text-success-800 dark:text-success",
+  "text-secondary-700 dark:text-secondary",
+  "text-info",
+];
+const stats = portfolioData.stats.home.map((text, i) => ({
+  text,
+  color: colors[i] ?? "text-info",
+}));
 ---
 
 <section aria-label="8-BitQuest by the numbers">

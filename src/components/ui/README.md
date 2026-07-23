@@ -15,7 +15,11 @@ follow it.
    primitive (e.g. Card) keeps each part as its own `.astro` file in the same folder.
 2. **Typed props = native + variants** — `type Props = HTMLAttributes<tag> & VariantProps<typeof config>`
    (add `& { … }` for extra props like `href`/`src`).
-3. **Export the `tv()` config** (named after the component) so consumers can compose/extend it.
+3. **Export a `tv()` config** named after the component, so consumers can compose/extend it. A primitive
+   that is a thin re-skin of another MAY instead compose that primitive's **exported recipe** rather than
+   cloning it (e.g. **PaginationLink** reuses the `button` recipe; **Searchbox**'s trigger/dialog reuse the
+   Dialog recipes and it exports only its own small wrapper recipe). Reuse over duplication — don't create
+   redundant recipes for parts that already have one.
 4. **Tokens only, never raw colors** — every class resolves to a semantic token (`bg-primary`,
    `text-foreground`, `border-input`, `ring-outline`, `bg-error`/`bg-success`, `rounded-md`). This is
    what keeps dark mode and re-theming free. See `tasks/ui-library-handoff.md` for the
@@ -169,7 +173,8 @@ MegaMenu (Trigger/Panel/Item) · List (+ Item). Native-first, no new JS beyond t
 
 ## Theme toggle (built)
 
-**ThemeToggle** — a manual light/dark override that reuses the `button` config. The sun/moon icon flip is
+**ThemeToggle** — a manual light/dark override styled as the retro `.pixel-btn` (a global.css class, **not**
+the `button` recipe); it exports a small `themeToggle` recipe for that square icon-button shell. The sun/moon icon flip is
 **CSS-only** (via the `dark:` variant), so it's correct pre-paint with **no flash**; only the click ships
 JS — toggle `.dark`, persist `localStorage("colorTheme")`, sync `aria-pressed`, re-init through
 `_client.ts`. Unlike the rest of the library it is **not purely additive**: it pairs with a one-time edit

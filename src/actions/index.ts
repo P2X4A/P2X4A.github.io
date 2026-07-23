@@ -5,15 +5,14 @@
  * disabled: the browser posts real FormData, Astro runs `contactSchema` first (the handler starts
  * from valid data), and `/contact/` re-renders with the result. Non-validation failures are thrown as
  * `ActionError`s whose message the page surfaces in one `role="alert"`; validation failures surface
- * per-field via `isInputError`. Nothing here leaks Resend's own response to the visitor — it can name
- * the account, so it's logged server-side only.
+ * per-field via `isInputError`. The Resend send itself lives in `@js/resend` (a tested, framework-free
+ * boundary); here we translate its result — logging the provider detail server-side (it can name the
+ * account, so it never reaches the visitor) and throwing a generic ActionError on any failure.
  */
 import siteData from "@config/siteData.json";
 import { buildEmail, contactSchema, spamReason } from "@js/contact";
+import { sendContactEmail } from "@js/resend";
 import { ActionError, defineAction } from "astro:actions";
-
-const RESEND_ENDPOINT = "https://api.resend.com/emails";
-const SEND_TIMEOUT_MS = 10_000;
 
 export const server = {
   contact: defineAction({
@@ -38,31 +37,16 @@ export const server = {
       // Verify your own domain in Resend and set CONTACT_FROM_EMAIL to send anywhere.
       const from = import.meta.env.CONTACT_FROM_EMAIL ?? "onboarding@resend.dev";
 
-      // 3. Build (escaped) + send. A plain fetch to Resend — no SDK, no dependency — with a 10s cap.
-      const { subject, html, replyTo } = buildEmail(input, siteData.name);
-      const sendFailed = "Your message could not be sent. Please email me directly.";
-      let res: Response;
-      try {
-        res = await fetch(RESEND_ENDPOINT, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ from, to, subject, html, reply_to: replyTo }),
-          signal: AbortSignal.timeout(SEND_TIMEOUT_MS),
-        });
-      } catch (e) {
-        console.error("[contact] Resend request failed:", e);
-        throw new ActionError({ code: "INTERNAL_SERVER_ERROR", message: sendFailed });
-      }
-      if (!res.ok) {
+      // 3. Build (escaped) + send via the Resend boundary, then translate the result.
+      const result = await sendContactEmail(buildEmail(input, siteData.name), { apiKey, to, from });
+      if (!result.ok) {
         // Log the provider's real answer (it can name the account); never show it to the visitor.
-        console.error(
-          `[contact] Resend responded ${res.status}:`,
-          await res.text().catch(() => ""),
-        );
-        throw new ActionError({ code: "INTERNAL_SERVER_ERROR", message: sendFailed });
+        const context = result.reason === "provider" ? `provider ${result.status}` : result.reason;
+        console.error(`[contact] Resend send failed (${context}):`, result.detail);
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Your message could not be sent. Please email me directly.",
+        });
       }
 
       return { ok: true as const };

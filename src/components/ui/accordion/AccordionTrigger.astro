@@ -11,7 +11,7 @@ type Props = HTMLAttributes<"summary"> & VariantProps<typeof accordionTrigger>;
 export const accordionTrigger = tv({
   base: [
     "text-foreground flex w-full cursor-pointer list-none items-center justify-between gap-4 py-4 font-medium",
-    "outline-none hover:underline focus-visible:ring-3 focus-visible:ring-outline/50",
+    "outline-none hover:underline focus-visible:ring-3 focus-visible:ring-outline",
     "[&::-webkit-details-marker]:hidden",
   ],
 });

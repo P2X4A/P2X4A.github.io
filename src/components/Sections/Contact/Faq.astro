@@ -9,7 +9,7 @@
 //
 // CONTENT: the three Q&A are the mock's copy verbatim — editorial placeholder (retro flavour). Edit
 // them for your project; a filled honeypot / real support policy is your call, not lorem to keep.
-import SectionHeading from "@components/Sections/Home/SectionHeading.astro";
+import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
 import { Accordion, AccordionContent, AccordionItem } from "@components/ui/accordion";
 import { PixelPanel } from "@components/ui/pixel-panel";
 import { Reveal } from "@components/ui/reveal";
@@ -41,7 +41,7 @@ const faqs = [
             open={i === 0}
             class="border-base-300 border-t-0 border-b-2 border-dashed [&[open]_[data-faq-v]]:opacity-0"
           >
-            <summary class="text-secondary font-display focus-visible:ring-outline/50 flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-xs leading-relaxed outline-none focus-visible:ring-3 [&::-webkit-details-marker]:hidden">
+            <summary class="text-secondary-700 dark:text-secondary font-display focus-visible:ring-outline flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-xs leading-relaxed outline-none focus-visible:ring-3 [&::-webkit-details-marker]:hidden">
               <span>{faq.q}</span>
               <span class="relative ml-2 size-4 shrink-0" aria-hidden="true">
                 <span class="bg-muted-foreground absolute top-1/2 left-0 h-1 w-full -translate-y-1/2" />

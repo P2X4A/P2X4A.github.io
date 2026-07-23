@@ -14,7 +14,7 @@ export const fieldBase = [
 
 /** Validation `state` variant: border + focus ring per status. Tokens only. */
 export const fieldState = {
-  default: "border-input focus-visible:border-outline focus-visible:ring-outline/50",
-  error: "border-error focus-visible:border-error focus-visible:ring-error/50",
-  success: "border-success focus-visible:border-success focus-visible:ring-success/50",
+  default: "border-input focus-visible:border-outline focus-visible:ring-outline",
+  error: "border-error focus-visible:border-error focus-visible:ring-error",
+  success: "border-success focus-visible:border-success focus-visible:ring-success",
 };

@@ -1,8 +1,6 @@
 ---
 name: "@admin"
 avatar: "../../assets/images/hero-avatar.jpg"
-about: "Retro-obsessed full-stack developer logging field notes from the code frontier."
-email: "you@example.com"
 authorLink: "/about/"
 ---
 

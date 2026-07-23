@@ -5,28 +5,36 @@
 // "scoreboard" stats strip (CLASS / LVL / XP / STARS). Second section, still near the fold → NO
 // <Reveal>. Tokens only.
 //
-// COPY: the bio is the mock's two paragraphs verbatim (meaningful, not lorem). The stats strip is
-// retro flavour (typed local), same as the home Stats scoreboard.
+// COPY: the tag, H1, bio, and stats strip come from portfolioData (profile.* / stats.profile) —
+// buyer-editable; the strip's per-stat colours stay here (presentational).
 //
 // BUTTONS: the mock has no CTA here, but per the brief the CTAs use `.pixel-btn` — the site's
 // dependency-free port of the CodePen "Pure CSS 8bit Button Style" (Maximuz/BdqXXN). VIEW PROJECTS
 // links to the /projects/ page (the Project Log is now its own route, no longer a section here);
-// GET IN TOUCH points at the intended /contact/ route (404 until built, same precedent as the nav).
-import Scoreboard from "@components/Sections/Home/Scoreboard.astro";
+// GET IN TOUCH points at the /contact/ route.
+import Scoreboard from "@components/Sections/Global/Scoreboard.astro";
 import { Badge } from "@components/ui/badge";
 import { PixelPanel } from "@components/ui/pixel-panel";
+import portfolioData from "@config/portfolioData.json";
+
+const { tagline, heading, bio } = portfolioData.profile;
 
 // The strip sits on the theme-aware `bg-muted` (a light-blue scoreboard in light mode, the dark
 // #272939 panel in dark) — the same call the home Stats strip makes. It reuses the shared <Scoreboard>
 // shell, stacking until `lg` (four longer stats need the room). Each colour is a light/dark PAIR so it
 // reads on BOTH grounds: deepened green/pink for the light strip, the neon shades under `dark:` for the
 // dark one; the blue rides the flipping `text-info` (deep blue on light, airy primary-300 on dark).
-const strip = [
-  { text: "Class: Full-Stack Dev", color: "text-success-700 dark:text-success" },
-  { text: "Lvl: 8+", color: "text-info" },
-  { text: "XP: 8.5K", color: "text-secondary-700 dark:text-secondary" },
-  { text: "Stars: 2.1K", color: "text-success-700 dark:text-success" },
-] as const;
+// Stat TEXT is portfolioData.stats.profile; the colours below pair by order (keep them aligned).
+const colors = [
+  "text-success-700 dark:text-success",
+  "text-info",
+  "text-secondary-700 dark:text-secondary",
+  "text-success-700 dark:text-success",
+];
+const strip = portfolioData.stats.profile.map((text, i) => ({
+  text,
+  color: colors[i] ?? "text-info",
+}));
 ---
 
 <PixelPanel
@@ -35,20 +43,12 @@ const strip = [
   aria-labelledby="about-hero-heading"
   class="flex flex-col items-start gap-4 p-6 sm:p-8 md:p-9"
 >
-  <Badge pixel variant="info">Dev 01</Badge>
+  <Badge pixel variant="info">{tagline}</Badge>
 
-  <h1 id="about-hero-heading" class="h1 text-info text-balance">The Full-Stack Dev</h1>
+  <h1 id="about-hero-heading" class="h1 text-info text-balance">{heading}</h1>
 
   <div class="text-muted-foreground flex flex-col gap-4 text-base">
-    <p>
-      Welcome to the mainframe. I'm a full-stack developer with 8+ years of experience building
-      scalable web applications, APIs, and tools. This profile serves as a chronological log of my
-      projects, open-source contributions, and the systems I've shipped.
-    </p>
-    <p>
-      I'm passionate about clean code, automated testing, and shipping fast. I write about modern
-      frontend patterns, backend architecture, and the tools that keep my workflow efficient.
-    </p>
+    {bio.map((para) => <p>{para}</p>)}
   </div>
 
   <div class="flex flex-col gap-4 pt-1 sm:flex-row">

@@ -84,7 +84,8 @@ assert(
   "getSiteSchema must link website → org",
 );
 
-// getArticleSchema: dateModified defaults to datePublished; url doubles as mainEntityOfPage.
+// getArticleSchema: stable @id; dateModified is OMITTED when absent (never invented); url doubles
+// as mainEntityOfPage.
 const post = getArticleSchema({
   headline: "T",
   description: "D",
@@ -93,7 +94,34 @@ const post = getArticleSchema({
   authorName: "A",
   inLanguage: "en-US",
 });
-assert(post.dateModified === "2026-01-01", "dateModified should default to datePublished");
+assert(post["@id"] === "https://acme.com/blog/p/#article", "article must carry a stable @id");
+assert(
+  !("dateModified" in post),
+  "dateModified must be omitted when not provided (never invented)",
+);
 assert(post.mainEntityOfPage === "https://acme.com/blog/p/", "mainEntityOfPage should equal url");
+assert(!("publisher" in post), "publisher omitted when no publisherId is passed");
+
+// dateModified, authorUrl, and publisher reference all thread through when provided.
+const updated = getArticleSchema({
+  headline: "T",
+  description: "D",
+  url: "https://acme.com/blog/p/",
+  datePublished: "2026-01-01",
+  dateModified: "2026-02-01",
+  authorName: "A",
+  authorUrl: "https://acme.com/about/",
+  inLanguage: "en-US",
+  publisherId: organizationId("https://acme.com/"),
+});
+assert(updated.dateModified === "2026-02-01", "dateModified passes through when provided");
+assert(
+  (updated.author as { url?: string }).url === "https://acme.com/about/",
+  "author url threads through",
+);
+assert(
+  (updated.publisher as { "@id": string })["@id"] === "https://acme.com/#organization",
+  "publisher references the org @id",
+);
 
 console.log("schema.test: ok");

@@ -14,10 +14,9 @@
 //
 // Wiring (see wiki/design/homepage-figma.md for the decisions the single mock didn't specify):
 //   - copyright year is build-time; "GAME OVER" is kept retro flavour, not the site name.
-//   - Privacy/Terms are real routes; Credits is an intended route (404s until built, same precedent
-//     as the header nav's /blog//about//contact).
+//   - Privacy/Terms are the real legal routes.
 //   - social destinations map to the site's real touchpoints (email → author email; LinkedIn/YouTube
-//     → siteData.sameAs, else the platform root; RSS → the intended /rss.xml).
+//     → siteData.sameAs, else the platform root; RSS → /rss.xml).
 import { PixelIcon, type PixelIconName } from "@components/svg/pixel-icons";
 import siteData from "@config/siteData.json";
 import { socialUrl } from "@js/social";
@@ -49,7 +48,6 @@ const socialLinks: readonly SocialLink[] = [
 const legalLinks = [
   { label: "Privacy", href: "/privacy/" },
   { label: "Terms", href: "/terms/" },
-  { label: "Credits", href: "/credits/" },
 ] as const;
 ---
 

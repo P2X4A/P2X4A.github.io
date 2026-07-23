@@ -6,13 +6,13 @@
 //   • Tech Stack — static labels (no `href`) → renders a <span>.
 //   • Contact socials — links (`href` present) → renders an <a> that goes green on hover, the house
 //     active/hover colour (same as the nav / footer).
-// Icons come from the existing stroke `svg/icons` registry (reused, not re-drawn). Tokens only.
-import { Icon, type IconName } from "@components/svg/icons";
+// Icons come from the pixel `svg/pixel-icons` registry (crisp-edges, fill = currentColor). Tokens only.
+import { PixelIcon, type PixelIconName } from "@components/svg/pixel-icons";
 import { PixelPanel } from "@components/ui/pixel-panel";
 import type { HTMLAttributes } from "astro/types";
 
 interface Props {
-  icon: IconName;
+  icon: PixelIconName;
   label: string;
   /** When set, the chip is a link (Contact socials); otherwise a static span (Tech Stack). */
   href?: string;
@@ -42,6 +42,6 @@ const chipClass = ["inline-flex items-center gap-2 px-3 py-2", interactive]
 ---
 
 <PixelPanel as={Tag} class={chipClass} data-slot="pixel-chip" {...attrs}>
-  <Icon name={icon} class="size-[18px]" />
+  <PixelIcon name={icon} class="size-[18px]" />
   <span class="text-sm font-bold uppercase">{label}</span>
 </PixelPanel>

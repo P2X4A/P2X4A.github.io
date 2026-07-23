@@ -3,10 +3,10 @@
 // "project-log-overview" frame (node 72:7) — the ProjectsHero panel + the shared CardGrid, fed from
 // the `projects` collection (sorted by `order`, drafts dropped). Same `.site-container` shell/rhythm
 // as index.astro & about.astro. This is the page the header nav's PROJECTS link points at.
-import CardGrid from "@components/Sections/Home/CardGrid.astro";
-import { toProjectCard } from "@components/Sections/Project/projectCards";
-import { getSortedProjects } from "@components/Sections/Project/projectData";
+import CardGrid from "@components/Sections/Global/CardGrid.astro";
 import ProjectsHero from "@components/Sections/Project/ProjectsHero.astro";
+import { toProjectCard } from "@js/projectCards";
+import { getSortedProjects } from "@js/projectData";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
 const cards = (await getSortedProjects()).map(toProjectCard);

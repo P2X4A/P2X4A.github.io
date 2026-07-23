@@ -1,9 +1,10 @@
 ---
 // src/components/Sections/NotFound/NotFoundIllustration.astro — the 404 hero artwork.
-// Swap this whole file to change the illustration. The brand fills use `currentColor`, so the
-// artwork follows the theme's primary token: recolor by editing the wrapper's `text-*` utility
-// (defaults to `text-primary`) or by rebranding the `--color-primary-*` scale in tailwind-theme.css.
-// Decorative by default (aria-hidden) — the page heading carries the accessible "not found" message.
+// Swap this whole file to change the illustration. The main shapes use `currentColor`, so they follow
+// the theme's primary token (recolor via the wrapper's `text-*` utility, default `text-primary`); the
+// decorative sparkles + soft shadows use the site's accent/neutral tokens (fill-info / fill-success /
+// fill-secondary / the base ramp), so the whole illustration flips with the theme instead of sitting
+// there in a stock palette. Decorative by default (aria-hidden) — the heading carries the "not found" text.
 import type { HTMLAttributes } from "astro/types";
 
 type Props = HTMLAttributes<"svg">;
@@ -53,7 +54,7 @@ const { class: className, ...rest } = Astro.props;
       fill="black"></path>
     <path
       d="M177.358 217.075C178.077 214.939 177.505 212.819 176.08 212.339C174.655 211.859 172.917 213.202 172.198 215.339C171.479 217.475 172.052 219.596 173.477 220.075C174.901 220.555 176.639 219.212 177.358 217.075Z"
-      fill="#E0E0E0"></path>
+      class="fill-base-300"></path>
     <path
       d="M231.626 208C233.835 208 235.626 206.209 235.626 204C235.626 201.791 233.835 200 231.626 200C229.417 200 227.626 201.791 227.626 204C227.626 206.209 229.417 208 231.626 208Z"
       fill="white"></path>
@@ -101,47 +102,47 @@ const { class: className, ...rest } = Astro.props;
     <path
       opacity="0.5"
       d="M57.1336 24.049C56.3671 23.7148 55.9723 22.8604 56.2148 22.0607C56.2336 22.001 56.2457 21.9394 56.2507 21.8771V21.8771C56.2742 21.5131 56.0554 21.177 55.7129 21.0509C55.3704 20.9248 54.9857 21.0386 54.7672 21.3307V21.3307C54.7313 21.3809 54.7012 21.435 54.6775 21.492C54.3446 22.2593 53.488 22.6545 52.6875 22.41C52.6277 22.3917 52.5661 22.3797 52.5038 22.3742V22.3742C52.1395 22.3507 51.8032 22.5693 51.6769 22.9115C51.5507 23.2537 51.6646 23.6381 51.957 23.8565V23.8565C52.0065 23.8946 52.0607 23.9262 52.1183 23.9505C52.8848 24.2847 53.2796 25.1392 53.0371 25.9389C53.0187 25.9971 53.0067 26.0572 53.0013 26.118V26.118C52.9755 26.4828 53.1935 26.8209 53.5367 26.9483C53.8798 27.0757 54.2659 26.9619 54.4848 26.6688V26.6688C54.5216 26.6176 54.5518 26.5619 54.5744 26.5031C54.9154 25.7445 55.7698 25.36 56.5644 25.6075C56.6242 25.6258 56.6858 25.6378 56.7482 25.6433V25.6433C57.1124 25.6668 57.4488 25.4482 57.575 25.106C57.7013 24.7638 57.5873 24.3793 57.295 24.161V24.161C57.2465 24.1165 57.1922 24.0789 57.1336 24.049Z"
-      fill="#4D8AF0"></path>
+      class="fill-info"></path>
     <path
       opacity="0.5"
       d="M270.132 152.049C269.371 151.707 268.986 150.854 269.232 150.061C269.251 150.001 269.263 149.939 269.268 149.877V149.877C269.292 149.513 269.072 149.177 268.728 149.051C268.384 148.925 267.998 149.039 267.779 149.331V149.331C267.743 149.381 267.713 149.435 267.689 149.492C267.355 150.259 266.495 150.654 265.692 150.41C265.631 150.392 265.57 150.38 265.507 150.374V150.374C265.141 150.351 264.804 150.569 264.677 150.911C264.55 151.254 264.665 151.638 264.958 151.856V151.856C265.008 151.895 265.062 151.926 265.12 151.951C265.881 152.293 266.266 153.145 266.02 153.939C266.001 153.997 265.989 154.057 265.984 154.118V154.118C265.958 154.483 266.177 154.821 266.521 154.948C266.866 155.076 267.253 154.962 267.473 154.669V154.669C267.51 154.618 267.54 154.562 267.563 154.503C267.905 153.745 268.763 153.36 269.56 153.607C269.62 153.626 269.682 153.638 269.745 153.643V153.643C270.111 153.667 270.448 153.448 270.575 153.106C270.702 152.764 270.587 152.379 270.294 152.161V152.161C270.245 152.117 270.191 152.079 270.132 152.049V152.049Z"
-      fill="#4D8AF0"></path>
+      class="fill-info"></path>
     <path
       opacity="0.5"
       d="M35.1336 211.049C34.3671 210.715 33.9723 209.86 34.2148 209.061C34.2336 209.001 34.2457 208.939 34.2507 208.877V208.877C34.2742 208.513 34.0554 208.177 33.7129 208.051C33.3704 207.925 32.9857 208.039 32.7672 208.331V208.331C32.7313 208.381 32.7012 208.435 32.6775 208.492C32.3446 209.259 31.488 209.654 30.6875 209.41C30.6277 209.392 30.5661 209.38 30.5038 209.374V209.374C30.1395 209.351 29.8032 209.569 29.6769 209.911C29.5507 210.254 29.6646 210.638 29.957 210.856V210.856C30.0065 210.895 30.0607 210.926 30.1183 210.951C30.8848 211.285 31.2796 212.139 31.0371 212.939C31.0187 212.997 31.0067 213.057 31.0013 213.118V213.118C30.9755 213.483 31.1935 213.821 31.5367 213.948C31.8798 214.076 32.2659 213.962 32.4848 213.669V213.669C32.5216 213.618 32.5518 213.562 32.5744 213.503C32.9154 212.745 33.7698 212.36 34.5644 212.607C34.6242 212.626 34.6858 212.638 34.7482 212.643V212.643C35.1124 212.667 35.4488 212.448 35.575 212.106C35.7013 211.764 35.5873 211.379 35.295 211.161V211.161C35.2465 211.117 35.1922 211.079 35.1336 211.049Z"
-      fill="#47E6B1"></path>
+      class="fill-success"></path>
     <path
       opacity="0.5"
       d="M12.1112 73.049C11.3535 72.7068 10.9693 71.8545 11.2148 71.0607C11.2336 71.001 11.2457 70.9394 11.2507 70.8771V70.8771C11.2742 70.5131 11.0554 70.177 10.7129 70.0509C10.3704 69.9248 9.98569 70.0386 9.76716 70.3307V70.3307C9.73127 70.3809 9.7012 70.435 9.67752 70.492C9.34459 71.2593 8.48802 71.6545 7.68754 71.41C7.62771 71.3917 7.56612 71.3797 7.50379 71.3742V71.3742C7.13953 71.3507 6.80316 71.5693 6.67692 71.9115C6.55069 72.2537 6.66462 72.6381 6.95699 72.8565V72.8565C7.0065 72.8946 7.06073 72.9262 7.11834 72.9505C7.8848 73.2847 8.27964 74.1392 8.03713 74.9389C8.01875 74.9971 8.00673 75.0572 8.00128 75.118V75.118C7.97553 75.4828 8.19354 75.8209 8.53665 75.9483C8.87976 76.0757 9.26586 75.9619 9.4848 75.6688V75.6688C9.52163 75.6176 9.55175 75.5619 9.57443 75.5031C9.91545 74.7445 10.7698 74.36 11.5644 74.6075C11.6242 74.6258 11.6858 74.6378 11.7482 74.6433V74.6433C12.1124 74.6668 12.4488 74.4482 12.575 74.106C12.7013 73.7638 12.5873 73.3793 12.295 73.161V73.161C12.2396 73.1148 12.1777 73.077 12.1112 73.049Z"
-      fill="#4D8AF0"></path>
+      class="fill-info"></path>
     <path
       opacity="0.5"
       d="M266.133 3.02454C265.388 2.68504 265.01 1.83959 265.252 1.05217C265.27 0.99299 265.282 0.931894 265.287 0.870041V0.870041C265.31 0.509005 265.095 0.175613 264.758 0.0504942C264.422 -0.0746248 264.043 0.0382993 263.829 0.328085V0.328085C263.793 0.377859 263.764 0.43151 263.74 0.488007C263.405 1.24051 262.565 1.62196 261.784 1.37646C261.725 1.35829 261.665 1.34638 261.603 1.34092V1.34092C261.211 1.25791 260.817 1.4767 260.677 1.85561C260.537 2.23452 260.693 2.65967 261.044 2.85573V2.85573C261.092 2.89359 261.146 2.92494 261.202 2.94902C261.947 3.28852 262.325 4.13397 262.084 4.92139C262.066 4.97916 262.054 5.03874 262.048 5.09908V5.09908C262.01 5.47564 262.233 5.82948 262.588 5.95424C262.942 6.07901 263.335 5.94207 263.538 5.62326V5.62326C263.574 5.57249 263.604 5.51725 263.626 5.4589C263.961 4.7064 264.801 4.32495 265.582 4.57045C265.641 4.58862 265.702 4.60053 265.763 4.60599V4.60599C266.121 4.62927 266.452 4.41245 266.576 4.07298C266.7 3.73352 266.588 3.35219 266.301 3.1356V3.1356C266.25 3.09082 266.194 3.05344 266.133 3.02454V3.02454Z"
-      fill="#F55F44"></path>
+      class="fill-secondary"></path>
     <g opacity="0.5">
-      <rect x="46.5088" y="107.378" width="1.23529" height="7.55556" fill="#47E6B1"></rect>
-      <path d="M50.626 110.489V111.822H43.626V110.489H50.626Z" fill="#47E6B1"></path>
+      <rect x="46.5088" y="107.378" width="1.23529" height="7.55556" class="fill-success"></rect>
+      <path d="M50.626 110.489V111.822H43.626V110.489H50.626Z" class="fill-success"></path>
     </g>
     <g opacity="0.5">
-      <rect x="348.509" y="74.3777" width="1.23529" height="7.55556" fill="#47E6B1"></rect>
-      <path d="M352.626 77.4888V78.8221H345.626V77.4888H352.626Z" fill="#47E6B1"></path>
+      <rect x="348.509" y="74.3777" width="1.23529" height="7.55556" class="fill-success"></rect>
+      <path d="M352.626 77.4888V78.8221H345.626V77.4888H352.626Z" class="fill-success"></path>
     </g>
     <g opacity="0.5">
-      <rect x="306.509" y="190.378" width="1.23529" height="7.55556" fill="#47E6B1"></rect>
-      <path d="M310.626 193.489V194.822H303.626V193.489H310.626Z" fill="#47E6B1"></path>
+      <rect x="306.509" y="190.378" width="1.23529" height="7.55556" class="fill-success"></rect>
+      <path d="M310.626 193.489V194.822H303.626V193.489H310.626Z" class="fill-success"></path>
     </g>
     <path
       opacity="0.5"
       d="M303.126 37C304.507 37 305.626 35.8807 305.626 34.5C305.626 33.1193 304.507 32 303.126 32C301.745 32 300.626 33.1193 300.626 34.5C300.626 35.8807 301.745 37 303.126 37Z"
-      fill="#F55F44"></path>
+      class="fill-secondary"></path>
     <path
       opacity="0.5"
       d="M3.12598 8C4.50669 8 5.62598 6.88071 5.62598 5.5C5.62598 4.11929 4.50669 3 3.12598 3C1.74526 3 0.625977 4.11929 0.625977 5.5C0.625977 6.88071 1.74526 8 3.12598 8Z"
-      fill="#F55F44"></path>
+      class="fill-secondary"></path>
     <path
       opacity="0.5"
       d="M79.126 152C80.5067 152 81.626 150.881 81.626 149.5C81.626 148.119 80.5067 147 79.126 147C77.7453 147 76.626 148.119 76.626 149.5C76.626 150.881 77.7453 152 79.126 152Z"
-      fill="#F55F44"></path>
+      class="fill-secondary"></path>
     <path
       opacity="0.05"
       d="M98.626 68C106.358 68 112.626 66.6569 112.626 65C112.626 63.3431 106.358 62 98.626 62C90.894 62 84.626 63.3431 84.626 65C84.626 66.6569 90.894 68 98.626 68Z"
@@ -191,9 +192,9 @@ const { class: className, ...rest } = Astro.props;
       y2="8.35425"
       gradientUnits="userSpaceOnUse"
     >
-      <stop stop-color="#808080" stop-opacity="0.25"></stop>
-      <stop offset="0.54" stop-color="#808080" stop-opacity="0.12"></stop>
-      <stop offset="1" stop-color="#808080" stop-opacity="0.1"></stop>
+      <stop stop-color="var(--color-base-400)" stop-opacity="0.25"></stop>
+      <stop offset="0.54" stop-color="var(--color-base-400)" stop-opacity="0.12"></stop>
+      <stop offset="1" stop-color="var(--color-base-400)" stop-opacity="0.1"></stop>
     </linearGradient>
     <linearGradient
       id="notfound-grad-1"
@@ -203,9 +204,9 @@ const { class: className, ...rest } = Astro.props;
       y2="211.191"
       gradientUnits="userSpaceOnUse"
     >
-      <stop stop-color="#808080" stop-opacity="0.25"></stop>
-      <stop offset="0.54" stop-color="#808080" stop-opacity="0.12"></stop>
-      <stop offset="1" stop-color="#808080" stop-opacity="0.1"></stop>
+      <stop stop-color="var(--color-base-400)" stop-opacity="0.25"></stop>
+      <stop offset="0.54" stop-color="var(--color-base-400)" stop-opacity="0.12"></stop>
+      <stop offset="1" stop-color="var(--color-base-400)" stop-opacity="0.1"></stop>
     </linearGradient>
     <linearGradient
       id="notfound-grad-2"
@@ -215,9 +216,9 @@ const { class: className, ...rest } = Astro.props;
       y2="46.7894"
       gradientUnits="userSpaceOnUse"
     >
-      <stop stop-color="#808080" stop-opacity="0.25"></stop>
-      <stop offset="0.54" stop-color="#808080" stop-opacity="0.12"></stop>
-      <stop offset="1" stop-color="#808080" stop-opacity="0.1"></stop>
+      <stop stop-color="var(--color-base-400)" stop-opacity="0.25"></stop>
+      <stop offset="0.54" stop-color="var(--color-base-400)" stop-opacity="0.12"></stop>
+      <stop offset="1" stop-color="var(--color-base-400)" stop-opacity="0.1"></stop>
     </linearGradient>
     <linearGradient
       id="notfound-grad-3"
@@ -227,9 +228,9 @@ const { class: className, ...rest } = Astro.props;
       y2="43.1125"
       gradientUnits="userSpaceOnUse"
     >
-      <stop stop-color="#808080" stop-opacity="0.25"></stop>
-      <stop offset="0.54" stop-color="#808080" stop-opacity="0.12"></stop>
-      <stop offset="1" stop-color="#808080" stop-opacity="0.1"></stop>
+      <stop stop-color="var(--color-base-400)" stop-opacity="0.25"></stop>
+      <stop offset="0.54" stop-color="var(--color-base-400)" stop-opacity="0.12"></stop>
+      <stop offset="1" stop-color="var(--color-base-400)" stop-opacity="0.1"></stop>
     </linearGradient>
     <clipPath id="notfound-clip">
       <rect width="353" height="330" fill="white"></rect>

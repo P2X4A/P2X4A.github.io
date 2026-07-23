@@ -5,10 +5,9 @@
 // three most-recent posts from the `blog` collection (newest first) so the home grid and the /blog/
 // listing share ONE source and every link resolves — replacing the hardcoded placeholder list that
 // stood in until the blog route landed (the same rewire the Featured Projects section got).
-import { getSortedPosts } from "@components/Sections/Blog/blogData";
-import { toPostCard } from "@components/Sections/Blog/postCards";
-
-import CardGrid from "./CardGrid.astro";
+import CardGrid from "@components/Sections/Global/CardGrid.astro";
+import { getSortedPosts } from "@js/blogData";
+import { toPostCard } from "@js/postCards";
 
 const posts = (await getSortedPosts()).slice(0, 3).map(toPostCard);
 ---

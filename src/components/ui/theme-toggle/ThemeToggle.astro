@@ -8,8 +8,14 @@
 // script, which reads that same key before falling back to the device.
 import { PixelIcon } from "@components/svg/pixel-icons";
 import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
 
-type Props = HTMLAttributes<"button">;
+type Props = HTMLAttributes<"button"> & VariantProps<typeof themeToggle>;
+
+// Re-skins the global `.pixel-btn` (a CSS class, not the `button` recipe) into a square icon button,
+// so it needs its own small exported recipe rather than composing another primitive's. Exported so a
+// consumer can merge overrides the tailwind-merge way (class:list wouldn't dedupe conflicts).
+export const themeToggle = tv({ base: "pixel-btn size-9 shrink-0" });
 
 const { class: className, ...rest } = Astro.props;
 ---
@@ -18,7 +24,7 @@ const { class: className, ...rest } = Astro.props;
   type="button"
   data-slot="theme-toggle"
   aria-label="Toggle color theme"
-  class:list={["pixel-btn size-9 shrink-0", className]}
+  class={themeToggle({ class: className })}
   {...rest}
 >
   {

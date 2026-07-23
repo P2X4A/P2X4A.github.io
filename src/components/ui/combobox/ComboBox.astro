@@ -192,7 +192,7 @@ const listId = `combobox-list-${crypto.randomUUID().slice(0, 8)}`;
     }
 
     root.addEventListener("focusout", (event) => {
-      if (!root.contains(event.relatedTarget as Node)) close();
+      if (!(event.relatedTarget instanceof Node && root.contains(event.relatedTarget))) close();
     });
   }
 
