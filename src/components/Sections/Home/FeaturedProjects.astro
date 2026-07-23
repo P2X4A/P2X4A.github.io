@@ -6,9 +6,9 @@
 // the shared `toProjectCard`, so the home grid, the /projects/ grid, and the detail routes all share
 // one source — no more hand-kept demo list with slugs that 404. Each card links to its real
 // /projects/<slug>/ detail page.
-import CardGrid from "@components/Sections/Home/CardGrid.astro";
-import { toProjectCard } from "@components/Sections/Project/projectCards";
-import { getSortedProjects } from "@components/Sections/Project/projectData";
+import CardGrid from "@components/Sections/Global/CardGrid.astro";
+import { toProjectCard } from "@js/projectCards";
+import { getSortedProjects } from "@js/projectData";
 
 const featured = (await getSortedProjects()).slice(0, 3).map(toProjectCard);
 ---

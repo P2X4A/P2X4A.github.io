@@ -3,10 +3,10 @@
 // "blog-listing-page" frame (node 76:4) — the BlogHero panel + the shared CardGrid, fed from the
 // `blog` collection (newest first, drafts dropped). Same `.site-container` shell/rhythm as the other
 // pages. This is the page the header nav's BLOG link points at.
-import { getSortedPosts } from "@components/Sections/Blog/blogData";
 import BlogHero from "@components/Sections/Blog/BlogHero.astro";
-import { toPostCard } from "@components/Sections/Blog/postCards";
-import CardGrid from "@components/Sections/Home/CardGrid.astro";
+import CardGrid from "@components/Sections/Global/CardGrid.astro";
+import { getSortedPosts } from "@js/blogData";
+import { toPostCard } from "@js/postCards";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
 const cards = (await getSortedPosts()).map(toPostCard);

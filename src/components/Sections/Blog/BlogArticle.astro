@@ -19,9 +19,8 @@ import {
   BreadcrumbSeparator,
 } from "@components/ui/breadcrumb";
 import { PixelPanel } from "@components/ui/pixel-panel";
+import { type AdjacentLink, categoryMeta } from "@js/postCards";
 import type { CollectionEntry } from "astro:content";
-
-import { type AdjacentLink, categoryMeta } from "./postCards";
 
 interface Props {
   post: CollectionEntry<"blog">["data"];
@@ -37,8 +36,11 @@ interface Props {
 const { post, author, dateLabel, dateISO, readMinutes, prev, next } = Astro.props as Props;
 const { title, category, heroImage, heroImageAlt, tags } = post;
 
-const { label: categoryLabel, variant: categoryVariant, class: categoryClass } =
-  categoryMeta(category);
+const {
+  label: categoryLabel,
+  variant: categoryVariant,
+  class: categoryClass,
+} = categoryMeta(category);
 ---
 
 <div class="flex flex-col gap-8">

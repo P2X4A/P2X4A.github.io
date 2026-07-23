@@ -7,11 +7,11 @@
 // CONTENT: retro flavour tech list (typed local). Icons are mapped to the closest glyphs in the
 // existing stroke `svg/icons` registry (reused, not re-drawn) — the set has no exact `layers`/`cloud`
 // glyph, so React→component and AWS→globe are deliberate nearest-matches (easy to veto).
+import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
 import type { IconName } from "@components/svg/icons";
 import { Reveal } from "@components/ui/reveal";
 
 import PixelChip from "./PixelChip.astro";
-import SectionHeading from "./SectionHeading.astro";
 
 const stack: readonly { label: string; icon: IconName }[] = [
   { label: "JavaScript", icon: "code-01" },
