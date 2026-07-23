@@ -5,17 +5,18 @@
 // One desktop frame → the avatar sits above the bio on phones, beside it from sm. Below-the-fold →
 // <Reveal>. The meta is a real <dl> (label→value pairs). Tokens only.
 //
-// CONTENT: the bio + meta are placeholder demo copy (the mock's, retro flavour). Swap the bio for a
-// real author bio; the meta rows are typed local. Avatar ships as a demo asset (plain <img>, no Sharp).
+// CONTENT: the bio + meta VALUES come from portfolioData.profile (buyer-editable); the meta LABELS
+// (Location/Role/Favorite) are presentational and stay here. Avatar is a demo asset (plain <img>, no Sharp).
+import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
 import { Reveal } from "@components/ui/reveal";
+import portfolioData from "@config/portfolioData.json";
 import avatar from "@images/about-avatar.png";
 
-import SectionHeading from "./SectionHeading.astro";
-
+const { shortBio, meta: profileMeta } = portfolioData.profile;
 const meta = [
-  { label: "Location", value: "The Internet" },
-  { label: "Role", value: "Full Stack Dev" },
-  { label: "Favorite", value: "8-Bit Chiptunes" },
+  { label: "Location", value: profileMeta.location },
+  { label: "Role", value: profileMeta.role },
+  { label: "Favorite", value: profileMeta.favorite },
 ] as const;
 ---
 
@@ -38,10 +39,7 @@ const meta = [
     </div>
 
     <div class="flex flex-1 flex-col gap-4">
-      <p class="text-muted-foreground text-base leading-relaxed">
-        I'm a developer who builds things with pixels, code, and a healthy dose of nostalgia. I write
-        about the tech I use, the tools I love, and the retro systems that still inspire me.
-      </p>
+      <p class="text-muted-foreground text-base leading-relaxed">{shortBio}</p>
 
       <dl class="flex flex-col gap-2 text-sm">
         {
