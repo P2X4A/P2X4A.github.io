@@ -109,8 +109,8 @@ const sizes = ["sm", "md", "lg"] as const;
   <div class="flex flex-wrap items-center gap-10 py-6">
     {
       (["top", "bottom", "left", "right"] as const).map((side) => (
-        <Tooltip side={side} text={`Tooltip on ${side}`}>
-          <Button variant="outline" size="sm">
+        <Tooltip id={`tooltip-${side}`} side={side} text={`Tooltip on ${side}`}>
+          <Button variant="outline" size="sm" aria-describedby={`tooltip-${side}`}>
             Hover / focus ({side})
           </Button>
         </Tooltip>

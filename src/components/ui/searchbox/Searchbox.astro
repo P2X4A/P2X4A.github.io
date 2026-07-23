@@ -7,14 +7,21 @@
 // `id` must be unique (it's the dialog id). Items are static; remote/grouped results are out of scope.
 import { Dialog, DialogTrigger } from "@components/ui/dialog";
 import type { HTMLAttributes } from "astro/types";
+import { tv, type VariantProps } from "tailwind-variants";
 
-type Props = HTMLAttributes<"div"> & {
-  id: string;
-  label?: string;
-  placeholder?: string;
-  emptyText?: string;
-  shortcut?: string;
-};
+// The palette's inner parts (trigger, dialog) reuse the Dialog/DialogTrigger recipes — this small
+// recipe is only the outer wrapper, so a consumer can merge layout overrides (block/inline) the
+// tailwind-merge way. Don't clone Dialog's parts into their own recipes here.
+export const searchbox = tv({ base: "inline-block" });
+
+type Props = HTMLAttributes<"div"> &
+  VariantProps<typeof searchbox> & {
+    id: string;
+    label?: string;
+    placeholder?: string;
+    emptyText?: string;
+    shortcut?: string;
+  };
 
 const {
   id,
@@ -28,7 +35,7 @@ const {
 const listId = `${id}-list`;
 ---
 
-<div data-slot="searchbox" class:list={["inline-block", className]} {...rest}>
+<div data-slot="searchbox" class={searchbox({ class: className })} {...rest}>
   <DialogTrigger
     for={id}
     variant="outline"
