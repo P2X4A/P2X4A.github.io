@@ -20,7 +20,12 @@ const isProductionDeploy =
   process.env.VERCEL_ENV === "production" || // Vercel
   process.env.DEPLOY_ENV === "production"; // anything else — set it in your host's build env
 
-if (isProductionDeploy && site.includes("example.com")) {
+// Match the placeholder by exact hostname, not `site.includes("example.com")` — a substring test both
+// misses real domains that merely contain it and green-lights hosts like `example.com.evil.test`. An
+// unparseable SITE_URL is treated as still-placeholder so a malformed value fails the gate too.
+const placeholderHosts = new Set(["example.com", "www.example.com"]);
+const hostname = URL.canParse(site) ? new URL(site).hostname : "example.com";
+if (isProductionDeploy && placeholderHosts.has(hostname)) {
   throw new Error(
     "SITE_URL is unset or still the placeholder. Set it to your production domain in your " +
       "host's environment variables before deploying.",

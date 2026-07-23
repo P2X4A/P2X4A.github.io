@@ -156,7 +156,7 @@ export interface ArticleInput {
   image?: string;
   /** ISO-8601 publish date, e.g. `date.toISOString()` */
   datePublished: string;
-  /** ISO-8601 modified date; defaults to `datePublished` */
+  /** ISO-8601 modified date; omitted from the node when absent (never invented from datePublished) */
   dateModified?: string;
   authorName: string;
   authorUrl?: string;
@@ -185,13 +185,15 @@ export function getArticleSchema({
 }: ArticleInput): JsonLdNode {
   return {
     "@type": "BlogPosting",
+    "@id": `${url}#article`,
     headline,
     description,
     url,
     mainEntityOfPage: url,
     inLanguage,
     datePublished,
-    dateModified: dateModified ?? datePublished,
+    // only emit dateModified when the content was actually updated — never invent it from datePublished
+    ...(dateModified ? { dateModified } : {}),
     author: {
       "@type": "Person",
       name: authorName,

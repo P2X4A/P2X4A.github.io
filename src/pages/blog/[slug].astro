@@ -5,13 +5,13 @@
 // listing links off the SAME id — so the grid links and the generated routes can never drift. The
 // glob loader gives single-segment ids (`<slug>` for `<slug>/index.mdx`), so a plain `[slug]` fits.
 import BlogArticle from "@components/Sections/Blog/BlogArticle.astro";
-import { getSortedPosts } from "@components/Sections/Blog/blogData";
-import { getAdjacentPosts, getRelatedPosts } from "@components/Sections/Blog/postCards";
 import RelatedPosts from "@components/Sections/Blog/RelatedPosts.astro";
 import siteData from "@config/siteData.json";
 import { siteLocale } from "@config/siteSettings.json";
+import { getSortedPosts } from "@js/blogData";
+import { getAdjacentPosts, getRelatedPosts } from "@js/postCards";
 import { readingTime } from "@js/readingTime";
-import { getArticleSchema, getBreadcrumbSchema } from "@js/schema";
+import { getArticleSchema, getBreadcrumbSchema, organizationId } from "@js/schema";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import type { GetStaticPaths } from "astro";
 import { type CollectionEntry, getEntry, render } from "astro:content";
@@ -49,6 +49,9 @@ const related = getRelatedPosts(posts, entry.id, 2);
 // SEO: BlogPosting + a BreadcrumbList matching the visible breadcrumb (seo.md — never emit one
 // without the other). Absolute URLs resolve against `site`.
 const canonical = new URL(`/blog/${entry.id}/`, Astro.site).href;
+// author's public URL (the authors collection's authorLink), resolved absolute; publisher points at
+// the same Organization @id BaseHead emits site-wide, so the Article joins that graph by reference.
+const authorUrl = authorEntry ? new URL(authorEntry.data.authorLink, Astro.site).href : undefined;
 const articleSchema = getArticleSchema({
   headline: data.title,
   description: data.description,
@@ -57,7 +60,9 @@ const articleSchema = getArticleSchema({
   datePublished: dateISO,
   dateModified: data.updatedDate?.toISOString(),
   authorName: author.name,
+  authorUrl,
   inLanguage: siteLocale,
+  publisherId: organizationId(canonical),
 });
 const breadcrumbSchema = getBreadcrumbSchema([
   { name: "Home", url: new URL("/", Astro.site).href },

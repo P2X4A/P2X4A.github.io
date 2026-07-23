@@ -18,15 +18,11 @@ const blogCollection = defineCollection({
     z.object({
       title: z.string(), // card title + article H1 + SEO title
       description: z.string(), // card excerpt + SEO meta description
-      authors: z.array(reference("authors")), // byline (avatar + name); referenced ids must exist
-      pubDate: z
-        .string()
-        .or(z.date())
-        .transform((val) => new Date(val)),
-      updatedDate: z
-        .string()
-        .optional()
-        .transform((str) => (str ? new Date(str) : undefined)),
+      // byline (avatar + name); referenced ids must exist, and every post needs at least one
+      authors: z.array(reference("authors")).min(1, "a post needs at least one author reference"),
+      // coerce.date validates: it runs `new Date(value)` then rejects an Invalid Date at build time
+      pubDate: z.coerce.date(), // sorts the listing + article:published_time
+      updatedDate: z.coerce.date().optional(), // drives article:modified_time only when present
       // required for a real blog (seo.md): the card thumbnail AND the article hero banner
       heroImage: image(),
       heroImageAlt: z.string(),
@@ -75,9 +71,7 @@ const authorsCollection = defineCollection({
     z.object({
       name: z.string(),
       avatar: image().optional(),
-      about: z.string(),
-      email: z.string(),
-      authorLink: z.string(),
+      authorLink: z.string(), // author's public URL — becomes the JSON-LD Article author.url
     }),
 });
 
