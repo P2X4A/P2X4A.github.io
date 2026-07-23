@@ -30,13 +30,25 @@ export function nextIndex(length: number, current: number, dir: 1 | -1): number 
   return current < 0 ? (dir > 0 ? 0 : length - 1) : (current + dir + length) % length;
 }
 
+/** The roving controller returned by {@link createActiveDescendant}. */
+export interface ActiveDescendant {
+  /** the currently-visible (non-hidden) options, in DOM order */
+  visible: () => HTMLElement[];
+  /** the active option, or null when none is set */
+  active: () => HTMLElement | null;
+  /** set (or clear, with null) the active option and sync aria-* + scroll */
+  setActive: (item: HTMLElement | null) => void;
+  /** step the active option among the visible ones (wrap-around) */
+  move: (dir: 1 | -1) => void;
+}
+
 /**
  * Roving active-descendant over a listbox where focus stays in `input` (the WAI-ARIA combobox
  * pattern): the active option is tracked via `input`'s `aria-activedescendant` and each option's
  * `aria-selected`. `move` steps through the currently-visible options only. Options must already
  * carry stable ids.
  */
-export function createActiveDescendant(input: HTMLElement, items: HTMLElement[]) {
+export function createActiveDescendant(input: HTMLElement, items: HTMLElement[]): ActiveDescendant {
   const visible = (): HTMLElement[] => items.filter((i) => !i.hidden);
   const active = (): HTMLElement | null =>
     items.find((i) => i.id === input.getAttribute("aria-activedescendant")) ?? null;
