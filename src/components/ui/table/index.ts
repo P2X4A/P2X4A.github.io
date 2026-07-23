@@ -7,26 +7,22 @@ import TableHead, { tableHead } from "./TableHead.astro";
 import TableHeader, { tableHeader } from "./TableHeader.astro";
 import TableRow, { tableRow } from "./TableRow.astro";
 
-const TableVariants = {
-  table,
-  tableHeader,
-  tableBody,
-  tableFooter,
-  tableRow,
-  tableHead,
-  tableCell,
-  tableCaption,
-};
-
 export {
   Table,
+  table,
   TableBody,
+  tableBody,
   TableCaption,
+  tableCaption,
   TableCell,
+  tableCell,
   TableFooter,
+  tableFooter,
   TableHead,
+  tableHead,
   TableHeader,
+  tableHeader,
   TableRow,
-  TableVariants,
+  tableRow,
 };
 export default Table;

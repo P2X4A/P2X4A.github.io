@@ -1,6 +1,4 @@
 import Tooltip, { tooltip } from "./Tooltip.astro";
 
-const TooltipVariants = { tooltip };
-
-export { Tooltip, TooltipVariants };
+export { Tooltip, tooltip };
 export default Tooltip;

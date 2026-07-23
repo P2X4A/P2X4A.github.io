@@ -1,6 +1,4 @@
 import Radio, { radio } from "./Radio.astro";
 
-const RadioVariants = { radio };
-
-export { Radio, RadioVariants };
+export { Radio, radio };
 export default Radio;

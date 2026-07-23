@@ -2,25 +2,14 @@
 // src/components/Sections/Contact/Hero.astro — Figma "Header - Hero Panel" (node 9:22).
 //
 // The contact page's header panel: a QUEST START tag, the GET IN TOUCH H1, and the intro line.
-// Above the fold → NO <Reveal>. Reuses the shared pixel surface + badge — same shape as the
-// Home/About heroes. Tokens only, so it flips to the light theme for free. Copy is the mock's
-// verbatim (meaningful, not lorem).
-import { Badge } from "@components/ui/badge";
-import { PixelPanel } from "@components/ui/pixel-panel";
+// Static page copy (verbatim from the mock), so it takes no props. Renders the shared
+// Global/HeroPanel so it can't drift from the other page heroes. Above the fold → no <Reveal>.
+import HeroPanel from "@components/Sections/Global/HeroPanel.astro";
 ---
 
-<PixelPanel
-  as="section"
-  elevated
-  aria-labelledby="contact-hero-heading"
-  class="flex flex-col items-start gap-4 p-6 sm:p-8 md:p-9"
->
-  <Badge pixel variant="info">Quest Start</Badge>
-
-  <h1 id="contact-hero-heading" class="h1 text-info text-balance">Get in Touch</h1>
-
-  <p class="text-muted-foreground max-w-3xl text-base">
-    Have a question about vintage hardware, noticed a glitch in our matrix, or want to collaborate
-    on a new retro quest? Drop us a transmission. Our communications array is fully operational.
-  </p>
-</PixelPanel>
+<HeroPanel
+  headingId="contact-hero-heading"
+  tagline="Quest Start"
+  heading="Get in Touch"
+  intro="Have a question about vintage hardware, noticed a glitch in our matrix, or want to collaborate on a new retro quest? Drop us a transmission. Our communications array is fully operational."
+/>

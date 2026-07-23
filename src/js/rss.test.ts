@@ -26,6 +26,16 @@ assert.ok(
 );
 assert.ok(item.includes("02 Jan 2026 03:04:05 GMT</pubDate>"), "pubDate is RFC-822 UTC");
 
+// A `&` in a URL is entity-escaped in both link and guid, so the document stays well-formed XML.
+const ampItem = renderRssItem({
+  title: "T",
+  url: "https://acme.com/blog/p/?a=1&b=2",
+  description: "d",
+  pubDate: new Date("2026-01-02T03:04:05Z"),
+});
+assert.ok(ampItem.includes("?a=1&amp;b=2</link>"), "ampersand in url escaped in link");
+assert.ok(ampItem.includes("?a=1&amp;b=2</guid>"), "ampersand in url escaped in guid");
+
 // The feed wraps items in a valid channel and escapes channel metadata too.
 const xml = renderRssFeed(
   { title: "A & B", link: "https://acme.com/blog/", description: "d<e", language: "en-US" },

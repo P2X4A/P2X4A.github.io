@@ -1,6 +1,4 @@
 import Avatar, { avatar } from "./Avatar.astro";
 
-const AvatarVariants = { avatar };
-
-export { Avatar, AvatarVariants };
+export { Avatar, avatar };
 export default Avatar;

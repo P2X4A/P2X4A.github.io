@@ -1,6 +1,4 @@
 import PixelPanel, { pixelPanel } from "./PixelPanel.astro";
 
-const PixelPanelVariants = { pixelPanel };
-
-export { PixelPanel, PixelPanelVariants };
+export { PixelPanel, pixelPanel };
 export default PixelPanel;

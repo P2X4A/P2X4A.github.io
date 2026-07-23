@@ -3,7 +3,13 @@ import PaginationEllipsis, { paginationEllipsis } from "./PaginationEllipsis.ast
 import PaginationItem, { paginationItem } from "./PaginationItem.astro";
 import PaginationLink from "./PaginationLink.astro";
 
-const PaginationVariants = { pagination, paginationItem, paginationEllipsis };
-
-export { Pagination, PaginationEllipsis, PaginationItem, PaginationLink, PaginationVariants };
+export {
+  Pagination,
+  pagination,
+  PaginationEllipsis,
+  paginationEllipsis,
+  PaginationItem,
+  paginationItem,
+  PaginationLink,
+};
 export default Pagination;

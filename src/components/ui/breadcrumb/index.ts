@@ -4,20 +4,16 @@ import BreadcrumbLink, { breadcrumbLink } from "./BreadcrumbLink.astro";
 import BreadcrumbPage, { breadcrumbPage } from "./BreadcrumbPage.astro";
 import BreadcrumbSeparator, { breadcrumbSeparator } from "./BreadcrumbSeparator.astro";
 
-const BreadcrumbVariants = {
-  breadcrumb,
-  breadcrumbItem,
-  breadcrumbLink,
-  breadcrumbPage,
-  breadcrumbSeparator,
-};
-
 export {
   Breadcrumb,
+  breadcrumb,
   BreadcrumbItem,
+  breadcrumbItem,
   BreadcrumbLink,
+  breadcrumbLink,
   BreadcrumbPage,
+  breadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbVariants,
+  breadcrumbSeparator,
 };
 export default Breadcrumb;

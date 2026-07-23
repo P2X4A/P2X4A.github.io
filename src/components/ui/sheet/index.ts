@@ -2,7 +2,5 @@ import { DialogClose as SheetClose, DialogTrigger as SheetTrigger } from "@compo
 
 import Sheet, { sheet } from "./Sheet.astro";
 
-const SheetVariants = { sheet };
-
-export { Sheet, SheetClose, SheetTrigger, SheetVariants };
+export { Sheet, sheet, SheetClose, SheetTrigger };
 export default Sheet;
