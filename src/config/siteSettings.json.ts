@@ -3,7 +3,7 @@
  *
  * Single-language site (the i18n layer was removed). To internationalize, reintroduce a
  * locales list, per-locale data registries + helpers, and the `i18n` block in
- * astro.config.mjs — git history and wiki/subsystems/i18n.md record the old shape.
+ * astro.config.mjs — git history records the old shape.
  */
 
 import { type SiteSettingsProps } from "./types/configDataTypes";

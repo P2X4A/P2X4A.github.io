@@ -1,6 +1,6 @@
 // Self-check for postCards.ts — the category→badge map, the entry→card mapping, and the prev/next
-// + related selectors (see the project docs: non-trivial logic leaves ONE runnable check
-// behind). No framework: `pnpm test` runs this under Node's type-stripping.
+// + related selectors (house rule: non-trivial logic leaves ONE runnable check behind — see
+// the project docs). No framework: `pnpm test` runs this under Node's type-stripping.
 import assert from "node:assert/strict";
 
 import type { CollectionEntry } from "astro:content";
@@ -52,9 +52,6 @@ assert.deepEqual(getAdjacentPosts(posts, "missing"), {}, "unknown id yields no n
 const related = getRelatedPosts(posts, "a", 2);
 assert.equal(related.length, 2);
 assert.equal(related[0].id, "c", "same-category post ranks first");
-assert.ok(
-  !related.some((e) => e.id === "a"),
-  "the current post is never related to itself",
-);
+assert.ok(!related.some((e) => e.id === "a"), "the current post is never related to itself");
 
 console.log("postCards.test.ts — all assertions passed");

@@ -23,7 +23,10 @@ export const badge = tv({
     // LORE / TECH / PROJECT). Same opt-in-variant pattern as ui/nav's `retro`. It re-tunes the shell
     // only — 2px black frame, chunkier padding, bold uppercase Space Mono — and reuses the tone
     // `variant` for colour. tailwind-merge (via tv) lets these win over the base px/py/font-weight.
-    pixel: { true: "border-2 border-border px-2.5 py-1 font-bold tracking-wide uppercase", false: "" },
+    pixel: {
+      true: "border-2 border-border px-2.5 py-1 font-bold tracking-wide uppercase",
+      false: "",
+    },
   },
   defaultVariants: { variant: "primary" },
 });
@@ -34,4 +37,5 @@ export type BadgeVariant = NonNullable<VariantProps<typeof badge>["variant"]>;
 const { variant, pixel, class: className, ...rest } = Astro.props;
 ---
 
-<span class={badge({ variant, pixel, class: className })} data-slot="badge" {...rest}><slot /></span>
+<span class={badge({ variant, pixel, class: className })} data-slot="badge" {...rest}><slot /></span
+>

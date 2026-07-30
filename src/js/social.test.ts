@@ -19,7 +19,10 @@ assert.equal(
 );
 
 // falls back when nothing matches, or the list is empty / undefined
-assert.equal(socialUrl(sameAs, "youtube.com", "https://www.youtube.com/"), "https://www.youtube.com/");
+assert.equal(
+  socialUrl(sameAs, "youtube.com", "https://www.youtube.com/"),
+  "https://www.youtube.com/",
+);
 assert.equal(socialUrl([], "github.com", "https://github.com/"), "https://github.com/");
 assert.equal(socialUrl(undefined, "github.com", "https://github.com/"), "https://github.com/");
 

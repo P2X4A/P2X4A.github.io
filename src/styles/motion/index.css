@@ -4,7 +4,7 @@
  * A dependency-free port of `tailwind-animations` (Tailwind v4 CSS-first), adapted to
  * astro-boiler's conventions. We OWN this rather than adding the package: same rung as the
  * Marquee keyframes in `tailwind-theme.css` — a keyframe library is content, not infrastructure,
- * and the template's ethos is self-contained + vendor-free. See wiki/subsystems/motion.md.
+ * and the template's ethos is self-contained + vendor-free (see the project docs: motion is owned).
  *
  * Upstream: tailwind-animations © Miguel Ángel Durán (@midudev) & community — MIT.
  * https://tailwind-animations.com · https://github.com/midudev/tailwind-animations

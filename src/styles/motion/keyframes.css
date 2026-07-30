@@ -9,7 +9,7 @@
  * Kept inside `@theme` so Tailwind still tree-shakes them: a keyframe is emitted only when an
  * `animate-*` utility that uses it is actually present in the markup (cross-`@theme`-block name
  * resolution is fine — the `--animate-*` tokens live in `./index.css`). Add a keyframe here and its
- * `--animate-<name>` shorthand in `./index.css` together. See wiki/subsystems/motion.md.
+ * `--animate-<name>` shorthand in `./index.css` together.
  */
 
 @theme inline {
