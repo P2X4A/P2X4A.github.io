@@ -23,7 +23,8 @@ const blogCollection = defineCollection({
       // coerce.date validates: it runs `new Date(value)` then rejects an Invalid Date at build time
       pubDate: z.coerce.date(), // sorts the listing + article:published_time
       updatedDate: z.coerce.date().optional(), // drives article:modified_time only when present
-      // required for a real blog (seo.md): the card thumbnail AND the article hero banner
+      // required, not optional: it is both the card thumbnail AND the article hero banner, and a
+      // post without one degrades the listing and the OG image at once
       heroImage: image(),
       heroImageAlt: z.string(),
       // the retro category tag ("Quest" / "Lore" / "Tech" / "Guide" / "Dev Log") — see categoryMeta

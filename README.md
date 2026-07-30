@@ -23,17 +23,17 @@ content for your own, then work through [Before you deploy](#before-you-deploy).
 
 ## Commands
 
-| Command        | Action                                              |
-| :------------- | :-------------------------------------------------- |
-| `pnpm install` | Install dependencies                                |
-| `pnpm dev`     | Dev server at `localhost:4321`                      |
-| `pnpm build`   | Production build to `dist/` (`client/` + `server/`) |
-| `pnpm preview` | Preview the production build                        |
-| `pnpm start`   | Run the built Node server (`dist/server/entry.mjs`) |
-| `pnpm check`   | Type-check `.astro` / `.ts` (`astro check`)         |
-| `pnpm lint`    | ESLint                                              |
-| `pnpm format`  | `eslint --fix`, then Prettier                       |
-| `pnpm test`    | Every `*.test.ts` self-check under `src/`           |
+| Command        | Action                                                  |
+| :------------- | :------------------------------------------------------ |
+| `pnpm install` | Install dependencies                                    |
+| `pnpm dev`     | Dev server at `localhost:4321`                          |
+| `pnpm build`   | Production build to `dist/` (static pages + the Worker) |
+| `pnpm preview` | `wrangler dev` — run the production Worker locally      |
+| `pnpm deploy`  | `astro build && wrangler deploy` to Cloudflare          |
+| `pnpm check`   | Type-check `.astro` / `.ts` (`astro check`)             |
+| `pnpm lint`    | ESLint                                                  |
+| `pnpm format`  | `eslint --fix`, then Prettier                           |
+| `pnpm test`    | Every `*.test.ts` self-check under `src/`               |
 
 ## Routes
 
@@ -66,7 +66,7 @@ entry named. Entries live one folder deep and the folder name is the slug.
 | Collection | Location             | Ships with     | Holds                                                                                                                                           |
 | :--------- | :------------------- | :------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
 | `blog`     | `src/data/blog/`     | **6 posts**    | `title`, `description`, `authors[]` (≥1), `pubDate`, `heroImage(+alt)`, `category`, `tags`, optional `updatedDate`, `draft`                     |
-| `projects` | `src/data/projects/` | **6 projects** | `title`, `description`, `tagline`, `status`, `moduleId`, `order`, `thumbnail(+alt)`, `tech[]`, `specs[]`, `features[]`, `challenge`, `solution` |
+| `projects` | `src/data/projects/` | **6 projects** | `title`, `description`, `tagline`, `status`, `moduleId`, `order`, `thumbnail(+alt)`, `tech[]`, `specs[]`, `features[]`, `archCaption`, `challenge`, `solution`, optional `cardTitle`, `draft` |
 | `authors`  | `src/data/authors/`  | `admin`        | `name`, `authorLink`, optional `avatar` — referenced by posts as the byline                                                                     |
 
 The samples are retro-flavoured placeholders; replace them with your own. A blog post's body is
@@ -75,10 +75,16 @@ data is structured frontmatter.
 
 ## Configuration
 
-Typed data lives in `src/config/`, never as literals in components:
+Site-wide facts live typed in `src/config/`. (One-off section copy — the FAQ, the tech-stack list,
+the gear table — deliberately lives as a typed literal at the top of its Section component instead:
+edit the section to edit the copy. The rule: used on more than one page ⇒ it belongs in config.)
 
-- **`siteData.json.ts`** — brand name, title, description, the author block, `sameAs` (social URLs
-  that disambiguate the JSON-LD `Organization`) and the default social image.
+- **`siteData.json.ts`** — brand name, title, description, the author block, `sameAs` (your social
+  profile URLs) and the default social image. `sameAs` does double duty: it disambiguates the JSON-LD
+  `Organization` **and** it is where every social link on the site resolves from.
+- **`socialData.json.ts`** — one definition per social platform (label, pixel glyph, and how its URL
+  resolves out of `sameAs`), shared by the footer row, the home contact chips and the contact info
+  cards. Add a platform here, then reference it from whichever section should show it.
 - **`siteSettings.json.ts`** — `siteLang` / `siteLocale`, plus the feature switches
   `useViewTransitions` and `useAnimations`.
 - **`legalData.json.ts`** — the terms and privacy copy, section by section.
@@ -99,9 +105,17 @@ the `ui/pixel-panel` primitive; the shadow colour is itself a theme-aware token 
   table, pixel-panel, theme-toggle, and the rest — each a folder with a `tailwind-variants` recipe,
   built on the token layer and zero-JS unless interaction demands it. Alongside them sit **7 internal
   entries** (`_client.ts`, `_dialog.ts`, `_listbox.ts`, `_popover.ts`, `_overlay.css`, `_field.ts`,
-  `_Chevron.astro`) that the primitives share. Contract: `src/components/ui/README.md`.
-- **571 inlined SVG icons** (`src/components/svg/icons/`) behind a typed `<Icon name="…" />`.
-  Build-time only: icons inline into HTML and nothing lands in client JS.
+  `_Chevron.astro`) that the primitives share. Contract: `src/components/ui/README.md`. The theme's
+  own pages use about a third of the library; the rest is stock for your customisation — browse it
+  all at `/examples/ui` in dev, or trim it (see [Before you deploy](#before-you-deploy), step 6).
+- **Two icon systems.** The theme's own UI runs on **18 pixel-art glyphs**
+  (`src/components/svg/pixel-icons/`) behind a typed `<PixelIcon name="…" />` — the theme toggle, the
+  footer social row, the tech-stack and skill-tree lists, the article navigation. Alongside it sits a
+  stock library of **553 inlined 24×24 line icons** (`src/components/svg/icons/`) behind
+  `<Icon name="…" />`, for your own pages; it is referenced only by the `/examples/ui` catalog, so
+  deleting that catalog (step 6 below) leaves it unreferenced — keep the folder or delete it. Both are
+  build-time only: icons inline into HTML and nothing lands in client JS. Licensing for both is in
+  [`THIRD-PARTY.md`](./THIRD-PARTY.md).
 - **87 motion utilities** (`src/styles/motion/`) — a dependency-free port of tailwind-animations plus
   scroll-driven extensions, with a global `prefers-reduced-motion` guard.
 - **An owned SEO layer** — every meta/OG tag emitted natively by `BaseHead`, JSON-LD (Organization +
@@ -109,8 +123,8 @@ the `ui/pixel-panel` primitive; the shadow colour is itself a theme-aware token 
   `@js/schema`, and dynamic `robots.txt` / `llms.txt` / `rss.xml`. No SEO package.
 
 The owned motion, icon and SEO layers add **no runtime dependencies**. The primitives use
-`tailwind-variants` + `tailwind-merge`; SSR uses `@astrojs/node`; content uses `@astrojs/mdx`; the
-two fonts are self-hosted via `@fontsource`.
+`tailwind-variants` + `tailwind-merge`; SSR uses `@astrojs/cloudflare`; content uses `@astrojs/mdx`;
+the two fonts are self-hosted via `@fontsource`.
 
 ## Contact form
 
@@ -138,7 +152,7 @@ verify a domain in Resend** and set `CONTACT_FROM_EMAIL` to an address on it. Se
 src/
 ├── components/
 │   ├── Sections/<Page>/   layout-free page sections (Global/ for cross-page chrome: Header, Footer)
-│   ├── Cards/             content-aware card compositions (built on ui/card)
+│   ├── Cards/             content-aware card compositions (built on ui/pixel-panel)
 │   ├── ui/<name>/         the primitive library (see its README for the contract)
 │   └── svg/icons/         the <Icon> system
 ├── actions/               the contact server action (Resend)
@@ -156,22 +170,39 @@ Pages are thin route shells that own `BaseLayout` + SEO and compose **Sections**
 
 ## Deployment
 
-The build is static **except `/contact/`**, so `@astrojs/node` (standalone) is mounted and the output
-splits: prerendered pages land in `dist/client/`, the one server entry in `dist/server/entry.mjs`.
+The site deploys to **Cloudflare Workers**: the build is static **except `/contact/`**, so
+`@astrojs/cloudflare` is mounted and `astro build` emits the static pages plus one Worker
+(`dist/_worker.js`) that renders the on-demand route. `wrangler.jsonc` is the Worker config — its
+`main` stays the adapter's entrypoint, and the adapter injects the asset wiring and provisions its
+session KV binding on first deploy.
 
 ```sh
-pnpm build
-pnpm start        # node ./dist/server/entry.mjs  (honours HOST / PORT; default :4321)
+SITE_URL=https://your.domain pnpm build   # bakes canonical/OG/sitemap URLs at build time
+pnpm deploy                               # astro build && wrangler deploy (wrangler login once)
+pnpm preview                              # wrangler dev — the production Worker, locally
 ```
 
-This suits a Docker / Traefik / Dokploy target. **To change hosts**, swap the adapter in
-`astro.config.mjs` for `@astrojs/netlify` or `@astrojs/vercel` (a two-line change; nothing else knows
-which adapter is mounted). **To go fully static**, remove the contact form (or its `prerender = false`)
-and drop the adapter — then any static host serves `dist/`.
+The contact keys live in the Worker, not the build: set them once with
+`pnpm wrangler secret put RESEND_API_KEY` / `CONTACT_TO_EMAIL` (and `CONTACT_FROM_EMAIL` for a
+verified domain). Locally, `.env` keeps working for `pnpm dev`.
 
-Required environment variables: **`SITE_URL`** (your production domain — feeds canonical, OG, JSON-LD,
-sitemap, `robots.txt`, `llms.txt`; a production deploy throws on the `example.com` placeholder), plus
-the contact keys above. See `.env.example`.
+**To change hosts**, swap the adapter in `astro.config.mjs` for `@astrojs/node`, `@astrojs/netlify`
+or `@astrojs/vercel` (a two-line change; nothing else knows which adapter is mounted — the contact
+keys read through `astro:env`, which every adapter serves). **To go fully static**, remove the
+contact form (or its `prerender = false`) and drop the adapter — then any static host serves `dist/`.
+
+**One known cost of the mixed build:** because `/contact/` is on-demand, the build emits the shared
+stylesheet twice — `_astro/BaseLayout.<hash>.css` and a byte-identical `_astro/contact.<hash>.css`
+(84,211 B, ~14.7 KB gzip each) — so a visitor who navigates from any static page to `/contact/`
+downloads it again. It is an artifact of mixing prerendered and on-demand routes, not a
+misconfiguration: setting `prerender = true` on the contact route collapses the two into one file,
+verified. Going fully static (above) removes it; otherwise it is the price of the server-rendered
+form, and the second copy is cached from then on.
+
+Required environment variables at **build** time: **`SITE_URL`** (your production domain — feeds
+canonical, OG, JSON-LD, sitemap, `robots.txt`, `llms.txt`; a production deploy throws on the
+`example.com` placeholder — set `DEPLOY_ENV=production` in your CI build env to arm that guard).
+See `.env.example`.
 
 ## Before you deploy
 
@@ -182,13 +213,19 @@ the contact keys above. See `.env.example`.
    verified domain + `CONTACT_FROM_EMAIL`).
 3. **`public/og.jpg`** — replace the placeholder with a real 1200×630 social image.
 4. **`src/config/*`** — `siteData`, `portfolioData`, and the `legalData` terms/privacy copy (the last
-   is placeholder text, not legal advice — have it reviewed).
+   is placeholder text, not legal advice — have it reviewed). In `siteData`, **fill `sameAs`**: until
+   you do, the footer icons and contact links point at bare platform home pages (`github.com`,
+   `linkedin.com`, `discord.gg`) rather than at your profiles. Set `author.email` and, if you use it,
+   `author.twitter` (empty by default, which omits `twitter:creator`).
 5. **Favicons** — `public/favicon.svg` and `public/favicon.ico`.
 6. **Delete the dev catalog** — `src/components/Sections/UiCatalog/` and `src/pages/examples/`, once
    you have finished picking primitives. It builds no pages in production, but Tailwind still scans its
    markup, so its demo classes sit in the stylesheet every page loads; removing it trims the shared CSS
-   by roughly a quarter (measured 76.4 KB → 56.7 KB on the stock catalog) and drops ~70 unused
-   `@keyframes`.
+   by roughly a quarter (re-measured on the stock catalog: 84,211 B → 64,246 B, ~11.7 KB gzip) and
+   drops 75 unused `@keyframes` (90 → 15).
+7. **Read [`THIRD-PARTY.md`](./THIRD-PARTY.md)** — the fonts, icon sets and code ports that are *not*
+   covered by [`LICENSE`](./LICENSE), including which trademarked brand marks the theme uses and the
+   demo images whose provenance you need to settle before shipping commercially.
 
 ## Verifying a change
 
@@ -202,7 +239,9 @@ finds none**, so a check cannot go missing unnoticed.
 
 ## Docs
 
-House rules live in the project docs — TypeScript,
-Tailwind, Astro, motion, SEO. `wiki/` is a maintained knowledge base covering every subsystem, and
-records the removal of the former i18n layer and Keystatic CMS along with the shape to restore if a
-project needs them back — start at `wiki/index.md`.
+House rules live in the project docs. The component
+contracts live next to the code they govern: `src/components/ui/README.md`,
+`src/components/Sections/README.md`, `src/components/Cards/README.md`,
+`src/components/svg/icons/README.md` and `src/data/README.md`. Git history records the removal of
+the former i18n layer and Keystatic CMS, along with the shape to restore them if a project needs
+them back.

@@ -3,8 +3,7 @@
 This folder is astro-boiler's **own** UI primitive library. It is informed by the proven
 `tailwind-variants` shape (folder / `tv()` config / `index.ts` re-export) but it is **ours** — not a
 vendored kit, not the Starwind CLI, not the `preline` package. Preline is a markup/states reference
-only; never load `preline.js`. Full rationale and the build roadmap live in
-`tasks/ui-library-handoff.md`.
+only; never load `preline.js`.
 
 This README is the source of truth for the pattern. Every primitive in `src/components/ui/` MUST
 follow it.
@@ -22,8 +21,7 @@ follow it.
    redundant recipes for parts that already have one.
 4. **Tokens only, never raw colors** — every class resolves to a semantic token (`bg-primary`,
    `text-foreground`, `border-input`, `ring-outline`, `bg-error`/`bg-success`, `rounded-md`). This is
-   what keeps dark mode and re-theming free. See `tasks/ui-library-handoff.md` for the
-   Preline→token translation table; the token defs live in `src/styles/global.css` +
+   what keeps dark mode and re-theming free. The token defs live in `src/styles/global.css` +
    `tailwind-theme.css`.
 5. **Merge consumer overrides** — destructure `class: className`, spread `...rest`, pass
    `class: className` through the config (so `tailwind-merge` lets the last conflicting utility win),
@@ -79,10 +77,33 @@ renders every primitive in every variant via `@components/Sections/UiCatalog`. A
 `/examples/ui` and eyeball it in **light and dark** mode (toggle in the header) — a missing token
 shows up instantly as an un-themed element.
 
+## Buttons: `.pixel-btn` vs `ui/button`
+
+Two button systems exist on purpose, and reaching for the wrong one is the easiest way to get
+something that looks nothing like the theme.
+
+**`.pixel-btn`** (a global class in `src/styles/global.css`) is what 8-BitQuest's own CTAs use — the
+notched pixel face with the inset depth shadow, in pink (default), `--blue`, or `--green`. Every
+visible call to action in the theme is one: the hero CTAs, the header MENU button, the theme toggle,
+the contact submit, the 404. Apply it to a plain `<a>` or `<button>` and size it with padding
+utilities at the call site. If you are adding a CTA to a page, this is the one you want.
+
+**`ui/button`** is the neutral stock primitive — rounded, token-coloured, `variant` + `size`, no pixel
+treatment. It is deliberately *not* used by any page in the theme; it appears only in the
+`/examples/ui` catalog, like the other stock primitives. It stays in the library for two reasons: it
+is there for buyers who want a conventional button somewhere, and five primitives compose its exported
+`button` recipe rather than cloning it (**PaginationLink**, **InputNumber**, **DialogTrigger**,
+**DialogClose**, **DropdownTrigger**) — so deleting it would break those.
+
 ## Tier 1 (built)
 
 Button · Input · Label · Textarea · Badge · Card (Image/Header/Title/Description/Action/Content/Footer,
 `variant` + `size`) · Alert · Separator · Skeleton · Avatar.
+
+- **Textarea** takes its default value as a `value` prop, like Input, even though the underlying
+  element carries its value as content rather than as an attribute — the primitive writes it with
+  `set:text`. That is what keeps call sites safe: children spread over several lines would put those
+  newlines *inside* the element, where they become leading whitespace in the submitted value.
 
 ## Tier 2 (built)
 
@@ -121,9 +142,9 @@ Select · Checkbox · Radio · Switch · Table (Header/Body/Footer/Row/Head/Cell
 
 Slider · InputNumber · ToggleCount (+ Value) · PasswordInput · PasswordStrength · ComboBox (+ Option)
 · AdvancedSelect · Searchbox (+ Item). The Preline "advanced forms" set, native-first — no
-`preline.js`, tokens only. Three (ComboBox, AdvancedSelect, Searchbox) were deferred as "heavy JS" in
-the roadmap and built on request; each keeps its own small bundled script (re-init on
-`astro:after-swap`) and states its ceiling with a `ponytail:` note.
+`preline.js`, tokens only. Three (ComboBox, AdvancedSelect, Searchbox) were initially deferred as
+"heavy JS" and built later; each keeps its own small bundled script (re-init on `astro:after-swap`)
+and states its ceiling with a `ponytail:` note.
 
 - **Slider** is a native `<input type="range">` styled through the range pseudo-elements — a `bg-muted`
   track (`::-webkit-slider-runnable-track` / `::-moz-range-track`) and a `bg-primary` thumb ringed in
@@ -150,8 +171,8 @@ the roadmap and built on request; each keeps its own small bundled script (re-in
 sites), `_overlay.css`, `password/strength.ts`, and — for the filterable-listbox
 trio — `_listbox.ts` (`filterByText` / `nextIndex` / `createActiveDescendant`) and `_client.ts`
 (`onReady`, the load + `astro:after-swap` re-init contract every scripted primitive shares) are shared
-internal modules (leading `_` or plain helpers), not primitives. The full catalog and roadmap live in
-`tasks/ui-library-handoff.md`.
+internal modules (leading `_` or plain helpers), not primitives. The full catalog is browsable at the
+dev-only `/examples` pages.
 
 ## Navigation & content (built)
 
@@ -192,5 +213,5 @@ follows `siteSettings.useAnimations` (off ⇒ plain pass-through wrapper) with a
 override, and carries `motion-reduce:animate-none` so reduced motion degrades to static content (the
 global reduced-motion guard zeroes time durations but can't stop a scroll-driven animation — see the
 `ponytail:` note in the file). The whole motion system — the catalog, the guard, and the two switches
-(`prefers-reduced-motion` vs `useAnimations`) — is documented in the project docs and
-`wiki/subsystems/motion.md`.
+(`prefers-reduced-motion` vs `useAnimations`) — lives in `src/styles/motion/` and is documented in
+its file headers and the project docs.

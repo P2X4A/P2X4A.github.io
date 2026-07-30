@@ -40,7 +40,7 @@ const pathname = Astro.url.pathname;
       >
         {
           /* ponytail: plain <img> on the Vite-fingerprinted import, not astro:assets <Image>, so the
-            build needs no Sharp (the template ships no images and no Sharp dep — see build handoff).
+            build needs no Sharp (the template has no Sharp dep; see the README's image note).
             Fine for a 1KB brand mark; switch to <Image> if the project adds Sharp for real content. */
         }
         <img
