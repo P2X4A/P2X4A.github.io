@@ -6,10 +6,10 @@
  * dependency). Each builder returns a plain JSON-LD node; `getSiteSchema` composes the
  * site-level graph (Organization + WebSite) that `BaseHead` emits on every page, and merges
  * any page-specific nodes (Article, BreadcrumbList) into one `@graph`. Serialize with
- * `serializeJsonLd`, which escapes `<`
- * so the JSON is safe to inline in a `<script>` without a `</script>` breakout.
+ * `serializeJsonLd`, which escapes `<` as `\u003c`, so the JSON is safe to inline in a `<script>`
+ * without a `</script>` breakout.
  *
- * See the project docs and `wiki/subsystems/seo.md`.
+ * SEO is owned, not vendored — see the project docs.
  */
 
 /**
@@ -229,8 +229,8 @@ export function getBreadcrumbSchema(items: readonly BreadcrumbItem[]): JsonLdNod
 
 /**
  * * Serialize nodes into a schema.org document for inlining in a `<script>` tag.
- * A single node inlines directly; multiple nodes are wrapped in an `@graph`. `<` is
- * escaped to `<` so a value containing `</script>` cannot break out of the tag.
+ * A single node inlines directly; multiple nodes are wrapped in an `@graph`. `<` is escaped to
+ * `\u003c` so a value containing `</script>` cannot break out of the tag.
  * @returns the JSON string, or `""` for an empty graph (so BaseHead can skip the tag).
  */
 export function serializeJsonLd(nodes: readonly JsonLdNode[]): string {
