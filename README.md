@@ -17,8 +17,8 @@ pnpm install
 pnpm dev          # http://localhost:4321
 ```
 
-It runs with no configuration and no keys — the contact form just reports "not configured yet" until
-you add its Resend keys (see [Contact form](#contact-form)). Fill in `src/config/`, swap the sample
+It runs with no configuration and no keys — the contact form accepts a submission and then reports a
+send failure until you add its Resend keys (see [Contact form](#contact-form)). Fill in `src/config/`, swap the sample
 content for your own, then work through [Before you deploy](#before-you-deploy).
 
 ## Commands
@@ -135,7 +135,8 @@ plain `fetch` to the Resend API — no SDK, no dependency, a 10-second timeout. 
 logged server-side and never shown to the visitor.
 
 It needs two environment variables (read at **request** time, so a missing key never breaks the
-build — the form just says "not configured yet"):
+build — the form answers with its generic send-failure message, and names the missing key in the
+server log rather than to the visitor):
 
 | Variable             | Required | Purpose                                                           |
 | :------------------- | :------: | :---------------------------------------------------------------- |
