@@ -12,35 +12,25 @@
 // Icons rest **blue in light** (`text-info`) / **pink in dark** (`dark:text-secondary`) and go green
 // (`hover:text-success`) on hover — the same active/hover colour as the nav.
 //
-// Wiring (see wiki/design/homepage-figma.md for the decisions the single mock didn't specify):
+// Wiring (decisions the single mock didn't specify):
 //   - copyright year is build-time; "GAME OVER" is kept retro flavour, not the site name.
 //   - Privacy/Terms are the real legal routes.
-//   - social destinations map to the site's real touchpoints (email → author email; LinkedIn/YouTube
-//     → siteData.sameAs, else the platform root; RSS → /rss.xml).
+//   - the two external social destinations resolve through `@config/socialData` (label + glyph + the
+//     sameAs derivation, defined once); RSS and email are site-local, so they stay literal here.
 import { PixelIcon, type PixelIconName } from "@components/svg/pixel-icons";
 import siteData from "@config/siteData.json";
-import { socialUrl } from "@js/social";
+import { socialLink } from "@config/socialData.json";
 
 const year = new Date().getFullYear();
 const copyright = `© ${year} — Game Over`;
 
 // Social row (Figma 5:96, glyphs swapped to the pixel set). `name` is validated against the
-// pixel-icon registry; destinations pull from siteData.sameAs where present.
+// pixel-icon registry. Which platforms appear is this section's call; how one resolves is not.
 type SocialLink = { name: PixelIconName; label: string; href: string; external?: boolean };
 const socialLinks: readonly SocialLink[] = [
-  {
-    name: "linkedin",
-    label: "LinkedIn",
-    href: socialUrl(siteData.sameAs, "linkedin.com", "https://www.linkedin.com/"),
-    external: true,
-  },
+  { ...socialLink("linkedin"), external: true },
   { name: "rss", label: "RSS feed", href: "/rss.xml" },
-  {
-    name: "youtube",
-    label: "YouTube",
-    href: socialUrl(siteData.sameAs, "youtube.com", "https://www.youtube.com/"),
-    external: true,
-  },
+  { ...socialLink("youtube"), external: true },
   { name: "email", label: "Email", href: `mailto:${siteData.author.email}` },
 ];
 

@@ -5,6 +5,7 @@
 // links off the SAME id — so the grid links and the generated routes can never drift. The glob
 // loader gives single-segment ids (`<slug>` for `<slug>/index.mdx`), so a plain `[slug]` param fits.
 import ProjectArticle from "@components/Sections/Project/ProjectArticle.astro";
+import siteData from "@config/siteData.json";
 import { getSortedProjects } from "@js/projectData";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import type { GetStaticPaths } from "astro";
@@ -23,7 +24,7 @@ const { Content } = await render(entry);
 ---
 
 <BaseLayout
-  title={`${entry.data.title} — 8-BitQuest`}
+  title={`${entry.data.title} — ${siteData.name}`}
   description={entry.data.description}
   image={entry.data.thumbnail}
 >

@@ -32,6 +32,18 @@ export interface NavItemProps {
 }
 
 // --------------------------------------------------------
+// social platforms (label + glyph + how the URL resolves). See src/config/socialData.json.ts.
+export interface SocialPlatformProps {
+  label: string; // accessible name / chip label, e.g. "Twitter/X"
+  // pixel-icon glyph name; omitted for a platform with no glyph in the 18-icon set (Discord)
+  icon?: string;
+  // host substring(s) identifying this platform inside siteData.sameAs
+  match: string | readonly string[];
+  // where the link points when sameAs has no match — a platform home page, not a profile
+  fallback: string;
+}
+
+// --------------------------------------------------------
 // legal pages (terms, privacy), keyed by document
 export interface LegalSection {
   heading: string;
