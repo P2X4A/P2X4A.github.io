@@ -5,11 +5,11 @@
 // Astro action (accept: "form"), so it works with JavaScript disabled. The server validates
 // (contactSchema), runs the spam gates, sends via Resend, and /contact/ re-renders with the result —
 // success replaces the card; validation errors show per-field; everything else shows in one alert.
-// See src/actions/index.ts + src/js/contact.ts (the grafio pattern).
+// See src/actions/index.ts + src/js/contact.ts.
 //
 // Reuse: the shared pixel surface (PixelPanel) + the Input / Textarea / Label primitives, re-skinned
-// to the pixel field look (bg-accent + a 4px black frame) via a shared class. Per the grafio styling
-// trap, the override carries SHAPE only, never a border COLOUR that would beat a validation state —
+// to the pixel field look (bg-accent + a 4px black frame) via a shared class. The override carries
+// SHAPE only, never a border COLOUR that would beat a validation state —
 // here the black frame is the theme's invariant (borders are always black), so the error affordance
 // is the red message + aria-invalid ring, not a recoloured border.
 import { Badge } from "@components/ui/badge";
@@ -17,6 +17,7 @@ import { Input } from "@components/ui/input";
 import { Label } from "@components/ui/label";
 import { PixelPanel } from "@components/ui/pixel-panel";
 import { Textarea } from "@components/ui/textarea";
+import { repopulate } from "@js/contact";
 import { actions, isInputError } from "astro:actions";
 
 const result = Astro.getActionResult(actions.contact);
@@ -26,7 +27,15 @@ const fieldErrors: Record<string, string[] | undefined> =
   error && isInputError(error) ? error.fields : {};
 const formError = error && !isInputError(error) ? error.message : undefined;
 
-// Render timestamp for the time gate. Request-time because /contact/ is prerender:false.
+// Repopulate on a rejected submit — see `repopulate` for why the action result can't supply this.
+// Reading the body here is safe: the action middleware parses a *clone* of the request, so the
+// original stream is still unconsumed. `.catch` covers a body that isn't form-encoded at all.
+const submitted =
+  Astro.request.method === "POST" ? await Astro.request.formData().catch(() => null) : null;
+const values = repopulate(submitted);
+
+// Render timestamp for the time gate. Request-time because /contact/ is prerender:false — and it must
+// be *this* render's clock, so a retry of a slowly-filled form isn't rejected as too quick.
 const renderedAt = Date.now();
 
 const FIELDS = [
@@ -112,6 +121,7 @@ const fieldClass = [
         {FIELDS.map((field) => {
           const err = fieldErrors[field.name]?.[0];
           // Shared across both control types; only the element + its one unique attr differ below.
+          // `value` included: Input renders it as an attribute, Textarea as element content.
           const attrs = {
             id: field.name,
             name: field.name,
@@ -119,6 +129,7 @@ const fieldClass = [
             autocomplete: field.autocomplete,
             required: true,
             maxlength: field.maxlength,
+            value: values[field.name] || undefined,
             "aria-invalid": err ? true : undefined,
             "aria-describedby": err ? `${field.name}-error` : undefined,
           };
