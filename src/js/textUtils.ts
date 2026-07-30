@@ -1,4 +1,4 @@
-import { siteLocale } from "@/config/siteSettings.json";
+import { siteLocale } from "@config/siteSettings.json";
 
 /**
  * * returns a formatted date string in the site's locale (siteLocale in siteSettings)

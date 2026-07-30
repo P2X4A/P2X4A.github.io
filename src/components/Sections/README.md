@@ -8,7 +8,8 @@ schema) and composes sections; a section never imports `BaseLayout`.
 
 ```
 src/components/Sections/
-├── Global/          # sections shared across pages: Header, Footer, SectionHeading, CardGrid, Scoreboard
+├── Global/          # shared across pages: Header, HeaderNavLinks, Footer, HeroPanel,
+│                 #   SectionHeading, CardGrid, Scoreboard
 └── <Page>/          # sections of one page: Home/, About/, Blog/, Project/, Contact/, Legal/, NotFound/, UiCatalog/
     └── <Name>.astro # PascalCase, one file per section
 ```
@@ -22,4 +23,4 @@ src/components/Sections/
   `Legal/LegalArticle.astro`) or reads config itself via the `@js` helpers — never both for the
   same data.
 - **Build sections from the primitives** in `@components/ui/*` and `@components/Cards/*`; tokens
-  only, no raw colors (see the project docs).
+  only, no raw colors (see the project docs: token discipline).

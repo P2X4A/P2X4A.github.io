@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Runs every `.test.ts` self-check under `src/` with Node's type stripping — no test framework, no
- * config, no fixtures (see the project docs: non-trivial logic leaves ONE runnable check
+ * config, no fixtures (house rule, see the project docs: non-trivial logic leaves ONE runnable check
  * behind). Discovery-based, so a check written next to the code it covers runs without being
  * registered anywhere; sorted, so failures always report in the same order.
  *

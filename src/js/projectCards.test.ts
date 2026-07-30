@@ -1,5 +1,5 @@
-// Self-check for projectCards.ts — the status→badge map and the entry→card mapping (see
-// the project docs: non-trivial logic leaves ONE runnable check behind). No framework:
+// Self-check for projectCards.ts — the status→badge map and the entry→card mapping (house rule:
+// non-trivial logic leaves ONE runnable check behind — see the project docs). No framework:
 // `pnpm test` runs this under Node's type-stripping.
 import assert from "node:assert/strict";
 

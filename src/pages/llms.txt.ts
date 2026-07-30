@@ -8,7 +8,7 @@ import type { APIRoute } from "astro";
  *
  * ponytail: hand-curated, not an auto-generated sitemap — add new top-level entry points here as
  * the site grows, or this drifts. Currently the main pages, the blog index, and the RSS feed. It's
- * an editorial content map for AI crawlers, not a ranking factor. See the project docs.
+ * an editorial content map for AI crawlers, not a ranking factor.
  */
 export const GET: APIRoute = ({ site }) => {
   const { name, description } = siteData;

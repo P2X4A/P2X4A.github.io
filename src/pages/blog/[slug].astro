@@ -46,7 +46,7 @@ const dateISO = data.pubDate.toISOString();
 const { prev, next } = getAdjacentPosts(posts, entry.id);
 const related = getRelatedPosts(posts, entry.id, 2);
 
-// SEO: BlogPosting + a BreadcrumbList matching the visible breadcrumb (seo.md — never emit one
+// SEO: BlogPosting + a BreadcrumbList matching the visible breadcrumb (never emit one
 // without the other). Absolute URLs resolve against `site`.
 const canonical = new URL(`/blog/${entry.id}/`, Astro.site).href;
 // author's public URL (the authors collection's authorLink), resolved absolute; publisher points at
@@ -72,7 +72,7 @@ const breadcrumbSchema = getBreadcrumbSchema([
 ---
 
 <BaseLayout
-  title={`${data.title} — 8-BitQuest`}
+  title={`${data.title} — ${siteData.name}`}
   description={data.description}
   image={data.heroImage}
   schema={[articleSchema, breadcrumbSchema]}

@@ -1,4 +1,4 @@
-// Dependency-free RSS 2.0 feed for the blog (seo.md: RSS ships with the blog route; hand-rolled like
+// Dependency-free RSS 2.0 feed for the blog (a feed ships with the blog route; hand-rolled like
 // everything else in <head>, no @astrojs/rss). A static endpoint so its absolute URLs resolve against
 // `site` and never drift; linked from the footer, BaseHead, and llms.txt. The escaping + document
 // shape live in @js/rss (pure + tested); this endpoint only supplies the posts and the `site` URL.

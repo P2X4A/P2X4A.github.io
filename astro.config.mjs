@@ -1,9 +1,9 @@
 // @ts-check
+import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
-import node from "@astrojs/node";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "astro/config";
+import { defineConfig, envField } from "astro/config";
 
 // The production domain, which `site` below feeds to canonical, OG, JSON-LD, the sitemap,
 // robots.txt and llms.txt — six things one wrong value poisons at once, and none of them visibly
@@ -37,16 +37,29 @@ export default defineConfig({
   site,
 
   // The site is static EXCEPT one page: `/contact/` sets `export const prerender = false` because
-  // it receives the Resend form POST and re-renders itself with the result (the grafio pattern).
-  // That single on-demand route is the only thing this Node server ever runs; every other route
-  // still prerenders to HTML. `mode: "standalone"` emits a self-contained Node server (dist/server +
-  // dist/client) that fits the Dokploy/Traefik/Docker setup this project deploys behind — swap it for
-  // `@astrojs/netlify` / `@astrojs/vercel` in two lines if the host changes (nothing else knows which
-  // adapter is mounted). Drop the contact form and remove this line to go fully static again.
-  adapter: node({ mode: "standalone" }),
+  // it receives the Resend form POST and re-renders itself with the result.
+  // That single on-demand route is the only thing the Cloudflare Worker ever runs; every other
+  // route still prerenders to HTML and is served as a static asset (see wrangler.jsonc). Swap this
+  // for `@astrojs/node` / `@astrojs/netlify` / `@astrojs/vercel` in two lines if the host changes
+  // (nothing else knows which adapter is mounted). Drop the contact form and remove this line to go
+  // fully static again.
+  adapter: cloudflare(),
+
+  // The contact action's mail keys, declared through `astro:env` so they resolve at REQUEST time on
+  // every adapter — on Cloudflare Workers, secrets exist only in the runtime env (`wrangler secret`),
+  // which `import.meta.env` never sees. All optional: a missing key must not break the build; the
+  // action logs which key is missing to the server and answers the visitor with its generic
+  // send-failure message instead (see src/actions/index.ts).
+  env: {
+    schema: {
+      RESEND_API_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+      CONTACT_TO_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
+      CONTACT_FROM_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
+    },
+  },
 
   // One canonical URL shape: the directory build emits trailing slashes, and canonical + OG agree
-  // on that shape (see the project docs).
+  // on that shape.
   trailingSlash: "always",
 
   // mdx() renders .mdx content.

@@ -1,9 +1,17 @@
 // Run: pnpm test  (or: node --experimental-strip-types src/js/contact.test.ts)
 // The runnable check behind the contact form's trust boundary: schema accept/reject, the two spam
-// gates, header-injection rejection, and email-body escaping. No framework, no fixtures.
+// gates, header-injection rejection, email-body escaping, and error repopulation. No framework, no
+// fixtures.
 import assert from "node:assert/strict";
 
-import { buildEmail, contactSchema, escapeHtml, MIN_FILL_MS, spamReason } from "./contact.ts";
+import {
+  buildEmail,
+  contactSchema,
+  escapeHtml,
+  MIN_FILL_MS,
+  repopulate,
+  spamReason,
+} from "./contact.ts";
 
 const valid = {
   name: "Alex Chen",
@@ -47,5 +55,30 @@ assert.ok(!mail.html.includes("<script>"));
 
 // escapeHtml covers all five significant characters
 assert.equal(escapeHtml(`&<>"'`), "&amp;&lt;&gt;&quot;&#39;");
+
+// repopulate: a rejected submit gives every visible field back, so nothing typed is lost
+const posted = new FormData();
+posted.set("name", "Alex Chen");
+posted.set("email", "not-an-email");
+posted.set("subject", "Tutorial inquiry");
+posted.set("message", "A long message worth preserving.");
+posted.set("_gotcha", "");
+posted.set("_ts", "1000");
+assert.deepEqual(repopulate(posted), {
+  name: "Alex Chen",
+  email: "not-an-email",
+  subject: "Tutorial inquiry",
+  message: "A long message worth preserving.",
+});
+
+// ...and only those four. Echoing _gotcha back would defeat the honeypot on the retry, and a
+// repopulated _ts would make the time gate reject every resubmission of a slowly-filled form.
+assert.deepEqual(Object.keys(repopulate(posted)), ["name", "email", "subject", "message"]);
+
+// a fresh GET render has no body, and a File entry never reaches a value attribute
+assert.deepEqual(repopulate(null), { name: "", email: "", subject: "", message: "" });
+const withFile = new FormData();
+withFile.set("message", new File(["x"], "x.txt"));
+assert.equal(repopulate(withFile).message, "");
 
 console.log("contact: all assertions passed");

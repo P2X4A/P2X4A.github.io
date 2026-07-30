@@ -1,5 +1,5 @@
 /**
- * * Astro Actions — the one server mutation in 8-BitQuest: the contact form (the grafio pattern).
+ * * Astro Actions — the one server mutation in 8-BitQuest: the contact form.
  *
  * `accept: "form"` binds the action to a native `<form method="POST">`, so it works with JavaScript
  * disabled: the browser posts real FormData, Astro runs `contactSchema` first (the handler starts
@@ -13,6 +13,9 @@ import siteData from "@config/siteData.json";
 import { buildEmail, contactSchema, spamReason } from "@js/contact";
 import { sendContactEmail } from "@js/resend";
 import { ActionError, defineAction } from "astro:actions";
+// astro:env, not import.meta.env: on Cloudflare Workers secrets live only in the runtime env,
+// which import.meta.env never sees. Declared (all optional) in astro.config.mjs `env.schema`.
+import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, RESEND_API_KEY } from "astro:env/server";
 
 export const server = {
   contact: defineAction({
@@ -24,18 +27,26 @@ export const server = {
       if (reason) throw new ActionError({ code: "BAD_REQUEST", message: reason });
 
       // 2. Mail keys — checked at REQUEST time, so a missing key never breaks the build.
-      const apiKey = import.meta.env.RESEND_API_KEY;
-      const to = import.meta.env.CONTACT_TO_EMAIL;
+      const apiKey = RESEND_API_KEY;
+      const to = CONTACT_TO_EMAIL;
       if (!apiKey || !to) {
+        // The visitor gets the same generic message as any other send failure — naming the env vars
+        // to the public tells an attacker what the deployment is missing and reads as a broken site.
+        // The operator gets the actionable sentence in the Worker log, same split as the send failure
+        // below.
+        const missing = [!apiKey && "RESEND_API_KEY", !to && "CONTACT_TO_EMAIL"].filter(Boolean);
+        console.error(
+          `[contact] Not configured — set ${missing.join(" and ")} (see .env.example). ` +
+            `On Cloudflare: pnpm wrangler secret put <NAME>.`,
+        );
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
-          message:
-            "This form is not configured yet. Set RESEND_API_KEY and CONTACT_TO_EMAIL — see .env.example.",
+          message: "Your message could not be sent. Please email me directly.",
         });
       }
       // Defaults to Resend's shared sender, which only delivers to the account owner's address.
       // Verify your own domain in Resend and set CONTACT_FROM_EMAIL to send anywhere.
-      const from = import.meta.env.CONTACT_FROM_EMAIL ?? "onboarding@resend.dev";
+      const from = CONTACT_FROM_EMAIL ?? "onboarding@resend.dev";
 
       // 3. Build (escaped) + send via the Resend boundary, then translate the result.
       const result = await sendContactEmail(buildEmail(input, siteData.name), { apiKey, to, from });

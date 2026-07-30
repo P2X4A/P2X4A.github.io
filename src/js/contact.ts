@@ -1,5 +1,5 @@
 /**
- * * Contact form — the trust boundary (the grafio pattern; see astrocraft-doc → grafio/contact-form.md).
+ * * Contact form — the trust boundary.
  *
  * Pure and framework-free on purpose: no `import.meta.env`, no `fetch`, no Astro imports — so it
  * type-strips for `pnpm test` and the action handler (`src/actions/index.ts`) starts from data that
@@ -42,6 +42,38 @@ export const contactSchema = z.object({
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;
+
+/** The fields the form echoes back after a rejected submit. Deliberately not the two hidden ones. */
+export type RepopulatedField = "name" | "email" | "subject" | "message";
+
+/**
+ * * Pull the visitor's submitted values back out of a raw `FormData`, so a validation failure
+ * re-renders the form filled in rather than blank.
+ *
+ * Needed because Astro's `isInputError(error)` exposes `.fields` — the messages — but never the input
+ * that produced them. Without this a bad email address discards up to 5000 characters of message,
+ * which is exactly the no-JS path the template advertises.
+ *
+ * The two hidden fields are excluded on purpose, not by omission: echoing `_gotcha` back would defeat
+ * the honeypot on the retry, and `_ts` must carry the CURRENT render's timestamp or the time gate
+ * rejects every resubmission of a form that was slow to fill.
+ *
+ * @param form the submitted FormData, or `null` on a fresh GET render
+ * @returns every repopulated field as a string — `""` where absent or where the entry was a File
+ */
+export function repopulate(form: Pick<FormData, "get"> | null): Record<RepopulatedField, string> {
+  // A multipart post can hand back a File for any name; it must never reach a value attribute.
+  const read = (name: RepopulatedField): string => {
+    const value = form?.get(name);
+    return typeof value === "string" ? value : "";
+  };
+  return {
+    name: read("name"),
+    email: read("email"),
+    subject: read("subject"),
+    message: read("message"),
+  };
+}
 
 /** Minimum ms between render and submit. Faster than a human can read the form ⇒ a bot. */
 export const MIN_FILL_MS = 3000;
