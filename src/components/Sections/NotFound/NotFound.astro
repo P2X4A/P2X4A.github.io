@@ -1,10 +1,18 @@
 ---
 // 404 content. Layout-free section: src/pages/404.astro owns BaseLayout + SEO (noindex) and
 // passes the title/description copy down (it doubles as the page's meta tags).
-import Button from "@components/ui/button/Button.astro";
+//
+// Re-skinned to the theme (it was the one page still in the generic stock language — ui/button, a
+// text gradient and a 239-line non-pixel illustration). Now it reuses what every other page uses:
+// the PixelPanel surface, a pixel Badge tag, and a `.pixel-btn` CTA matching Home/Hero. Centred
+// rather than left-aligned like HeroPanel, because a dead end should read as a full-screen stop.
+//
+// The big 404 is set in the display face (Press Start 2P) instead of an illustration: the font IS
+// the pixel treatment, so it costs no new asset and can never drift from the theme's palette. It is
+// aria-hidden — the <h1> carries the real message for a screen reader.
+import { Badge } from "@components/ui/badge";
+import { PixelPanel } from "@components/ui/pixel-panel";
 import { siteSettings } from "@config/siteSettings.json";
-
-import NotFoundIllustration from "./NotFoundIllustration.astro";
 
 interface Props {
   title: string;
@@ -15,22 +23,34 @@ const { title, description } = Astro.props as Props;
 ---
 
 <section
-  class="site-container flex min-h-[100lvh] flex-col items-center justify-center gap-8 py-20 text-center"
+  class="site-container flex min-h-[100lvh] flex-col items-center justify-center py-20 text-center"
 >
   {
     /* Above the fold → a time-based `animate-*` (plays once on load), gated on the decorative-motion switch. */
   }
-  <NotFoundIllustration
+  <PixelPanel
+    elevated
     class:list={[
-      "max-w-xs md:max-w-sm",
+      "flex w-full max-w-2xl flex-col items-center gap-6 p-6 sm:p-10",
       siteSettings.useAnimations && "animate-fade-in-up motion-reduce:animate-none",
     ]}
-  />
+  >
+    <Badge pixel variant="error">Game Over</Badge>
 
-  <div class="flex flex-col items-center gap-4">
-    <h1 class="h1 text-balance"><span class="main-text-gradient">{title}</span></h1>
-    <p class="description max-w-xl text-balance">{description}</p>
-  </div>
+    <p
+      class="font-display text-secondary-700 dark:text-secondary text-5xl leading-none sm:text-7xl md:text-8xl"
+      aria-hidden="true"
+    >
+      404
+    </p>
 
-  <Button href="/" size="lg">Back to home</Button>
+    <div class="flex flex-col items-center gap-3">
+      <h1 class="h2 text-info text-balance">{title}</h1>
+      <p class="text-muted-foreground max-w-xl text-base text-balance">{description}</p>
+    </div>
+
+    <a href="/" class="pixel-btn pixel-btn--blue mt-1 px-5 py-4 text-sm uppercase sm:text-base">
+      Continue
+    </a>
+  </PixelPanel>
 </section>
