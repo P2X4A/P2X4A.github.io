@@ -42,7 +42,7 @@ const FIELDS = [
   {
     name: "name",
     label: "Your Name",
-    placeholder: "e.g. ALEX CHEN",
+    placeholder: "e.g. PLAYER ONE",
     as: "input",
     type: "text",
     autocomplete: "name",
@@ -51,7 +51,9 @@ const FIELDS = [
   {
     name: "email",
     label: "Email Address",
-    placeholder: "e.g. PLAYER1@GENESIS.COM",
+    // example.com, never an invented domain: the Astro theme-catalogue review strictly enforces it,
+    // since a made-up domain can resolve to a real site and draw unwanted contact.
+    placeholder: "e.g. PLAYER1@EXAMPLE.COM",
     as: "input",
     type: "email",
     autocomplete: "email",
