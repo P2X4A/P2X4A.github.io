@@ -147,6 +147,17 @@ server log rather than to the visitor):
 The default sender only delivers to your own Resend account address. **To send anywhere else you must
 verify a domain in Resend** and set `CONTACT_FROM_EMAIL` to an address on it. See `.env.example`.
 
+### Demo deployments
+
+Building with `CONTACT_DEMO_MODE=true` makes the form validate, run its spam gates, and then report
+success **without sending** — so a public demo of this template needs no Resend account and no
+inbox. It is read at build time and defaults to `false`; leave it unset on a real site, or your
+contact form will quietly deliver nothing.
+
+```sh
+CONTACT_DEMO_MODE=true SITE_URL=https://your-demo.example.com pnpm build
+```
+
 ## Structure
 
 ```text

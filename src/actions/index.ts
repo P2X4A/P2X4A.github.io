@@ -15,7 +15,12 @@ import { sendContactEmail } from "@js/resend";
 import { ActionError, defineAction } from "astro:actions";
 // astro:env, not import.meta.env: on Cloudflare Workers secrets live only in the runtime env,
 // which import.meta.env never sees. Declared (all optional) in astro.config.mjs `env.schema`.
-import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, RESEND_API_KEY } from "astro:env/server";
+import {
+  CONTACT_DEMO_MODE,
+  CONTACT_FROM_EMAIL,
+  CONTACT_TO_EMAIL,
+  RESEND_API_KEY,
+} from "astro:env/server";
 
 export const server = {
   contact: defineAction({
@@ -26,7 +31,12 @@ export const server = {
       const reason = spamReason(input);
       if (reason) throw new ActionError({ code: "BAD_REQUEST", message: reason });
 
-      // 2. Mail keys — checked at REQUEST time, so a missing key never breaks the build.
+      // 2. Demo deployments: report the real success state without sending. Deliberately AFTER the
+      // spam gates, so a demo still exercises the honeypot and the time gate, and before the key
+      // check, so a public demo needs no Resend account. Off unless CONTACT_DEMO_MODE is set.
+      if (CONTACT_DEMO_MODE) return { ok: true as const };
+
+      // 3. Mail keys — checked at REQUEST time, so a missing key never breaks the build.
       const apiKey = RESEND_API_KEY;
       const to = CONTACT_TO_EMAIL;
       if (!apiKey || !to) {
@@ -48,7 +58,7 @@ export const server = {
       // Verify your own domain in Resend and set CONTACT_FROM_EMAIL to send anywhere.
       const from = CONTACT_FROM_EMAIL ?? "onboarding@resend.dev";
 
-      // 3. Build (escaped) + send via the Resend boundary, then translate the result.
+      // 4. Build (escaped) + send via the Resend boundary, then translate the result.
       const result = await sendContactEmail(buildEmail(input, siteData.name), { apiKey, to, from });
       if (!result.ok) {
         // Log the provider's real answer (it can name the account); never show it to the visitor.
