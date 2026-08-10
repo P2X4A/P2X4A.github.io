@@ -1,5 +1,5 @@
 // @ts-check
-import cloudflare from "@astrojs/cloudflare";
+import staticAdapter from "@astrojs/static";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
@@ -43,8 +43,7 @@ export default defineConfig({
   // for `@astrojs/node` / `@astrojs/netlify` / `@astrojs/vercel` in two lines if the host changes
   // (nothing else knows which adapter is mounted). Drop the contact form and remove this line to go
   // fully static again.
-  adapter: cloudflare(),
-
+adapter: staticAdapter(),
   // The contact action's mail keys, declared through `astro:env` so they resolve at REQUEST time on
   // every adapter — on Cloudflare Workers, secrets exist only in the runtime env (`wrangler secret`),
   // which `import.meta.env` never sees. All optional: a missing key must not break the build; the
