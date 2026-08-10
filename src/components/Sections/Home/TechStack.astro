@@ -15,19 +15,19 @@ import { Reveal } from "@components/ui/reveal";
 import PixelChip from "./PixelChip.astro";
 
 const stack: readonly { label: string; icon: PixelIconName }[] = [
+  { label: "Java", icon: "code" },
   { label: "JavaScript", icon: "code" },
-  { label: "React", icon: "component" },
-  { label: "Node.js", icon: "server" },
-  { label: "Python", icon: "flash" },
-  { label: "Docker", icon: "package" },
-  { label: "AWS", icon: "globe" },
+  { label: "HTML", icon: "code" },
+  { label: "CSS", icon: "code" },
+  { label: "SQL", icon: "server" },
   { label: "Git", icon: "git-branch" },
+  { label: "Astro", icon: "code" },
   { label: "TypeScript", icon: "type" },
 ];
 ---
 
 <Reveal as="section" aria-labelledby="tech-stack-heading" class="flex flex-col gap-6">
-  <SectionHeading id="tech-stack-heading" title="Tech Stack" />
+<SectionHeading id="tech-stack-heading" title="Tecnologías" />
 
   <ul class="flex flex-wrap gap-3 sm:gap-4">
     {

@@ -1,25 +1,82 @@
 ---
-// About (/about/). Thin route shell: owns BaseLayout + SEO and composes the Figma "Pixel Quests -
-// About Me" frame (node 5:278) from Sections/About. One shared `.site-container` wraps every section
-// (aligned with the header/footer); `gap-*` gives the vertical rhythm — the same shell as index.astro.
-import Achievements from "@components/Sections/About/Achievements.astro";
-import DevProfile from "@components/Sections/About/DevProfile.astro";
-import Gear from "@components/Sections/About/Gear.astro";
-import Hero from "@components/Sections/About/Hero.astro";
-import SkillTree from "@components/Sections/About/SkillTree.astro";
-import siteData from "@config/siteData.json";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
+import portfolioData from "@config/portfolioData.json";
+import siteData from "@config/siteData.json";
+import { Image } from "astro:assets";
+import avatarImage from "../assets/images/about-avatar.png";
 ---
 
-<BaseLayout
-  title={`About — ${siteData.name}`}
-  description="The dev profile: a full-stack developer's project log, tech stack, unlocked achievements, and daily-driver setup — all in 8-bit."
->
-  <div class="site-container flex flex-col gap-10 py-8 md:gap-12 md:py-12">
-    <Hero />
-    <DevProfile />
-    <SkillTree />
-    <Achievements />
-    <Gear />
-  </div>
+<BaseLayout title={`Presentación | ${siteData.name}`} description="Conoce más sobre mi perfil, intereses y habilidades tecnológicas.">
+  <main class="site-container flex flex-col gap-10 py-8 md:gap-12 md:py-12">
+    
+    <section aria-labelledby="about-heading" class="flex flex-col gap-6 md:gap-8">
+      <SectionHeading id="about-heading" title="Presentación" />
+
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-[1fr_300px] lg:grid-cols-[1fr_400px]">
+        {/* Columna Izquierda: Texto y Video */}
+        <div class="flex flex-col gap-6 text-base text-muted-foreground sm:text-lg">
+          <div class="flex flex-col gap-4">
+            {portfolioData.profile.bio.map((paragraph: string) => <p>{paragraph}</p>)}
+          </div>
+
+          {/* Contenedor del Video de YouTube */}
+          <div class="mt-4 border-4 border-muted p-2 rounded-sm bg-muted/20">
+            <h3 class="text-xl font-bold mb-3 text-foreground">Video de Presentación - Bases de Datos 1</h3>
+            <div class="aspect-video w-full rounded-sm overflow-hidden">
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src="https://www.youtube.com/embed/3A-YaXXC1U8" 
+                title="Presentación Sergio Parra" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowFullScreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+
+        {/* Columna Derecha: Foto/Avatar y Skills */}
+        <aside class="flex flex-col gap-6">
+          {/* Requisito: Foto o Avatar */}
+          <div class="border-4 border-muted p-2 bg-muted/20">
+            <Image 
+              src={avatarImage} 
+              alt="Avatar de Sergio Parra" 
+              class="w-full h-auto object-cover rounded-sm border-2 border-foreground/20"
+            />
+          </div>
+
+          <div class="flex flex-col gap-4 p-4 md:p-6 rounded-lg bg-muted text-sm sm:text-base">
+            <h3 class="text-lg font-bold text-foreground">Tech Stack</h3>
+            <ul class="flex flex-col gap-3">
+              <li class="flex justify-between items-center">
+                <span>Java / POO</span>
+                <span class="text-success">Nvl. Intermedio</span>
+              </li>
+              <li class="flex justify-between items-center">
+                <span>SQL / BD Relacionales</span>
+                <span class="text-success">Nvl. Aprendiz</span>
+              </li>
+              <li class="flex justify-between items-center">
+                <span>Infraestructura TI</span>
+                <span class="text-success">Nvl. Intermedio</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="flex flex-col gap-4 p-4 md:p-6 rounded-lg bg-secondary/10 text-sm sm:text-base border border-secondary/20">
+             <h3 class="text-lg font-bold text-secondary">Logros (Achievements)</h3>
+             <ul class="flex flex-col gap-2">
+               <li class="flex gap-2"><span>🏆</span> <span>Construir mi primer PC</span></li>
+               <li class="flex gap-2"><span>💾</span> <span>Flashear Custom ROMs</span></li>
+               <li class="flex gap-2"><span>🏋️</span> <span>Optimización y Nutrición</span></li>
+             </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+  </main>
 </BaseLayout>

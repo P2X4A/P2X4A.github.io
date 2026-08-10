@@ -13,4 +13,8 @@ import { getSortedProjects } from "@js/projectData";
 const featured = (await getSortedProjects()).slice(0, 3).map(toProjectCard);
 ---
 
-<CardGrid headingId="featured-projects-heading" title="Featured Projects" items={featured} />
+<CardGrid
+  headingId="featured-projects-heading"
+  title="Proyectos destacados"
+  items={featured}
+/>
