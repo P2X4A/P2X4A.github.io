@@ -7,42 +7,48 @@ import { type PortfolioDataProps } from "./types/configDataTypes";
 // portfolio) — keep it consistent if you rewrite.
 const portfolioData = {
   profile: {
-    tagline: "Dev 01",
-    heading: "The Full-Stack Dev",
-    role: "Full-Stack",
-    years: "8+",
+    tagline: "Sergio Parra",
+    heading: "Estudiante de Ingeniería de Sistemas en la Universidad El Bosque",
+    role: "Systems Engineering Student",
+    years: "03",
     bio: [
-      "Welcome to the mainframe. I'm a full-stack developer with 8+ years of experience building scalable web applications, APIs, and tools. This profile serves as a chronological log of my projects, open-source contributions, and the systems I've shipped.",
-      "I'm passionate about clean code, automated testing, and shipping fast. I write about modern frontend patterns, backend architecture, and the tools that keep my workflow efficient.",
-    ],
+  "Soy estudiante de Ingeniería de Sistemas en la Universidad El Bosque, con interés en el desarrollo de software y la construcción de soluciones tecnológicas.",
+  "Actualmente estoy fortaleciendo mis conocimientos en programación, bases de datos, estructuras de datos e infraestructura TI, mientras desarrollo proyectos para aplicar lo aprendido.",
+],
     shortBio:
-      "I'm a developer who builds things with pixels, code, and a healthy dose of nostalgia. I write about the tech I use, the tools I love, and the retro systems that still inspire me.",
-    meta: {
-      location: "The Internet",
-      role: "Full Stack Dev",
-      favorite: "8-Bit Chiptunes",
-    },
-    skills: [
-      { label: "Frontend", pct: 95 },
-      { label: "Backend", pct: 90 },
-    ],
+  "Estudiante de Ingeniería de Sistemas enfocado en aprender, construir proyectos y convertir conocimientos de programación en soluciones funcionales.",
+meta: {
+  location: "Bogotá, Colombia",
+  role: "Estudiante Ingenieria De Sistemas",
+  favorite: "Programacion En Java",
+},
+skills: [
+  { label: "Java", pct: 80 },
+  { label: "JavaScript", pct: 60 },
+],
   },
 
-  stats: {
-    home: ["Posts: 42", "Years: 03", "Coffee: 9000+"],
-    profile: ["Class: Full-Stack Dev", "Lvl: 8+", "XP: 8.5K", "Stars: 2.1K"],
-  },
+stats: {
+  home: ["Estudiante: Ingenieria De Sistemas", "Semestre: 04", "Proyectos: 5+"],
+  profile: [
+    "Class: Estudiante Ingenieria De Sistemas",
+    "Lvl: Intermedio",
+    "Focus: Software",
+    "GitHub: P2X4A",
+  ],
+},
 
-  home: {
-    tagline: "Player 1",
-    heading: "Welcome, Player One",
-    intro:
-      "Level up your knowledge with my latest dev logs, tutorials, and retro tech explorations. Press start to begin your journey.",
-  },
+home: {
+  tagline: "Player 1",
+  heading: "Bienvenido a mi portafolio",
+  intro:
+    "Soy Sergio Parra, estudiante de Ingeniería de Sistemas. Este espacio reúne mis proyectos, conocimientos y experiencias mientras avanzo en mi formación como desarrollador.",
+},
 
-  contact: {
-    prompt: "Want to chat about a project, a retro build, or just share a favorite game?",
-  },
+contact: {
+  prompt:
+    "¿Tienes un proyecto, una oportunidad o una idea relacionada con programacion? Hablemos.",
+},
 } satisfies PortfolioDataProps;
 
 export default portfolioData;

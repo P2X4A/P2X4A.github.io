@@ -12,8 +12,8 @@ import { type NavItemProps } from "./types/configDataTypes";
  * live (`/contact/` is the one SSR page). Four Press Start labels fit the desktop bar at `lg` (measured).
  */
 export const navItems = [
-  { label: "About", href: "/about/" },
-  { label: "Projects", href: "/projects/" },
+  { label: "Presentación", href: "/about/" },
+  { label: "Evidencias", href: "/projects/" },
   { label: "Blog", href: "/blog/" },
-  { label: "Contact", href: "/contact/" },
+  { label: "Contacto", href: "/contact/" },
 ] as const satisfies readonly NavItemProps[];

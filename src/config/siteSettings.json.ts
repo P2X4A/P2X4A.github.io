@@ -9,9 +9,9 @@
 import { type SiteSettingsProps } from "./types/configDataTypes";
 
 // the site's language: <html lang> attribute
-export const siteLang = "en" as const;
+export const siteLang = "es" as const;
 // BCP-47 tag for Intl date formatting (formatDate), og:locale, and JSON-LD inLanguage
-export const siteLocale = "en-US" as const;
+export const siteLocale = "es-CO" as const;
 
 // settings that don't change between pages.
 // `satisfies` checks the shape while preserving the literal `true` (vs widening to boolean).
