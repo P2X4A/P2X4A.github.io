@@ -55,6 +55,14 @@ export default defineConfig({
       RESEND_API_KEY: envField.string({ context: "server", access: "secret", optional: true }),
       CONTACT_TO_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
       CONTACT_FROM_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
+      // Demo deployments only: the contact action reports success without sending, so a public
+      // demo needs no Resend account and no inbox. Never set this on a real deployment.
+      CONTACT_DEMO_MODE: envField.boolean({
+        context: "server",
+        access: "public",
+        optional: true,
+        default: false,
+      }),
     },
   },
 
