@@ -1,5 +1,9 @@
 # 8-BitQuest
 
+![The 8-BitQuest home, blog post and about pages](.github/preview.png)
+
+**[Live demo → 8-bitquest.domidex01.workers.dev](https://8-bitquest.domidex01.workers.dev/)**
+
 A **retro 8-bit, pixel-art developer-portfolio theme** built on **Astro 7 + Tailwind CSS v4 +
 TypeScript (strict)**, with a CSS-first token architecture, typed config-driven content, and an
 in-house UI, motion, icon and SEO stack. Headings are Press Start 2P on a black-bordered "pixel
