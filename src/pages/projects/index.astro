@@ -5,12 +5,17 @@
 // as index.astro & about.astro. This is the page the header nav's PROJECTS link points at.
 import CardGrid from "@components/Sections/Global/CardGrid.astro";
 import ProjectsHero from "@components/Sections/Project/ProjectsHero.astro";
+import { PixelPanel } from "@components/ui/pixel-panel";
 import siteData from "@config/siteData.json";
+import { projectCategories } from "@js/projectCategories";
 import { toProjectCard } from "@js/projectCards";
 import { getSortedProjects } from "@js/projectData";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
-const cards = (await getSortedProjects()).map(toProjectCard);
+const projects = await getSortedProjects();
+const cards = projects.map(toProjectCard);
+const counts = new Map(projects.map((p) => [p.data.category, 0] as const));
+for (const p of projects) counts.set(p.data.category, (counts.get(p.data.category) ?? 0) + 1);
 ---
 
 <BaseLayout
@@ -19,6 +24,27 @@ const cards = (await getSortedProjects()).map(toProjectCard);
 >
   <div class="site-container flex flex-col gap-10 py-8 md:gap-12 md:py-12">
     <ProjectsHero />
-    <CardGrid headingId="all-systems-heading" title="All Systems" items={cards} />
+    <section aria-labelledby="evidence-categories-heading" class="flex flex-col gap-6">
+      <h2 id="evidence-categories-heading" class="h3 text-info">Evidencias por sección</h2>
+      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          projectCategories.map((cat) => (
+            <li>
+              <a href={`/projects/${cat.slug}/`} class="block h-full">
+                <PixelPanel class="flex h-full flex-col gap-3 p-6 transition-transform hover:-translate-y-1">
+                  <span class="font-display text-info text-xs uppercase">{cat.tagline}</span>
+                  <span class="h3">{cat.label}</span>
+                  <span class="text-muted-foreground text-sm leading-relaxed">{cat.intro}</span>
+                  <span class="text-muted-foreground mt-auto text-xs font-bold tracking-wide uppercase">
+                    {counts.get(cat.slug) ?? 0} evidencia(s) — Ver sección
+                  </span>
+                </PixelPanel>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    <CardGrid headingId="all-systems-heading" title="Todas las evidencias" items={cards} />
   </div>
 </BaseLayout>
