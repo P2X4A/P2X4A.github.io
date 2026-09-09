@@ -1,0 +1,31 @@
+---
+// Evidencias / Modelado (/projects/modelado/). Lista solo la categoría "modelado".
+import CardGrid from "@components/Sections/Global/CardGrid.astro";
+import HeroPanel from "@components/Sections/Global/HeroPanel.astro";
+import { PixelIcon } from "@components/svg/pixel-icons";
+import siteData from "@config/siteData.json";
+import { projectCategories } from "@js/projectCategories";
+import { toProjectCard } from "@js/projectCards";
+import { getProjectsByCategory } from "@js/projectData";
+import BaseLayout from "@layouts/BaseLayout.astro";
+
+const category = projectCategories.find((c) => c.slug === "modelado")!;
+const cards = (await getProjectsByCategory("modelado")).map(toProjectCard);
+---
+
+<BaseLayout
+  title={`${category.label} - Evidencias - ${siteData.name}`}
+  description={category.intro}
+>
+  <div class="site-container flex flex-col gap-10 py-8 md:gap-12 md:py-12">
+    <a
+      href="/projects/"
+      class="primary-focus text-info hover:text-success inline-flex w-fit items-center gap-2 text-xs font-bold tracking-wide uppercase transition-colors"
+    >
+      <PixelIcon name="arrow-left" class="size-3.5" />
+      Volver a Evidencias
+    </a>
+    <HeroPanel headingId="modelado-heading" tagline={category.tagline} heading="MODELADO" intro={category.intro} />
+    <CardGrid headingId="modelado-list-heading" title="Evidencias de Modelado" items={cards} />
+  </div>
+</BaseLayout>
