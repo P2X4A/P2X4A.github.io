@@ -1,9 +1,10 @@
 ---
-import { Image } from "astro:assets";
+import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
 import portfolioData from "@config/portfolioData.json";
 import siteData from "@config/siteData.json";
-import SectionHeading from "@components/Sections/Global/SectionHeading.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
+import { Image } from "astro:assets";
+
 import avatarImage from "../assets/images/about-avatar.png";
 ---
 
@@ -26,9 +27,9 @@ import avatarImage from "../assets/images/about-avatar.png";
                 height="100%"
                 src="https://www.youtube.com/embed/3A-YaXXC1U8"
                 title="Presentación Sergio Parra"
-                frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen>
+                allowfullscreen
+                class="border-0">
               </iframe>
             </div>
           </div>
