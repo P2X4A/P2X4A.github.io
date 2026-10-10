@@ -14,8 +14,8 @@ import {
 } from "./contact.ts";
 
 const valid = {
-  name: "Alex Chen",
-  email: "player1@genesis.com",
+  name: "Player One",
+  email: "player1@example.com",
   subject: "Tutorial inquiry",
   message: "I would love a devlog on dithering.",
   _ts: 1000,

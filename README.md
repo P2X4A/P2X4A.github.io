@@ -53,6 +53,9 @@ public/        # favicon, og.jpg
 - Email: sparrar@unbosque.edu.co
 - GitHub: https://github.com/P2X4A
 
+> Nota: el formulario soporta `CONTACT_DEMO_MODE=true` (modo demo: valida pero no envía correos).
+> En este sitio real va sin definir, para que Resend envíe de verdad.
+
 ## Licencia
 
 Ver `LICENSE`. Material de terceros (fuentes, iconos, imágenes demo) en `THIRD-PARTY.md`.
