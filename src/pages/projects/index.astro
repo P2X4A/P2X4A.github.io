@@ -7,14 +7,14 @@ import CardGrid from "@components/Sections/Global/CardGrid.astro";
 import ProjectsHero from "@components/Sections/Project/ProjectsHero.astro";
 import { PixelPanel } from "@components/ui/pixel-panel";
 import siteData from "@config/siteData.json";
-import { projectCategories } from "@js/projectCategories";
 import { toProjectCard } from "@js/projectCards";
+import { projectCategories } from "@js/projectCategories";
 import { getSortedProjects } from "@js/projectData";
 import BaseLayout from "@layouts/BaseLayout.astro";
 
 const projects = await getSortedProjects();
 const cards = projects.map(toProjectCard);
-const counts = new Map(projects.map((p) => [p.data.category, 0] as const));
+const counts = new Map<string, number>(projects.map((p) => [p.data.category, 0]));
 for (const p of projects) counts.set(p.data.category, (counts.get(p.data.category) ?? 0) + 1);
 ---
 
