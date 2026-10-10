@@ -1,0 +1,111 @@
+---
+title: "Sala CineAndes — Parcial puntos 1 y 2"
+tagline: "Modelo Entidad–Relación y reducción a tablas para la cadena de salas de cine CineAndes"
+description: "Modelo conceptual Entidad–Relación de la cadena de salas de cine CineAndes (sedes, salas, sillas, películas, funciones, clientes y empleados) y su reducción a tablas."
+status: "complete"
+category: "modelado"
+moduleId: "BD1-MOD-002"
+order: 2
+thumbnail: "../../../assets/evidencias/sala-cineandes-parcial-punto1-2/cineandes-modelo.png"
+thumbnailAlt: "Diagrama Entidad–Relación de la cadena de salas de cine CineAndes"
+
+tech:
+  - "Modelado Entidad–Relación"
+  - "Bases de Datos 1"
+  - "Reducción a tablas"
+  - "Draw.io"
+
+specs:
+  - label: "Dominio"
+    value: "Cadena de salas de cine"
+  - label: "Entidades"
+    value: "Sede, sala, silla, película, función, cliente, empleado, proveedor, producto y medio de pago"
+  - label: "Alcance"
+    value: "Puntos 1 y 2 del parcial"
+  - label: "Relaciones"
+    value: "Compra, supervisa, entrega, paga con y especialización de empleado"
+
+features:
+  - lead: "Sedes, salas y sillas"
+    text: "Jerarquía de entidades débiles: la sala se identifica dentro de su sede y la silla dentro de su sala."
+  - lead: "Cartelera y funciones"
+    text: "Películas con idiomas, secuelas y antigüedad derivada; funciones identificadas por sala, fecha y hora."
+  - lead: "Clientes y compras"
+    text: "Relación compra con cantidad de boletas y canal, pagada con un único medio de pago."
+  - lead: "Empleados y supervisión"
+    text: "Especialización total y disjunta en proyeccionista y taquillero, más supervisión recursiva con fecha."
+
+archCaption: "Modelo Entidad–Relación de CineAndes"
+
+challenge:
+  title: "Problema"
+  body: "La cadena de salas de cine CineAndes necesita un modelo conceptual que cumpla sus reglas de negocio (sedes, salas, sillas, películas, funciones, clientes y empleados) y su reducción a tablas."
+
+solution:
+  title: "Solución"
+  body: "Se construyó el diagrama Entidad–Relación con entidades débiles, agregación, relación ternaria y especialización, y se resolvieron los puntos 1 y 2 del taller con ese modelo."
+---
+
+## Descripción
+
+Este trabajo resuelve los puntos 1 y 2 del parcial con el modelo Entidad–Relación de la cadena de salas de cine **CineAndes**: el punto 1 con las reglas de negocio (a–i) y el punto 2 con la reducción a tablas (a–f).
+
+## PUNTO 1 — Reglas de negocio
+
+La cadena de salas de cine CineAndes necesita un modelo conceptual que cumpla las siguientes reglas de negocio:
+
+a. De cada **SEDE** se registra un código, un nombre, la dirección —compuesta por ciudad y calle— y uno o varios teléfonos de contacto.
+
+b. Cada sede tiene varias **SALAS**. Dentro de una sede las salas se numeran 1, 2, 3 y así sucesivamente, y ese número solo tiene sentido dentro de su propia sede: la sala 3 de Bogotá y la sala 3 de Medellín son salas distintas. De cada sala se registra el formato de proyección y el aforo.
+
+c. Cada sala está compuesta por **SILLAS**. Una silla se identifica por su fila y su número, que solo tienen sentido dentro de su sala. De cada silla se registra si está habilitada o fuera de servicio.
+
+d. De cada **PELÍCULA** se registra un código, el título, el año de estreno, la duración en minutos y la clasificación. Una película puede estar disponible en uno o varios idiomas. La antigüedad de la película se obtiene a partir de su año de estreno. Además, una película puede ser la secuela de otra ya registrada en el catálogo, y tiene a lo sumo una precuela.
+
+e. Una **FUNCIÓN** es la proyección de una película en una sala determinada, en una fecha y una hora. Dentro de una misma sala, la fecha y la hora identifican la función. De cada función se registra el precio base de la boleta. Toda función proyecta exactamente una película; una película puede no haberse programado nunca.
+
+f. De cada **CLIENTE** se registra el documento, el nombre completo —nombres y apellidos por separado—, el correo y la fecha de nacimiento. La edad del cliente se obtiene de su fecha de nacimiento.
+
+g. Un cliente puede comprar boletas para muchas funciones y una función puede tener muchos clientes. De cada compra se registra la cantidad de boletas y el canal por el que se hizo. Un cliente puede no haber comprado nunca.
+
+h. De cada **EMPLEADO** se registra un identificador, el nombre y la fecha de ingreso. Todo empleado es proyeccionista, del que se registra su certificación técnica, o taquillero, del que se registra la caja asignada. Ningún empleado puede ser las dos cosas al mismo tiempo, y no existen empleados que no sean ni lo uno ni lo otro.
+
+i. Un empleado supervisa a otros empleados. Un empleado tiene a lo sumo un supervisor, y de esa supervisión se registra la fecha desde la cual se ejerce.
+
+## PUNTO 2 — Reducción a tablas (relaciones adicionales y requerimientos)
+
+Relaciones y elementos adicionales:
+
+5. **COMPRA:** atributos: cantidad_boletas, canal.
+
+6. **SUPERVISA:** EMPLEADO (1) — (N) EMPLEADO (recursiva, roles: supervisor / supervisado), atributo: fecha_desde.
+
+7. **ENTREGA:** relación ternaria PROVEEDOR — SEDE — PRODUCTO (M : N : N), atributos: cantidad, fecha_entrega.
+
+8. **PAGA_CON:** agregación: la participación de un CLIENTE en una FUNCION (relación COMPRA) se paga con un único MEDIO_PAGO; un medio de pago se usa en muchas compras (N — 1).
+
+9. **ESPECIALIZACIÓN:** EMPLEADO → PROYECCIONISTA (certificacion_tecnica), EMPLEADO → TAQUILLERO (caja_asignada), jerarquía TOTAL y DISJUNTA.
+
+Se pide:
+
+a. Transforme los atributos de SEDE y de CLIENTE. Escriba las tablas resultantes con su clave primaria y sus claves foráneas, y explique en una línea por qué el atributo derivado no genera columna (4 puntos).
+
+b. Transforme las entidades débiles SALA, SILLA y FUNCION. Escriba las tres tablas indicando con precisión la clave primaria de cada una. Explique en dos líneas cómo se construye la clave primaria de SILLA, dado que su entidad propietaria es a su vez débil (5 puntos).
+
+c. Transforme la relación COMPRA. Escriba la tabla resultante, señale su clave primaria y sus claves foráneas, e indique dónde quedan los atributos cantidad_boletas y canal (3 puntos).
+
+d. Transforme la relación ternaria ENTREGA. Escriba la tabla resultante y justifique por qué, siendo la cardinalidad M:N:N, la clave primaria debe incluir los identificadores de las tres entidades. Indique qué cambiaría en esa clave si la cadena exigiera que para una sede y un producto dados hubiera un único proveedor (4 puntos).
+
+e. Transforme la agregación PAGA_CON. Indique sobre qué tabla del esquema ya transformado queda apoyada la clave foránea hacia MEDIO_PAGO y explique en una línea por qué no puede apoyarse ni en CLIENTE ni en FUNCION (2 puntos).
+
+f. Transforme la especialización de EMPLEADO. Proponga dos estrategias distintas, escriba las tablas de las que elija y justifique en dos líneas por qué la elige, teniendo en cuenta que la jerarquía es total y disjunta (2 puntos).
+
+## Diagrama Entidad–Relación
+
+![Diagrama Entidad–Relación de la cadena de salas de cine CineAndes](../../../assets/evidencias/sala-cineandes-parcial-punto1-2/cineandes-modelo.png)
+
+## Resultado
+
+El modelo representa las sedes con sus salas y sillas como entidades débiles encadenadas, la cartelera con películas, idiomas y secuelas, las funciones por sala, fecha y hora, las compras de los clientes con su medio de pago, y los empleados con especialización total y disjunta más supervisión recursiva.
+
+Este trabajo corresponde a la categoría **Modelado** de la asignatura Bases de Datos 1.
