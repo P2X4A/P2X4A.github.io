@@ -1,0 +1,94 @@
+---
+title: "CineAndes — Punto 3: modelo relacional"
+tagline: "Del esquema del punto 2 al modelo relacional: conceptos, análisis crítico y esquema corregido"
+description: "Punto 3 del parcial de CineAndes: grado y cardinalidad de COMPRA, claves candidatas, claves foráneas nulas y corrección de cuatro errores del esquema relacional."
+status: "complete"
+category: "normalizacion"
+moduleId: "BD1-NOR-001"
+order: 3
+thumbnail: "../../../assets/evidencias/cineandes-punto3-normalizacion/cineandes-punto3.png"
+thumbnailAlt: "Modelo relacional corregido de CineAndes"
+
+tech:
+  - "Modelo relacional"
+  - "Bases de Datos 1"
+  - "Claves primarias y foráneas"
+  - "Draw.io"
+
+specs:
+  - label: "Dominio"
+    value: "Cadena de salas de cine"
+  - label: "Base"
+    value: "Esquema del punto 2"
+  - label: "Alcance"
+    value: "Punto 3 del parcial"
+  - label: "Puntaje"
+    value: "10 puntos"
+
+features:
+  - lead: "Conceptos aplicados"
+    text: "Grado y cardinalidad de COMPRA, correo como clave candidata y claves foráneas que aceptan nulo."
+  - lead: "Análisis crítico"
+    text: "Cuatro errores del esquema entregado: regla violada, consecuencia sobre los datos y corrección."
+  - lead: "Teléfonos y débiles"
+    text: "Atributo multivaluado a tabla propia y claves primarias completas en SALA, SILLA y FUNCION."
+  - lead: "N:M y derivados"
+    text: "COMPRA como tabla independiente y edad derivada fuera del almacenamiento físico."
+
+archCaption: "Modelo relacional de CineAndes"
+
+challenge:
+  title: "Problema"
+  body: "Partiendo del esquema obtenido en el punto 2, responder los conceptos del modelo relacional y corregir los cuatro errores del esquema entregado por otro estudiante."
+
+solution:
+  title: "Solución"
+  body: "Se resolvieron los conceptos (grado 7/8 y cardinalidad 1400 de COMPRA, correo candidato y FK nulas) y se corrigieron los cuatro errores con su regla, consecuencia y corrección."
+---
+
+## Descripción
+
+Este trabajo resuelve el **PUNTO 3 — Modelo relacional (10 puntos)** del parcial de la cadena de salas de cine **CineAndes**, refiriéndose siempre al esquema obtenido en el punto 2.
+
+## a. Conceptos aplicados (3 puntos)
+
+Responda de forma breve, refiriéndose siempre al esquema que obtuvo en el punto 2.
+
+a. ¿Cuál es el grado de la tabla que obtuvo al transformar la relación COMPRA? ¿Y su cardinalidad, si la cadena ha vendido boletas a doscientos clientes distintos en quinientas funciones, con mil cuatrocientas compras registradas?
+
+b. En la tabla CLIENTE, además del documento, ¿podría el correo ser clave candidata? Justifique en una línea y diga qué restricción del negocio haría falta para que lo fuera.
+
+c. ¿Puede una clave foránea tomar valor nulo? Dé un ejemplo concreto tomado de este modelo donde tenga sentido que lo tome, y otro donde no pueda tomarlo nunca.
+
+## b. Análisis crítico de un esquema relacional (4 puntos)
+
+Un estudiante entrega el siguiente esquema como resultado de transformar el modelo del punto 2. Bajo cada tabla se indica la clave primaria que él declaró; la clave foránea lleva asterisco.
+
+SEDE (codigo_sede, nombre, ciudad, calle, telefono1, telefono2)
+    PK: codigo_sede
+SALA (numero_sala, formato, aforo, codigo_sede*)
+    PK: numero_sala
+SILLA (fila, numero, estado, numero_sala*)
+    PK: fila, numero
+FUNCION (fecha, hora, precio_base, codigo_pelicula*)
+    PK: fecha, hora
+CLIENTE (documento, nombres, apellidos, correo, fecha_nacimiento, edad, cantidad_boletas, canal)
+    PK: documento
+EMPLEADO (id_empleado, nombre, fecha_ingreso, supervisor)
+    PK: id_empleado
+
+Identifique cuatro errores. Para cada uno indique qué regla de transformación se violó, qué consecuencia concreta tiene sobre los datos que el sistema podría almacenar o perder, y cómo debe corregirse.
+
+## Diagrama del modelo relacional
+
+<img
+  src="/evidencias/sala-cineandes-parcial-punto1-2/cineandes-punto3.png"
+  alt="Modelo relacional corregido de CineAndes: conceptos aplicados, análisis de errores y esquema final"
+  loading="lazy"
+/>
+
+## Resultado
+
+El punto 3 cierra con el modelo relacional: la tabla COMPRA con grado 7 (8 con la agregación PAGA_CON) y cardinalidad 1400, el correo como clave candidata bajo unicidad obligatoria, claves foráneas nulas solo donde la participación es opcional (supervisión) y nunca dentro de una clave primaria, más la corrección de los cuatro errores del esquema (teléfonos multivaluados a SEDE_TELEFONO, claves completas en SALA, SILLA y FUNCION, COMPRA como tabla independiente y edad derivada sin columna física).
+
+Este trabajo corresponde a la categoría **Normalización** de la asignatura Bases de Datos 1.
