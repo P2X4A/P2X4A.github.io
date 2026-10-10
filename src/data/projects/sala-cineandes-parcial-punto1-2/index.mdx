@@ -1,7 +1,7 @@
 ---
-title: "Sala CineAndes — Parcial puntos 1 y 2"
-tagline: "Modelo Entidad–Relación y reducción a tablas para la cadena de salas de cine CineAndes"
-description: "Modelo conceptual Entidad–Relación de la cadena de salas de cine CineAndes (sedes, salas, sillas, películas, funciones, clientes y empleados) y su reducción a tablas."
+title: "Sala CineAndes — Parcial puntos 1, 2 y 3"
+tagline: "Modelo Entidad–Relación, reducción a tablas y modelo relacional para la cadena de salas de cine CineAndes"
+description: "Modelo conceptual Entidad–Relación de la cadena de salas de cine CineAndes (sedes, salas, sillas, películas, funciones, clientes y empleados), su reducción a tablas y su modelo relacional."
 status: "complete"
 category: "modelado"
 moduleId: "BD1-MOD-002"
@@ -21,7 +21,7 @@ specs:
   - label: "Entidades"
     value: "Sede, sala, silla, película, función, cliente, empleado, proveedor, producto y medio de pago"
   - label: "Alcance"
-    value: "Puntos 1 y 2 del parcial"
+    value: "Puntos 1, 2 y 3 del parcial"
   - label: "Relaciones"
     value: "Compra, supervisa, entrega, paga con y especialización de empleado"
 
@@ -43,12 +43,12 @@ challenge:
 
 solution:
   title: "Solución"
-  body: "Se construyó el diagrama Entidad–Relación con entidades débiles, agregación, relación ternaria y especialización, y se resolvieron los puntos 1 y 2 del taller con ese modelo."
+  body: "Se construyó el diagrama Entidad–Relación con entidades débiles, agregación, relación ternaria y especialización, se resolvieron los puntos 1 y 2 del taller con ese modelo y se cerró con el modelo relacional del punto 3."
 ---
 
 ## Descripción
 
-Este trabajo resuelve los puntos 1 y 2 del parcial con el modelo Entidad–Relación de la cadena de salas de cine **CineAndes**: el punto 1 con las reglas de negocio (a–i) y el punto 2 con la reducción a tablas (a–f).
+Este trabajo resuelve los puntos 1, 2 y 3 del parcial con el modelo de la cadena de salas de cine **CineAndes**: el punto 1 con las reglas de negocio (a–i), el punto 2 con la reducción a tablas (a–f) y el punto 3 con el modelo relacional.
 
 ## PUNTO 1 — Reglas de negocio
 
@@ -102,10 +102,55 @@ f. Transforme la especialización de EMPLEADO. Proponga dos estrategias distinta
 
 ## Diagrama Entidad–Relación
 
-![Diagrama Entidad–Relación de la cadena de salas de cine CineAndes](../../../assets/evidencias/sala-cineandes-parcial-punto1-2/cineandes-modelo.png)
+<img
+  src="/evidencias/sala-cineandes-parcial-punto1-2/cineandes-modelo.png"
+  alt="Diagrama Entidad–Relación de la cadena de salas de cine CineAndes"
+  loading="lazy"
+/>
+
+## PUNTO 3 — Modelo relacional (10 puntos)
+
+### a. Conceptos aplicados (3 puntos)
+
+Responda de forma breve, refiriéndose siempre al esquema que obtuvo en el punto 2.
+
+a. ¿Cuál es el grado de la tabla que obtuvo al transformar la relación COMPRA? ¿Y su cardinalidad, si la cadena ha vendido boletas a doscientos clientes distintos en quinientas funciones, con mil cuatrocientas compras registradas?
+
+b. En la tabla CLIENTE, además del documento, ¿podría el correo ser clave candidata? Justifique en una línea y diga qué restricción del negocio haría falta para que lo fuera.
+
+c. ¿Puede una clave foránea tomar valor nulo? Dé un ejemplo concreto tomado de este modelo donde tenga sentido que lo tome, y otro donde no pueda tomarlo nunca.
+
+### b. Análisis crítico de un esquema relacional (4 puntos)
+
+Un estudiante entrega el siguiente esquema como resultado de transformar el modelo del punto 2. Bajo cada tabla se indica la clave primaria que él declaró; la clave foránea lleva asterisco.
+
+SEDE (codigo_sede, nombre, ciudad, calle, telefono1, telefono2)
+    PK: codigo_sede
+SALA (numero_sala, formato, aforo, codigo_sede*)
+    PK: numero_sala
+SILLA (fila, numero, estado, numero_sala*)
+    PK: fila, numero
+FUNCION (fecha, hora, precio_base, codigo_pelicula*)
+    PK: fecha, hora
+CLIENTE (documento, nombres, apellidos, correo, fecha_nacimiento, edad, cantidad_boletas, canal)
+    PK: documento
+EMPLEADO (id_empleado, nombre, fecha_ingreso, supervisor)
+    PK: id_empleado
+
+Identifique cuatro errores. Para cada uno indique qué regla de transformación se violó, qué consecuencia concreta tiene sobre los datos que el sistema podría almacenar o perder, y cómo debe corregirse.
+
+## Diagrama del modelo relacional
+
+<img
+  src="/evidencias/sala-cineandes-parcial-punto1-2/cineandes-punto3.png"
+  alt="Modelo relacional corregido de CineAndes: conceptos aplicados, análisis de errores y esquema final"
+  loading="lazy"
+/>
 
 ## Resultado
 
 El modelo representa las sedes con sus salas y sillas como entidades débiles encadenadas, la cartelera con películas, idiomas y secuelas, las funciones por sala, fecha y hora, las compras de los clientes con su medio de pago, y los empleados con especialización total y disjunta más supervisión recursiva.
+
+El punto 3 cierra con el modelo relacional: la tabla COMPRA con grado 7 (8 con la agregación) y cardinalidad 1400, el correo como clave candidata bajo unicidad obligatoria, claves foráneas nulas solo donde la participación es opcional (supervisión) y nunca dentro de una clave primaria, más la corrección de los cuatro errores del esquema (teléfonos multivaluados, claves de débiles incompletas, N:M colapsada en CLIENTE y edad derivada almacenada).
 
 Este trabajo corresponde a la categoría **Modelado** de la asignatura Bases de Datos 1.
