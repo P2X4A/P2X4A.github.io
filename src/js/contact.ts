@@ -2,16 +2,19 @@
  * * Contact form — the trust boundary.
  *
  * Pure and framework-free on purpose: no `import.meta.env`, no `fetch`, no Astro imports — so it
- * type-strips for `pnpm test` and the action handler (`src/actions/index.ts`) starts from data that
- * is already validated and, for the email, already escaped. One Zod schema is the ONLY definition of
- * a valid submission; the action re-runs it, never trusts the client.
+ * type-strips for `pnpm test` AND bundles straight into the browser script that validates the form.
+ * One Zod schema is the ONLY definition of a valid submission.
+ *
+ * The site is deployed 100% to GitHub Pages — a static host with no server to receive a POST — so the
+ * form validates in the browser and hands the visitor a prefilled `mailto:` link. The plain address
+ * is the no-JS fallback and already sits on the page in the info cards. The spam gates (honeypot +
+ * time) still run, client side: they stop the naive autofill bots, not a determined one.
  */
 import { z } from "astro/zod";
 
 /**
- * Reject CR/LF: `name` and `subject` are the two fields that reach a mail header (the subject line),
- * so a line break in either is a header-injection attempt. We reject rather than strip so the visitor
- * sees why.
+ * Reject CR/LF: `name` and `subject` are the two fields that reach the mail subject line, so a line
+ * break in either is a header-injection attempt. We reject rather than strip so the visitor sees why.
  */
 const noLineBreaks = (value: string): boolean => !/[\r\n]/.test(value);
 
@@ -37,55 +40,21 @@ export const contactSchema = z.object({
     .max(5000, "That transmission is too long."),
   /** Honeypot — permissive on purpose, so a filled value becomes a readable form-level rejection. */
   _gotcha: z.string().optional(),
-  /** Render timestamp for the time gate; coerced from the hidden field's string. */
+  /** Load timestamp for the time gate; coerced from the hidden field's string. */
   _ts: z.coerce.number().int().positive(),
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;
 
-/** The fields the form echoes back after a rejected submit. Deliberately not the two hidden ones. */
-export type RepopulatedField = "name" | "email" | "subject" | "message";
-
-/**
- * * Pull the visitor's submitted values back out of a raw `FormData`, so a validation failure
- * re-renders the form filled in rather than blank.
- *
- * Needed because Astro's `isInputError(error)` exposes `.fields` — the messages — but never the input
- * that produced them. Without this a bad email address discards up to 5000 characters of message,
- * which is exactly the no-JS path the template advertises.
- *
- * The two hidden fields are excluded on purpose, not by omission: echoing `_gotcha` back would defeat
- * the honeypot on the retry, and `_ts` must carry the CURRENT render's timestamp or the time gate
- * rejects every resubmission of a form that was slow to fill.
- *
- * @param form the submitted FormData, or `null` on a fresh GET render
- * @returns every repopulated field as a string — `""` where absent or where the entry was a File
- */
-export function repopulate(form: Pick<FormData, "get"> | null): Record<RepopulatedField, string> {
-  // A multipart post can hand back a File for any name; it must never reach a value attribute.
-  const read = (name: RepopulatedField): string => {
-    const value = form?.get(name);
-    return typeof value === "string" ? value : "";
-  };
-  return {
-    name: read("name"),
-    email: read("email"),
-    subject: read("subject"),
-    message: read("message"),
-  };
-}
-
-/** Minimum ms between render and submit. Faster than a human can read the form ⇒ a bot. */
+/** Minimum ms between load and submit. Faster than a human can read the form ⇒ a bot. */
 export const MIN_FILL_MS = 3000;
 
 /**
- * * Spam gates, cheapest first: honeypot then time. Both judged server-clock to server-clock, never
- * the visitor's device. Returns a rejection reason, or `null` to proceed.
+ * * Spam gates, cheapest first: honeypot then time. Returns a rejection reason, or `null` to proceed.
  *
  * The time gate has no upper bound (a form left open an hour still submits) and `_ts` is a forgeable
- * hidden field: this stops drive-by bots, not a targeted attacker. `ponytail:` ceiling — add
- * Cloudflare Turnstile (both keys or neither) if drive-by volume becomes a problem; it costs the
- * no-JS path, so it's deliberately left out here.
+ * hidden field: this stops drive-by bots, not a targeted attacker. It also costs the no-JS path,
+ * which never runs it — deliberately left out of the static flow.
  *
  * @param fields the two hidden anti-spam fields
  * @param now    current epoch ms (injectable for the self-check)
@@ -100,43 +69,32 @@ export function spamReason(
   return null;
 }
 
-/** Escape the five HTML-significant characters so a field can't inject markup into the email body. */
-export function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-/** The Resend payload pieces built from validated fields — every value escaped, `replyTo` verbatim. */
-export interface ContactEmail {
-  subject: string;
-  html: string;
-  replyTo: string;
-}
-
 /**
- * * Build the email subject + HTML body from validated fields. Header-safe (`name`/`subject` carry no
- * line breaks, enforced by the schema) and body-safe (every interpolation is HTML-escaped).
+ * * Build the prefilled `mailto:` URL the browser hands to the visitor's mail client — the static
+ * host's stand-in for the POST the old server action used to receive.
  *
- * @param fields   the validated name/email/subject/message
- * @param siteName the brand, prefixed to the subject line (passed in to keep this module config-free)
+ * Everything is percent-encoded by `URLSearchParams`, so a newline or an `&` inside the message can
+ * never break out of the query string and inject a second parameter.
+ *
+ * @param fields    the validated name/email/subject/message
+ * @param recipient the mailbox the message is addressed to
+ * @param siteName  the brand, prefixed to the subject line
  */
-export function buildEmail(
+export function buildMailtoUrl(
   { name, email, subject, message }: Pick<ContactInput, "name" | "email" | "subject" | "message">,
+  recipient: string,
   siteName: string,
-): ContactEmail {
-  return {
+): string {
+  const body = [
+    `Name: ${name}`,
+    `Email: ${email}`,
+    `Subject: ${subject}`,
+    "",
+    message,
+  ].join("\n");
+  const params = new URLSearchParams({
     subject: `[${siteName}] ${subject} — ${name}`,
-    replyTo: email,
-    html: [
-      `<h2>New transmission from ${escapeHtml(name)}</h2>`,
-      `<p><strong>Email:</strong> ${escapeHtml(email)}</p>`,
-      `<p><strong>Subject:</strong> ${escapeHtml(subject)}</p>`,
-      `<p><strong>Message:</strong></p>`,
-      `<p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>`,
-    ].join("\n"),
-  };
+    body,
+  });
+  return `mailto:${recipient}?${params.toString()}`;
 }

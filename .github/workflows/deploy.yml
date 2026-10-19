@@ -34,11 +34,14 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          # Canonical + OG URLs, the sitemap, robots.txt and llms.txt all read this one value.
+          SITE_URL: https://p2x4a.github.io
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist/client
+          path: ./dist
 
   deploy:
     needs: build

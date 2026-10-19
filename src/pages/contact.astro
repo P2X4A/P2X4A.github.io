@@ -3,11 +3,9 @@
 // SEO and composes the Sections/Contact blocks in the same shell as index/about (one .site-container
 // + gap rhythm).
 //
-// This is the ONE on-demand route: it receives the Resend form POST and re-renders with the result,
-// so it opts out of prerendering. Every other page stays static. See astro.config.mjs (the adapter)
-// and src/actions/index.ts.
-export const prerender = false;
-
+// This site is deployed 100% to GitHub Pages — a static host with no server runtime — so this route
+// is PRERENDERED like every other page. The contact form validates in the browser and hands the
+// visitor a prefilled mailto: link; see src/components/Sections/Contact/Form.astro and @js/contact.
 import Faq from "@components/Sections/Contact/Faq.astro";
 import Form from "@components/Sections/Contact/Form.astro";
 import Hero from "@components/Sections/Contact/Hero.astro";
