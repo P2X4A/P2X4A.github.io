@@ -1,0 +1,100 @@
+---
+title: "Taller Reducción a Tablas — Punto 1"
+tagline: "Reducción del modelo ER del sistema editorial a esquema relacional"
+description: "Punto 1 del Taller Reducción a Tablas: modelo Entidad–Relación extendido de autores, editores, libros, clientes, cestas de compra y almacenes, reducido a tablas relacionales."
+status: "complete"
+category: "modelado"
+moduleId: "BD1-MOD-003"
+order: 4
+thumbnail: "../../../assets/evidencias/taller-reduccion-a-tablas/thumbnail-punto-1.png"
+thumbnailAlt: "Esquema relacional — punto 1 del taller de reducción a tablas"
+
+tech:
+  - "Modelo Entidad–Relación Extendido"
+  - "Reducción a tablas"
+  - "Bases de Datos 1"
+  - "Draw.io"
+
+specs:
+  - label: "Dominio"
+    value: "Sistema editorial y de almacén: libros, autores, editores, clientes, cestas de compra y almacenes"
+  - label: "Entidades fuertes"
+    value: "AUTOR, EDITOR, LIBRO, CLIENTE, CESTA_DE_LA_COMPRA, ALMACÉN"
+  - label: "Entidades asociativas (tablas intermedias)"
+    value: "AUTOR_LIBRO, EDITOR_LIBRO, LIBRO_CESTA, LIBRO_ALMACÉN, CLIENTE_CESTA"
+  - label: "Relaciones M:N resueltas"
+    value: "Escribir/crear, editar, contener, almacenar, tener (todas resueltas con tablas intermedias)"
+  - label: "Alcance"
+    value: "Punto 1 del taller — reducción del MER a esquema relacional"
+
+features:
+  - lead: "Entidades fuertes identificadas"
+    text: "Se modelaron seis entidades fuertes con sus atributos simples y claves primarias (ID_autor, ID_editor, ISBN, IDcesta, código_almacén)."
+  - lead: "Relaciones M:N a tablas intermedias"
+    text: "Cada relación muchos-a-muchos se transformó en una tabla asociativa con clave primaria compuesta: AUTOR_LIBRO, EDITOR_LIBRO, LIBRO_CESTA, LIBRO_ALMACÉN y CLIENTE_CESTA."
+  - lead: "Claves foráneas definidas"
+    text: "Cada tabla intermedia lleva claves foráneas que referencian a las entidades participantes, garantizando integridad referencial."
+  - lead: "Atributos de relación"
+    text: "Algunas asociaciones incluyen atributos propios (por ejemplo, número en LIBRO_CESTA y LIBRO_ALMACÉN)."
+
+archCaption: "Esquema relacional — punto 1: sistema editorial y almacén"
+
+challenge:
+  title: "Problema"
+  body: "Partiendo de un modelo Entidad–Relación extendido del dominio editorial (autores, editores, libros, clientes, cestas de compra y almacenes), reducir el modelo conceptual a un esquema relacional, definiendo tablas, claves primarias compuestas y claves foráneas para cada relación M:N."
+
+solution:
+  title: "Solución"
+  body: "Se identificaron las seis entidades fuertes y sus claves primarias. Cada relación M:N del MER se resolvió creando una tabla intermedia con clave compuesta (AUTOR_LIBRO, EDITOR_LIBRO, LIBRO_CESTA, LIBRO_ALMACÉN, CLIENTE_CESTA), añadiendo claves foráneas hacia cada entidad relacionada y preservando los atributos propios de las asociaciones cuando correspondía."
+
+pdfUrl: "/evidencias/taller-reduccion-a-tablas/taller-reduccion-a-tablas.pdf"
+pdfLabel: "Descargar PDF del taller (punto 1)"
+---
+
+## Descripción
+
+Este trabajo corresponde al **Punto 1 del Taller de Reducción a Tablas** de la asignatura **Bases de Datos 1**. El dominio del ejercicio es un sistema editorial y de almacén: autores escriben libros, editores editan libros, libros se almacenan en almacenes, libros se incluyen en cestas de compra y clientes poseen cestas.
+
+## Entidades del modelo base
+
+| Entidad | Atributos | Clave primaria |
+|---------|-----------|----------------|
+| **AUTOR** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, URL | ID_autor |
+| **EDITOR** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, teléfono, URL | ID_editor |
+| **LIBRO** | año, título, precio, ISBN | ISBN |
+| **CLIENTE** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, correo_electrónico, teléfono | — |
+| **CESTA_DE_LA_COMPRA** | IDcesta | IDcesta |
+| **ALMACÉN** | código, calle, carrera, número_dirección, teléfono | código |
+
+## Relaciones del modelo base
+
+Las relaciones del MER son todas muchos-a-muchos (M:N):
+
+- **crear / escribir**: AUTOR ↔ LIBRO
+- **editar**: EDITOR ↔ LIBRO
+- **contener**: LIBRO ↔ CESTA_DE_LA_COMPRA (y LIBRO ↔ ALMACÉN)
+- **tener**: CLIENTE ↔ CESTA_DE_LA_COMPRA
+
+## Reducción a tablas (resolución)
+
+Cada relación M:N se transformó en una **tabla intermedia** con clave primaria compuesta:
+
+| Tabla intermedia | Clave primaria | Claves foráneas |
+|------------------|----------------|-----------------|
+| **AUTOR_LIBRO** | (ID_autor, ISBN) | ID_autor → AUTOR, ISBN → LIBRO |
+| **EDITOR_LIBRO** | (ID_editor, ISBN) | ID_editor → EDITOR, ISBN → LIBRO |
+| **LIBRO_CESTA** | (ISBN, IDcesta) | ISBN → LIBRO, IDcesta → CESTA_DE_LA_COMPRA |
+| **LIBRO_ALMACÉN** | (ISBN, código_almacén) | ISBN → LIBRO, código_almacén → ALMACÉN |
+| **CLIENTE_CESTA** | (IDcesta, correo_electrónico) | IDcesta → CESTA_DE_LA_COMPRA, correo_electrónico → CLIENTE |
+
+## Documento del trabajo
+
+<a
+  href="/evidencias/taller-reduccion-a-tablas/taller-reduccion-a-tablas.pdf"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Ver el enunciado y resolución del taller en PDF
+</a>
+
+Este trabajo corresponde a la categoría **Modelado** de la asignatura Bases de Datos 1.

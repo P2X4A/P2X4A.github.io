@@ -1,0 +1,103 @@
+---
+title: "Taller Reducción a Tablas — Punto 2"
+tagline: "Modelo Entidad–Relación extendido del zoológico"
+description: "Punto 2 del Taller Reducción a Tablas: MER extendido de hábitats, continentes, especies, zonas, cuidadores, itinerarios y guías, con entidades asociativas y atributos de relación."
+status: "complete"
+category: "modelado"
+moduleId: "BD1-MOD-004"
+order: 5
+thumbnail: "../../../assets/evidencias/taller-reduccion-a-tablas/thumbnail-punto-2.png"
+thumbnailAlt: "Modelo Entidad–Relación extendido — punto 2 del taller del zoológico"
+
+tech:
+  - "Modelo Entidad–Relación Extendido"
+  - "Bases de Datos 1"
+  - "Draw.io"
+
+specs:
+  - label: "Dominio"
+    value: "Espacio zoológico: hábitats, continentes, especies, zonas, cuidadores, itinerarios y guías"
+  - label: "Entidades fuertes"
+    value: "HÁBITAT, CONTINENTE, ESPECIE, ZONA, CUADOR, ITINERARIO, GUÍA"
+  - label: "Entidades asociativas (débiles)"
+    value: "HÁBITAT_CONTINENTE, ESPECIE_HÁBITAT, CUIDADOR_ESPECIE, ZONA_ITINERARIO, GUÍA_ITINERARIO"
+  - label: "Relaciones"
+    value: "esta_en, incluye, habita, vive en, está en, forma parte, recorre, recibe cuidado, cuida, es llevado, lleva"
+  - label: "Alcance"
+    value: "Punto 2 del taller — modelo Entidad–Relación extendido"
+
+features:
+  - lead: "Siete entidades fuertes"
+    text: "Se modelaron hábitat, continente, especie, zona, cuidador, itinerario y guía con sus atributos simples y claves primarias."
+  - lead: "Cinco entidades asociativas"
+    text: "Se resolvieron las relaciones M:N mediante entidades débiles: HÁBITAT_CONTINENTE, ESPECIE_HÁBITAT, CUIDADOR_ESPECIE, ZONA_ITINERARIO y GUÍA_ITINERARIO."
+  - lead: "Atributos propios en relaciones"
+    text: "Algunas relaciones llevan atributos específicos, como fecha en cuida y hora en lleva."
+  - lead: "Cardinalidades parciales y totales"
+    text: "Se especificaron participaciones (0,N) y (1,1) así como cardinalidades 1:N y N:1 en cada relación del modelo."
+
+archCaption: "Modelo Entidad–Relación extendido — punto 2: zoológico"
+
+challenge:
+  title: "Problema"
+  body: "El punto 2 del taller pide construir un Modelo Entidad–Relación extendido para un sistema zoológico con hábitats, especies, zonas, cuidadores, itinerarios y guías, definiendo entidades, atributos, relaciones, cardinalidades y entidades asociativas para resolver las relaciones muchos-a-muchos."
+
+solution:
+  title: "Solución"
+  body: "Se diseñó un MER extendido con siete entidades fuertes y cinco entidades asociativas. Cada relación M:N se materializó mediante una entidad débil con su propia clave compuesta. Se incluyeron atributos de relación donde correspondía (fecha en cuida, hora en lleva) y se indicaron las participaciones y cardinalidades de todas las conexiones."
+
+pdfUrl: "/evidencias/taller-reduccion-a-tablas/taller-reduccion-a-tablas.pdf"
+pdfLabel: "Descargar PDF del taller (punto 2)"
+---
+
+## Descripción
+
+Este trabajo corresponde al **Punto 2 del Taller de Reducción a Tablas** de la asignatura **Bases de Datos 1**. El dominio del ejercicio es un espacio zoológico con hábitats y especies, organizado en zonas y atendido por cuidadores y guías que conducen itinerarios de visita.
+
+## Entidades fuertes
+
+| Entidad | Atributos |
+|---------|-----------|
+| **HÁBITAT** | nombre, clima, vegetación |
+| **CONTINENTE** | nombre |
+| **ESPECIE** | nombre_científico, descripción, nombre_español |
+| **ZONA** | nombre, extensión |
+| **CUADOR** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, teléfono, ID_cuidador, fecha |
+| **ITINERARIO** | nombre_zona, id_itinerario, duración, longitud, visitantes |
+| **GUÍA** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, teléfono, ID_guía, fecha |
+
+## Entidades asociativas (débiles)
+
+| Entidad asociativa | Atributos | Relacionan |
+|--------------------|-----------|------------|
+| **HÁBITAT_CONTINENTE** | nombre_hábitat, nombre_continente | HÁBITAT ↔ CONTINENTE |
+| **ESPECIE_HÁBITAT** | nombre_científico, nombre_hábitat | HÁBITAT ↔ ESPECIE |
+| **CUIDADOR_ESPECIE** | ID_cuidador, nombre_científico, fecha | CUADOR ↔ ESPECIE |
+| **ZONA_ITINERARIO** | nombre_zona, id_itinerario | ZONA ↔ ITINERARIO |
+| **GUÍA_ITINERARIO** | ID_guía, id_itinerario, hora | GUÍA ↔ ITINERARIO |
+
+## Relaciones del modelo
+
+- **esta_en**: HÁBITAT → HÁBITAT_CONTINENTE (participación 1:N, totalidad (1,1))
+- **incluye**: HÁBITAT_CONTINENTE → CONTINENTE (participación (1,1), parcial (0,N))
+- **habita / alberga**: HÁBITAT → ESPECIE_HÁBITAT (participación (0,N), totalidad (1,1))
+- **vive en**: ESPECIE_HÁBITAT → ESPECIE (participación (1,1), parcial (0,N))
+- **está en**: ESPECIE → ZONA
+- **forma parte**: ZONA → ZONA_ITINERARIO (participación (0,N), totalidad (1,1))
+- **recorre**: ZONA_ITINERARIO → ITINERARIO (participación (1,1), cardinalidad 1:N)
+- **recibe cuidado**: ESPECIE → CUIDADOR_ESPECIE (participación (0,N), totalidad (1,1))
+- **cuida**: CUIDADOR_ESPECIE → CUADOR (atributo: fecha)
+- **es llevado**: ITINERARIO → GUÍA_ITINERARIO (participación (0,N), totalidad (1,1))
+- **lleva**: GUÍA_ITINERARIO → GUÍA (atributo: hora)
+
+## Documento del trabajo
+
+<a
+  href="/evidencias/taller-reduccion-a-tablas/taller-reduccion-a-tablas.pdf"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Ver el enunciado y el MER del taller en PDF
+</a>
+
+Este trabajo corresponde a la categoría **Modelado** de la asignatura Bases de Datos 1.
