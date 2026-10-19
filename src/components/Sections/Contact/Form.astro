@@ -1,42 +1,29 @@
 ---
 // src/components/Sections/Contact/Form.astro — Figma "ContactFormCard" (node 9:31).
 //
-// The one server-driven piece of 8-BitQuest: a native <form method="POST"> bound to the `contact`
-// Astro action (accept: "form"), so it works with JavaScript disabled. The server validates
-// (contactSchema), runs the spam gates, sends via Resend, and /contact/ re-renders with the result —
-// success replaces the card; validation errors show per-field; everything else shows in one alert.
-// See src/actions/index.ts + src/js/contact.ts.
+// The contact form of a 100%-static site. This project is deployed to GitHub Pages, so there is no
+// server to receive a POST (the Astro Action + Resend path is gone). The form therefore validates
+// IN THE BROWSER against the same Zod schema the server used (`@js/contact` — the single definition
+// of a valid submission) and then hands the visitor a prefilled `mailto:` link. If no mail client
+// opens, the panel keeps that link plus a copy-the-address button — and the plain address is
+// already on the page in the info cards, so the no-JS path still works.
+//
+// The spam gates (honeypot + time) still run, client side: they stop the naive autofill bots, not a
+// determined one.
 //
 // Reuse: the shared pixel surface (PixelPanel) + the Input / Textarea / Label primitives, re-skinned
 // to the pixel field look (bg-accent + a 4px black frame) via a shared class. The override carries
 // SHAPE only, never a border COLOUR that would beat a validation state —
 // here the black frame is the theme's invariant (borders are always black), so the error affordance
 // is the red message + aria-invalid ring, not a recoloured border.
-import { Badge } from "@components/ui/badge";
 import { Input } from "@components/ui/input";
 import { Label } from "@components/ui/label";
 import { PixelPanel } from "@components/ui/pixel-panel";
 import { Textarea } from "@components/ui/textarea";
-import { repopulate } from "@js/contact";
-import { actions, isInputError } from "astro:actions";
+import siteData from "@config/siteData.json";
 
-const result = Astro.getActionResult(actions.contact);
-const success = result?.data?.ok === true;
-const error = result?.error;
-const fieldErrors: Record<string, string[] | undefined> =
-  error && isInputError(error) ? error.fields : {};
-const formError = error && !isInputError(error) ? error.message : undefined;
-
-// Repopulate on a rejected submit — see `repopulate` for why the action result can't supply this.
-// Reading the body here is safe: the action middleware parses a *clone* of the request, so the
-// original stream is still unconsumed. `.catch` covers a body that isn't form-encoded at all.
-const submitted =
-  Astro.request.method === "POST" ? await Astro.request.formData().catch(() => null) : null;
-const values = repopulate(submitted);
-
-// Render timestamp for the time gate. Request-time because /contact/ is prerender:false — and it must
-// be *this* render's clock, so a retry of a slowly-filled form isn't rejected as too quick.
-const renderedAt = Date.now();
+/** The mailbox the message is addressed to — also the no-JS fallback target. */
+const recipient = siteData.author.email;
 
 const FIELDS = [
   {
@@ -85,103 +72,221 @@ const fieldClass = [
 ].join(" ");
 ---
 
-{
-  success ? (
-    <PixelPanel
-      elevated
-      role="status"
-      tabindex="-1"
-      data-contact-status
-      class="primary-focus flex flex-col items-start gap-3 p-8"
-    >
-      <Badge pixel variant="success">
-        Transmission Sent
-      </Badge>
-      <h2 class="h3 text-foreground">Message sent.</h2>
-      <p class="text-muted-foreground text-sm">
-        Thanks — your transmission reached the array. I'll beam a reply back to your inbox.
-      </p>
-    </PixelPanel>
-  ) : (
-    <PixelPanel elevated class="flex flex-col gap-6 p-6 sm:p-8">
-      <h2 class="text-secondary-700 dark:text-secondary font-display text-base uppercase sm:text-lg">
-        Send Message
-      </h2>
+<PixelPanel elevated class="flex flex-col gap-6 p-6 sm:p-8">
+  <h2 class="text-secondary-700 dark:text-secondary font-display text-base uppercase sm:text-lg">
+    Send Message
+  </h2>
 
-      {formError && (
-        <p
-          role="alert"
-          tabindex="-1"
-          data-contact-status
-          class="border-error text-error bg-error/10 primary-focus border-2 p-3 text-sm"
-        >
-          {formError}
-        </p>
-      )}
+  {/* Status regions: empty and hidden until the script has something to say (a validation error, or
+      a prepared transmission). They live in the DOM so the script can fill them in place — no
+      re-render, no server round-trip. */}
+  <p
+    data-contact-error
+    role="alert"
+    tabindex="-1"
+    hidden
+    class="border-error text-error bg-error/10 border-2 p-3 text-sm"
+  >
+  </p>
+  <div
+    data-contact-info
+    role="status"
+    tabindex="-1"
+    hidden
+    class="border-info text-info bg-info/10 flex flex-col gap-3 border-2 p-3 text-sm"
+  >
+    <p data-contact-info-text></p>
+    <div class="flex flex-wrap items-center gap-3">
+      <a
+        data-contact-mailto
+        href={`mailto:${recipient}`}
+        hidden
+        class="text-info underline underline-offset-2 hover:text-success"
+      >
+        Open the transmission again
+      </a>
+      <button
+        data-contact-copy
+        type="button"
+        hidden
+        class="border-info text-info hover:text-success border-2 px-2 py-1 text-xs uppercase"
+      >
+        Copy my e-mail
+      </button>
+    </div>
+  </div>
 
-      <form method="POST" action={actions.contact} class="flex flex-col gap-4">
-        {FIELDS.map((field) => {
-          const err = fieldErrors[field.name]?.[0];
-          // Shared across both control types; only the element + its one unique attr differ below.
-          // `value` included: Input renders it as an attribute, Textarea as element content.
-          const attrs = {
-            id: field.name,
-            name: field.name,
-            placeholder: field.placeholder,
-            autocomplete: field.autocomplete,
-            required: true,
-            maxlength: field.maxlength,
-            value: values[field.name] || undefined,
-            "aria-invalid": err ? true : undefined,
-            "aria-describedby": err ? `${field.name}-error` : undefined,
-          };
-          return (
-            <div class="flex flex-col gap-2">
-              <Label for={field.name} class="text-info font-display text-xs uppercase">
-                {field.label}
-              </Label>
-              {field.as === "textarea" ? (
-                <Textarea {...attrs} minlength={10} class={`${fieldClass} min-h-[120px] py-3`} />
-              ) : (
-                <Input {...attrs} type={field.type} class={`${fieldClass} h-14`} />
-              )}
-              {err && (
-                <p id={`${field.name}-error`} role="alert" class="text-error text-xs">
-                  {err}
-                </p>
-              )}
-            </div>
-          );
-        })}
-
-        {/* Honeypot: off-screen (not display:none) so bots that skip the invisible fill it, and
-            aria-hidden + tabindex=-1 keep it away from humans and assistive tech. */}
-        <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
-          <label for="_gotcha">Leave this field empty</label>
-          <input id="_gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+  {/* `action`/`method` are the no-JS fallback: the browser hands the fields to the mail client as
+      text/plain. The script intercepts the submit and takes over. */}
+  <form
+    data-contact-form
+    data-recipient={recipient}
+    data-site-name={siteData.name}
+    method="POST"
+    action={`mailto:${recipient}`}
+    enctype="text/plain"
+    class="flex flex-col gap-4"
+  >
+    {FIELDS.map((field) => {
+      // Shared across both control types; only the element + its one unique attr differ below.
+      const attrs = {
+        id: field.name,
+        name: field.name,
+        placeholder: field.placeholder,
+        autocomplete: field.autocomplete,
+        required: true,
+        maxlength: field.maxlength,
+        "aria-describedby": `${field.name}-error`,
+      };
+      return (
+        <div class="flex flex-col gap-2">
+          <Label for={field.name} class="text-info font-display text-xs uppercase">
+            {field.label}
+          </Label>
+          {field.as === "textarea" ? (
+            <Textarea {...attrs} minlength={10} class={`${fieldClass} min-h-[120px] py-3`} />
+          ) : (
+            <Input {...attrs} type={field.type} class={`${fieldClass} h-14`} />
+          )}
+          <p id={`${field.name}-error`} data-error-for={field.name} role="alert" hidden class="text-error text-xs">
+          </p>
         </div>
+      );
+    })}
 
-        {/* Time gate: the render timestamp, compared server-side against MIN_FILL_MS. */}
-        <input type="hidden" name="_ts" value={renderedAt} />
+    {/* Honeypot: off-screen (not display:none) so bots that skip the invisible fill it, and
+        aria-hidden + tabindex=-1 keep it away from humans and assistive tech. */}
+    <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+      <label for="_gotcha">Leave this field empty</label>
+      <input id="_gotcha" type="text" name="_gotcha" tabindex="-1" autocomplete="off" />
+    </div>
 
-        <button
-          type="submit"
-          class="pixel-btn pixel-btn--green mt-2 self-start px-6 py-3 text-sm uppercase sm:text-base"
-        >
-          Send Message
-        </button>
-      </form>
-    </PixelPanel>
-  )
-}
+    {/* Time gate: stamped by the script on load (the page is prerendered, so a build-time stamp
+        would make the gate meaningless). */}
+    <input id="_ts" type="hidden" name="_ts" value="0" />
+
+    <button
+      type="submit"
+      class="pixel-btn pixel-btn--green mt-2 self-start px-6 py-3 text-sm uppercase sm:text-base"
+    >
+      Send Message
+    </button>
+  </form>
+</PixelPanel>
 
 <script>
-  // Move focus to the success/error region after a submit — on the view-transition swap AND on a
-  // full no-JS re-render (the immediate call). No preventDefault: the router owns the submit.
-  function focusContactStatus() {
-    const el = document.querySelector("[data-contact-status]");
-    if (el instanceof HTMLElement) el.focus();
+  // The static contact flow: validate in the browser, then hand the visitor a prefilled mailto
+  // link. No server, no secrets — which is exactly what a 100%-GitHub-Pages deploy can offer.
+  import { buildMailtoUrl, contactSchema, spamReason } from "@js/contact";
+
+  const form = document.querySelector("[data-contact-form]");
+  if (form instanceof HTMLFormElement) {
+    const recipient = form.dataset.recipient ?? "";
+    const siteName = form.dataset.siteName ?? "";
+
+    const errorBox = document.querySelector<HTMLElement>("[data-contact-error]");
+    const infoBox = document.querySelector<HTMLElement>("[data-contact-info]");
+    const infoText = document.querySelector<HTMLElement>("[data-contact-info-text]");
+    const mailtoLink = document.querySelector<HTMLAnchorElement>("[data-contact-mailto]");
+    const copyButton = document.querySelector<HTMLButtonElement>("[data-contact-copy]");
+
+    /** The per-field message boxes, keyed by field name. */
+    const fieldErrors = new Map<string, HTMLElement>();
+    document.querySelectorAll<HTMLElement>("[data-error-for]").forEach((el) => {
+      fieldErrors.set(el.dataset.errorFor ?? "", el);
+    });
+
+    // Stamp the load time for the time gate. The page is prerendered, so the build timestamp would
+    // make every submit look "slow enough" and the gate would never fire.
+    const tsField = form.querySelector<HTMLInputElement>("#_ts");
+    if (tsField) tsField.value = String(Date.now());
+
+    const hide = (el: HTMLElement | null) => {
+      if (el) el.hidden = true;
+    };
+    const show = (el: HTMLElement | null) => {
+      if (el) el.hidden = false;
+    };
+
+    const clearErrors = () => {
+      fieldErrors.forEach((box) => {
+        box.textContent = "";
+        hide(box);
+      });
+      form.querySelectorAll('[aria-invalid="true"]').forEach((el) => {
+        el.removeAttribute("aria-invalid");
+      });
+      hide(errorBox);
+    };
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      clearErrors();
+
+      const data = new FormData(form);
+      const raw = {
+        name: String(data.get("name") ?? ""),
+        email: String(data.get("email") ?? ""),
+        subject: String(data.get("subject") ?? ""),
+        message: String(data.get("message") ?? ""),
+        _gotcha: String(data.get("_gotcha") ?? ""),
+        _ts: Number(data.get("_ts") ?? 0),
+      };
+
+      // 1. Spam gates (honeypot + time) — same rules the server used.
+      const reason = spamReason({ _gotcha: raw._gotcha, _ts: raw._ts });
+      if (reason) {
+        if (errorBox instanceof HTMLElement) errorBox.textContent = reason;
+        show(errorBox);
+        errorBox?.focus?.();
+        return;
+      }
+
+      // 2. The one schema — the same definition of a valid submission the server used.
+      const parsed = contactSchema.safeParse(raw);
+      if (!parsed.success) {
+        parsed.error.issues.forEach((issue) => {
+          const field = String(issue.path[0] ?? "");
+          const box = fieldErrors.get(field);
+          if (box && !box.textContent) {
+            box.textContent = issue.message;
+            show(box);
+            form.querySelector(`[name="${field}"]`)?.setAttribute("aria-invalid", "true");
+          }
+        });
+        if (errorBox instanceof HTMLElement) {
+          errorBox.textContent = "Some fields need attention, player.";
+        }
+        show(errorBox);
+        errorBox?.focus?.();
+        return;
+      }
+
+      // 3. Static hosting: no server to POST to — hand over a prefilled mailto link instead.
+      const url = buildMailtoUrl(parsed.data, recipient, siteName);
+      if (mailtoLink instanceof HTMLAnchorElement) {
+        mailtoLink.href = url;
+        show(mailtoLink);
+      }
+      if (infoText instanceof HTMLElement) {
+        infoText.textContent =
+          "Transmission ready — your e-mail client should have opened with the message prefilled. Send it and I'll beam a reply back.";
+      }
+      show(infoBox);
+      show(copyButton);
+      infoBox?.focus?.();
+      window.location.href = url;
+    });
+
+    // Copy the address: the visitor's machine may have no mail client at all.
+    copyButton?.addEventListener("click", async () => {
+      if (!(copyButton instanceof HTMLButtonElement)) return;
+      try {
+        await navigator.clipboard.writeText(recipient);
+        copyButton.textContent = "Copied";
+      } catch {
+        copyButton.textContent = recipient;
+      }
+    });
   }
-  document.addEventListener("astro:after-swap", focusContactStatus);
-  focusContactStatus();
 </script>

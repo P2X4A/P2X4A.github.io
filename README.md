@@ -12,14 +12,14 @@ Sitio con estética retro 8-bit / pixel-art donde presento mi perfil, proyectos,
 - **Presentación (`/about/`):** perfil, habilidades, logros y herramientas.
 - **Evidencias (`/projects/`):** proyectos y trabajos académicos, incluyendo *University Championship* (modelo Entidad-Relación).
 - **Blog (`/blog/`):** artículos y notas.
-- **Contacto (`/contact/`):** formulario con envío por Resend.
+- **Contacto (`/contact/`):** formulario que valida en el navegador y abre un mensaje prellenado (`mailto:`) hacia mi correo.
 
 ## Tecnologías
 
 - [Astro 7](https://astro.build) + TypeScript (strict)
 - [Tailwind CSS v4](https://tailwindcss.com)
 - MDX + Content Collections (Zod)
-- Deploy: GitHub Pages (build estático) / Cloudflare Workers para `/contact/`
+- Deploy: GitHub Pages (100% estático — el deploy es el push a `main`, vía `.github/workflows/deploy.yml`)
 
 ## Uso local
 
@@ -44,7 +44,6 @@ src/
   data/        # blog/, projects/, authors/
   layouts/     # BaseLayout + BaseHead (SEO)
   styles/      # tokens Tailwind + motion
-  actions/     # acción de contacto (Resend)
 public/        # favicon, og.jpg
 ```
 
@@ -53,8 +52,10 @@ public/        # favicon, og.jpg
 - Email: sparrar@unbosque.edu.co
 - GitHub: https://github.com/P2X4A
 
-> Nota: el formulario soporta `CONTACT_DEMO_MODE=true` (modo demo: valida pero no envía correos).
-> En este sitio real va sin definir, para que Resend envíe de verdad.
+> Nota: el sitio es 100% estático (GitHub Pages), así que el formulario no envía a ningún
+> servidor: valida en el navegador con el mismo esquema Zod y abre el cliente de correo con el
+> mensaje prellenado (`mailto:`). El destino se cambia en `src/config/siteData.json.ts`
+> (`author.email`), no en variables de entorno.
 
 ## Licencia
 

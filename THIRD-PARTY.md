@@ -156,7 +156,7 @@ They are placeholder content in any case: every one is demo material the buyer i
 
 The npm packages this template depends on are not redistributed by it — they install from the registry
 into the buyer's own `node_modules`, each with its own licence file. At the time of writing, every
-direct dependency is MIT: `astro`, `@astrojs/cloudflare`, `@astrojs/mdx`, `@astrojs/sitemap`,
+direct dependency is MIT: `astro`, `@astrojs/mdx`, `@astrojs/sitemap`,
 `tailwindcss`, `@tailwindcss/vite`, `tailwind-merge`, and `tailwind-variants`, plus the dev
 toolchain. Run `pnpm licenses list` to audit the resolved tree yourself.
 

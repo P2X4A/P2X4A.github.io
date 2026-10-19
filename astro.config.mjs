@@ -1,9 +1,8 @@
 // @ts-check
-import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig, envField } from "astro/config";
+import { defineConfig } from "astro/config";
 
 // Dominio de producción: úsalo para canonical, OG, sitemap, robots, etc.
 const site = process.env.SITE_URL ?? "https://p2x4a.github.io";
@@ -29,25 +28,11 @@ if (isProductionDeploy && placeholderHosts.has(hostname)) {
 export default defineConfig({
   site,
 
-  // Adaptador Cloudflare, como en la plantilla original
-  adapter: cloudflare(),
-
-  // Variables de entorno para el formulario de contacto (opcionales)
-  env: {
-    schema: {
-      RESEND_API_KEY: envField.string({ context: "server", access: "secret", optional: true }),
-      CONTACT_TO_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
-      CONTACT_FROM_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
-      // Demo deployments only: the contact action reports success without sending, so a public
-      // demo needs no Resend account and no inbox. Never set this on a real deployment.
-      CONTACT_DEMO_MODE: envField.boolean({
-        context: "server",
-        access: "public",
-        optional: true,
-        default: false,
-      }),
-    },
-  },
+  // 100% static: the site is hosted on GitHub Pages, which serves FILES — there is no server
+  // runtime to run on-demand routes. Every route is prerendered into `dist/`, and the deploy is the
+  // push to `main` (.github/workflows/deploy.yml builds and publishes `dist/`). No adapter, no
+  // server secrets, no `astro:env` — the contact form validates in the browser instead.
+  output: "static",
 
   // URLs con barra final
   trailingSlash: "always",

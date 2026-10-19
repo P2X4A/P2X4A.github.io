@@ -1,17 +1,10 @@
 // Run: pnpm test  (or: node --experimental-strip-types src/js/contact.test.ts)
 // The runnable check behind the contact form's trust boundary: schema accept/reject, the two spam
-// gates, header-injection rejection, email-body escaping, and error repopulation. No framework, no
-// fixtures.
+// gates, header-injection rejection, and the prefilled mailto link the static site hands over. No
+// framework, no fixtures.
 import assert from "node:assert/strict";
 
-import {
-  buildEmail,
-  contactSchema,
-  escapeHtml,
-  MIN_FILL_MS,
-  repopulate,
-  spamReason,
-} from "./contact.ts";
+import { buildMailtoUrl, contactSchema, MIN_FILL_MS, spamReason } from "./contact.ts";
 
 const valid = {
   name: "Player One",
@@ -38,47 +31,42 @@ assert.equal(contactSchema.safeParse({ ...valid, subject: "Hi\nBcc: x@y.z" }).su
 assert.equal(spamReason({ _gotcha: "i-am-a-bot", _ts: 0 }, 10_000), "Message rejected.");
 
 // spam gate — time: a submit faster than MIN_FILL_MS rejects; slower passes
-const rendered = 10_000;
-assert.ok(spamReason({ _ts: rendered }, rendered + MIN_FILL_MS - 1) !== null);
-assert.equal(spamReason({ _ts: rendered }, rendered + MIN_FILL_MS), null);
+const loaded = 10_000;
+assert.ok(spamReason({ _ts: loaded }, loaded + MIN_FILL_MS - 1) !== null);
+assert.equal(spamReason({ _ts: loaded }, loaded + MIN_FILL_MS), null);
 
-// email body escapes HTML so a field can't inject markup, and the reply-to is the sender's address
-const mail = buildEmail(
-  { name: "<script>", email: "a@b.co", subject: "Hi & bye", message: "1 < 2" },
+// the mailto link addresses the recipient and carries the branded subject
+const url = buildMailtoUrl(
+  {
+    name: "Player One",
+    email: "player1@example.com",
+    subject: "Tutorial inquiry",
+    message: "I would love a devlog on dithering.",
+  },
+  "sparrar@unbosque.edu.co",
   "8-BitQuest",
 );
-assert.equal(mail.replyTo, "a@b.co");
-assert.ok(mail.subject.startsWith("[8-BitQuest] Hi & bye — <script>")); // subject is a header, not HTML
-assert.ok(mail.html.includes("&lt;script&gt;"));
-assert.ok(mail.html.includes("1 &lt; 2"));
-assert.ok(!mail.html.includes("<script>"));
+assert.ok(url.startsWith("mailto:sparrar@unbosque.edu.co?"));
+const params = new URLSearchParams(url.slice(url.indexOf("?") + 1));
+assert.equal(params.get("subject"), "[8-BitQuest] Tutorial inquiry — Player One");
 
-// escapeHtml covers all five significant characters
-assert.equal(escapeHtml(`&<>"'`), "&amp;&lt;&gt;&quot;&#39;");
+// ...and the whole message in the body, with the sender's address so the reply reaches them
+const body = params.get("body") ?? "";
+assert.ok(body.includes("Name: Player One"));
+assert.ok(body.includes("Email: player1@example.com"));
+assert.ok(body.includes("Subject: Tutorial inquiry"));
+assert.ok(body.includes("I would love a devlog on dithering."));
 
-// repopulate: a rejected submit gives every visible field back, so nothing typed is lost
-const posted = new FormData();
-posted.set("name", "Alex Chen");
-posted.set("email", "not-an-email");
-posted.set("subject", "Tutorial inquiry");
-posted.set("message", "A long message worth preserving.");
-posted.set("_gotcha", "");
-posted.set("_ts", "1000");
-assert.deepEqual(repopulate(posted), {
-  name: "Alex Chen",
-  email: "not-an-email",
-  subject: "Tutorial inquiry",
-  message: "A long message worth preserving.",
-});
-
-// ...and only those four. Echoing _gotcha back would defeat the honeypot on the retry, and a
-// repopulated _ts would make the time gate reject every resubmission of a slowly-filled form.
-assert.deepEqual(Object.keys(repopulate(posted)), ["name", "email", "subject", "message"]);
-
-// a fresh GET render has no body, and a File entry never reaches a value attribute
-assert.deepEqual(repopulate(null), { name: "", email: "", subject: "", message: "" });
-const withFile = new FormData();
-withFile.set("message", new File(["x"], "x.txt"));
-assert.equal(repopulate(withFile).message, "");
+// the query string is encoded: a newline or an ampersand in the message can't break out of it
+const tricky = buildMailtoUrl(
+  { name: "A & B", email: "a@b.co", subject: "Hi <there>", message: "line1\nline2 & line3" },
+  "x@y.co",
+  "Site",
+);
+assert.ok(!tricky.includes("\n"));
+assert.ok(tricky.includes("%26")); // the ampersand is encoded, not a parameter separator
+assert.ok(tricky.includes("%0A")); // the newline is encoded too
+const trickyParams = new URLSearchParams(tricky.slice(tricky.indexOf("?") + 1));
+assert.ok((trickyParams.get("body") ?? "").includes("line1\nline2 & line3"));
 
 console.log("contact: all assertions passed");
