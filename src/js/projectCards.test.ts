@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 
 import type { CollectionEntry } from "astro:content";
 
-import { statusMeta, toProjectCard } from "./projectCards.ts";
+import { pickLatestProjects, statusMeta, toProjectCard } from "./projectCards.ts";
 
 // statusMeta: both branches, exhaustively.
 assert.deepEqual(statusMeta("complete"), { label: "[Complete]", variant: "success" });
@@ -59,5 +59,30 @@ assert.equal(
 );
 assert.equal(card2.badgeLabel, "[In Progress]");
 assert.equal(card2.badgeVariant, "warning");
+
+// pickLatestProjects: `order` is the upload chronology, so the newest upload (highest order) leads.
+// The listing grid walks the same array ascending — the two must not fight over it.
+const listed = [
+  { id: "oldest", data: { order: 1 } },
+  { id: "middle", data: { order: 3 } },
+  { id: "newest", data: { order: 5 } },
+];
+assert.deepEqual(
+  pickLatestProjects(listed, 3).map((p) => p.id),
+  ["newest", "middle", "oldest"],
+  "returns every entry, newest first",
+);
+assert.deepEqual(
+  pickLatestProjects(listed, 2).map((p) => p.id),
+  ["newest", "middle"],
+  "the limit keeps the newest ones",
+);
+assert.deepEqual(pickLatestProjects(listed, 0), [], "a limit of 0 yields nothing");
+assert.deepEqual(pickLatestProjects([], 3), [], "an empty list yields nothing");
+assert.deepEqual(
+  listed.map((p) => p.id),
+  ["oldest", "middle", "newest"],
+  "the caller's array is never mutated",
+);
 
 console.log("projectCards.test.ts — all assertions passed");

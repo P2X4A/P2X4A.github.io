@@ -46,3 +46,24 @@ export function toProjectCard(entry: CollectionEntry<"projects">): ContentCardPr
     cta: "View",
   };
 }
+
+/**
+ * Pick the `limit` most recently added projects, newest first.
+ *
+ * `order` is the upload chronology — the /projects/ listing walks it ascending (oldest first) and
+ * each new entry takes the next number — so the most recent uploads are the ones with the HIGHEST
+ * order. The home "Últimos proyectos" grid wants them in the opposite direction: newest leads.
+ *
+ * Pure and side-effect free: it copies before sorting, so the caller's array (and the shared
+ * listing order) is never mutated.
+ *
+ * @param entries the project entries to pick from
+ * @param limit   how many to return
+ * @returns at most `limit` entries, newest first
+ */
+export function pickLatestProjects<T extends { data: { order: number } }>(
+  entries: readonly T[],
+  limit: number,
+): T[] {
+  return [...entries].sort((a, b) => b.data.order - a.data.order).slice(0, limit);
+}

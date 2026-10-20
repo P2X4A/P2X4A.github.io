@@ -2,6 +2,7 @@
 // home Featured Projects grid, and the detail route's getStaticPaths, so their draft filter + sort
 // can't drift. Kept separate from projectCards.ts (pure mapping, no astro deps) because this imports
 // `getCollection` as a value, which the type-stripped `pnpm test` can't resolve.
+import { pickLatestProjects } from "@js/projectCards";
 import { type CollectionEntry, getCollection } from "astro:content";
 
 /**
@@ -25,4 +26,20 @@ export async function getProjectsByCategory(
 ): Promise<CollectionEntry<"projects">[]> {
   const projects = await getSortedProjects();
   return projects.filter((entry) => entry.data.category === category);
+}
+
+/**
+ * The most recently added projects, newest first.
+ *
+ * `order` is the upload chronology, so the latest uploads are the ones with the highest order —
+ * the opposite end of the list the /projects/ grid walks. The home "Últimos proyectos" section
+ * takes the head of this list, so the newest upload leads the row.
+ *
+ * @param limit how many to return (default 3)
+ * @returns at most `limit` entries, newest first
+ */
+export async function getLatestProjects(
+  limit = 3,
+): Promise<CollectionEntry<"projects">[]> {
+  return pickLatestProjects(await getSortedProjects(), limit);
 }
