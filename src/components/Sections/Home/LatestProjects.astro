@@ -1,0 +1,19 @@
+---
+// src/components/Sections/Home/LatestProjects.astro — Figma "Latest Posts Section" (node 5:31).
+//
+// Data-only section: the shared heading + 1/2/3-col card grid lives in <CardGrid>.
+//
+// It now leads with the student's MOST RECENT WORK: the newest projects first (see
+// `getLatestProjects` — `order` is the upload chronology, so the latest upload is the one with the
+// highest order). The demo blog posts left this row; the blog keeps its own listing at /blog/.
+//
+// The cards come from the same `toProjectCard` mapping the /projects/ grid uses, so a card here can
+// never drift from its detail page — same href, badge, thumbnail and tags.
+import CardGrid from "@components/Sections/Global/CardGrid.astro";
+import { toProjectCard } from "@js/projectCards";
+import { getLatestProjects } from "@js/projectData";
+
+const latest = (await getLatestProjects(3)).map(toProjectCard);
+---
+
+<CardGrid headingId="latest-projects-heading" title="Últimos proyectos" items={latest} />
