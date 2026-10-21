@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Portada: los símbolos de los operadores del álgebra relacional, primitivos, derivados y extendidos">
+  <title>Operadores del álgebra relacional</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <text x="16" y="44" fill="#63de86" font-size="13">GUÍA DE ESTUDIO</text>
+    <text x="16" y="62" fill="#b8b8d8" font-size="8" font-weight="normal">los operadores del algebra relacional</text>
+
+    <!-- fila 1: primitivos (verde) + interseccion (azul) -->
+    <g>
+      <rect x="16" y="88" width="60" height="60" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="46" y="128" fill="#63de86" font-size="30" text-anchor="middle">σ</text>
+
+      <rect x="80" y="88" width="60" height="60" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="110" y="128" fill="#63de86" font-size="30" text-anchor="middle">π</text>
+
+      <rect x="144" y="88" width="60" height="60" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="174" y="128" fill="#63de86" font-size="30" text-anchor="middle">∪</text>
+
+      <rect x="208" y="88" width="60" height="60" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="238" y="128" fill="#63de86" font-size="30" text-anchor="middle">−</text>
+
+      <rect x="272" y="88" width="60" height="60" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="302" y="128" fill="#63de86" font-size="30" text-anchor="middle">×</text>
+
+      <rect x="336" y="88" width="60" height="60" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="366" y="128" fill="#63de86" font-size="30" text-anchor="middle">ρ</text>
+
+      <rect x="400" y="88" width="60" height="60" fill="#171740" stroke="#62b4f8" stroke-width="2" />
+      <text x="430" y="128" fill="#62b4f8" font-size="30" text-anchor="middle">∩</text>
+    </g>
+
+    <!-- fila 2: derivados (azul) y extendidos (rosa) -->
+    <g>
+      <rect x="16" y="156" width="60" height="60" fill="#171740" stroke="#62b4f8" stroke-width="2" />
+      <polygon points="32,172 58,186 32,200" fill="none" stroke="#62b4f8" stroke-width="3" />
+      <polygon points="60,172 34,186 60,200" fill="none" stroke="#62b4f8" stroke-width="3" />
+
+      <rect x="80" y="156" width="60" height="60" fill="#171740" stroke="#62b4f8" stroke-width="2" />
+      <polygon points="94,172 118,186 94,200" fill="none" stroke="#62b4f8" stroke-width="3" />
+      <polygon points="122,172 98,186 122,200" fill="none" stroke="#62b4f8" stroke-width="3" />
+      <path d="M92 206 H126" stroke="#62b4f8" stroke-width="3" />
+
+      <rect x="144" y="156" width="60" height="60" fill="#171740" stroke="#62b4f8" stroke-width="2" />
+      <text x="174" y="196" fill="#62b4f8" font-size="30" text-anchor="middle">÷</text>
+
+      <rect x="208" y="156" width="60" height="60" fill="#171740" stroke="#f4677a" stroke-width="2" />
+      <text x="238" y="196" fill="#f4677a" font-size="30" text-anchor="middle">γ</text>
+
+      <rect x="272" y="156" width="60" height="60" fill="#171740" stroke="#f4677a" stroke-width="2" />
+      <text x="302" y="196" fill="#f4677a" font-size="30" text-anchor="middle">τ</text>
+
+      <rect x="336" y="156" width="60" height="60" fill="#171740" stroke="#f4677a" stroke-width="2" />
+      <text x="366" y="196" fill="#f4677a" font-size="30" text-anchor="middle">δ</text>
+
+      <rect x="400" y="156" width="60" height="60" fill="#171740" stroke="#f4677a" stroke-width="2" />
+      <text x="430" y="196" fill="#f4677a" font-size="30" text-anchor="middle">←</text>
+    </g>
+
+    <text x="16" y="242" fill="#63de86" font-size="9">PRIMITIVOS</text>
+    <text x="104" y="242" fill="#62b4f8" font-size="9">DERIVADOS</text>
+    <text x="196" y="242" fill="#f4677a" font-size="9">EXTENDIDOS</text>
+    <text x="300" y="242" fill="#b8b8d8" font-size="8" font-weight="normal">y su equivalente en SQL</text>
+  </g>
+</svg>

@@ -1,0 +1,887 @@
+---
+title: "Álgebra relacional — Guía de estudio"
+tagline: "Los operadores del álgebra relacional, su traducción a SQL y los puntos donde ambos lenguajes dejan de coincidir"
+description: "Guía de estudio de álgebra relacional para Bases de Datos 1: operadores primitivos, derivados y extendidos, multiconjuntos y NULL en SQL, equivalencias de reescritura, un ejemplo completo paso a paso y seis ejercicios resueltos sobre una base de datos de ejemplo."
+status: "complete"
+category: "algebra-relacional"
+moduleId: "BD1-ALG-002"
+order: 13
+thumbnail: "../../../assets/evidencias/introduccion-algebra-relacional/thumbnail.png"
+thumbnailAlt: "Los símbolos de los operadores del álgebra relacional: selección, proyección, unión, diferencia, producto, renombrado, intersección, join, división, agrupamiento, ordenamiento y eliminación de duplicados"
+
+tech:
+  - "Álgebra relacional (primitivos, derivados y extendidos)"
+  - "Traducción a SQL"
+  - "Álgebra de multiconjuntos"
+  - "NULL y lógica de tres valores"
+  - "Equivalencias y optimización"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Empleados, departamentos, proyectos y asignaciones"
+  - label: "Base de ejemplo"
+    value: "Cuatro relaciones con datos calculables a mano"
+  - label: "Alcance"
+    value: "Guía de estudio de los trece temas del álgebra relacional"
+  - label: "Ejercicios"
+    value: "Seis ejercicios con solución en álgebra y en SQL"
+
+features:
+  - lead: "Seis primitivos"
+    text: "Selección, proyección, unión, diferencia, producto y renombrado: con eso se expresa todo."
+  - lead: "El operador difícil"
+    text: "La división responde «¿quién se relaciona con todos?», y no tiene forma canónica en SQL."
+  - lead: "Dónde se aparta SQL"
+    text: "Multiconjuntos, NULL y orden: tres diferencias que explican casi toda sorpresa."
+  - lead: "Reescritura de consultas"
+    text: "Las equivalencias del álgebra son las reglas que usa el optimizador del motor."
+
+archCaption: "Los operadores del álgebra relacional y su equivalente en SQL"
+
+challenge:
+  title: "Problema"
+  body: "Preparar una guía de estudio que introduzca el álgebra relacional: qué es, con qué operadores se construyen las consultas, cómo se traduce cada operador a SQL, dónde los dos lenguajes dejan de coincidir y cómo reescribe el optimizador una consulta sin cambiar su resultado."
+solution:
+  title: "Solución"
+  body: "La guía recorre los seis operadores primitivos, los siete derivados y los seis extendidos, cada uno con su notación, un ejemplo sobre una base de cuatro relaciones y su equivalente en SQL. Sigue con las diferencias entre álgebra y SQL, las equivalencias de reescritura, un ejemplo completo paso a paso y seis ejercicios resueltos."
+---
+
+## Descripción
+
+Esta guía introduce el **álgebra relacional** y la traduce a SQL operador por operador. Está pensada para quien empieza: fija el vocabulario, construye los operadores uno a uno sobre una base de datos pequeña y termina señalando los puntos donde los dos lenguajes dejan de comportarse igual.
+
+Edgar F. Codd propuso el álgebra relacional en 1970 como parte del modelo relacional, y desde entonces es la base teórica de lo que hace un motor de bases de datos cuando recibe una consulta.
+
+La idea que sostiene todo lo demás es una: **cada operador recibe una o dos relaciones y devuelve otra relación**. A esa propiedad se le llama *clausura*, y es lo que permite encadenar operadores sin límite. El resultado de un filtro puede entrar a un join, el del join a una proyección, y así hasta construir consultas tan grandes como haga falta.
+
+El álgebra es **procedimental**: describe una receta, es decir, qué operaciones aplicar y en qué orden. SQL es **declarativo**: se dice qué se quiere y el motor decide cómo obtenerlo. Por dentro, el motor convierte el SQL en un árbol de operadores algebraicos, lo reescribe para que sea más barato y recién entonces lo ejecuta. Por eso entender el álgebra ayuda a escribir mejor SQL y a leer planes de ejecución.
+
+## El vocabulario
+
+Antes de tocar un operador conviene fijar los términos. Cada uno tiene su equivalente en el mundo SQL.
+
+| Álgebra relacional | SQL / práctica | Significado |
+| :-- | :-- | :-- |
+| Relación | Tabla | Conjunto de tuplas con el mismo esquema |
+| Tupla | Fila | Un registro individual |
+| Atributo | Columna | Una propiedad con nombre y dominio |
+| Esquema | Definición de la tabla | Nombre de la relación y lista de sus atributos |
+| Dominio | Tipo de dato | Valores permitidos para un atributo |
+| Clave | PRIMARY KEY | Atributos que identifican cada tupla |
+
+Una diferencia conviene tener presente desde ya: en la teoría, una relación es un **conjunto**. No hay tuplas repetidas y no importa el orden. Una tabla SQL, en cambio, admite filas duplicadas y devuelve las filas en el orden que quiera. Más adelante se ve qué consecuencias tiene eso.
+
+## La base de datos de ejemplo
+
+Todos los ejemplos del documento usan estas cuatro relaciones. Son pequeñas a propósito: así cada resultado se puede calcular a mano.
+
+**Empleado**(id, nombre, salario, depto_id)
+
+| id | nombre | salario | depto_id |
+| :-- | :-- | :-- | :-- |
+| 1 | Ana | 4000 | 10 |
+| 2 | Luis | 3000 | 10 |
+| 3 | Marta | 5000 | 20 |
+| 4 | Pedro | 2500 | NULL |
+| 5 | Sofía | 3000 | 20 |
+
+**Departamento**(id, nombre)
+
+| id | nombre |
+| :-- | :-- |
+| 10 | Ventas |
+| 20 | Sistemas |
+| 30 | Legal |
+
+**Proyecto**(id, titulo)
+
+| id | titulo |
+| :-- | :-- |
+| P1 | Portal |
+| P2 | App |
+
+**Asignacion**(emp_id, proy_id)
+
+| emp_id | proy_id |
+| :-- | :-- |
+| 1 | P1 |
+| 1 | P2 |
+| 2 | P1 |
+| 3 | P1 |
+| 3 | P2 |
+
+Hay tres detalles puestos con intención. Pedro no tiene departamento (NULL), el departamento Legal no tiene empleados, y solo Ana y Marta participan en todos los proyectos. Cada uno de esos casos sirve para ver cómo se comporta un operador concreto.
+
+## Los operadores primitivos
+
+Son seis. Con ellos se puede expresar cualquier consulta del álgebra clásica; todo lo demás es una comodidad construida encima. Tres son unarios (σ, π, ρ) y tres binarios (∪, −, ×).
+
+### Selección (σ)
+
+Filtra **filas**. Se queda con las tuplas que cumplen una condición y descarta el resto. No cambia las columnas.
+
+**Notación:** `σ_{condición}(R)`
+
+**Ejemplo:** empleados que ganan más de 3000.
+
+```text
+σ_{salario > 3000}(Empleado)
+```
+
+| id | nombre | salario | depto_id |
+| :-- | :-- | :-- | :-- |
+| 1 | Ana | 4000 | 10 |
+| 3 | Marta | 5000 | 20 |
+
+**En SQL:**
+
+```sql
+SELECT *
+FROM Empleado
+WHERE salario > 3000;
+```
+
+La condición admite comparaciones (`=, ≠, <, ≤, >, ≥`) y los conectores `∧` (AND), `∨` (OR) y `¬` (NOT). Una cascada de selecciones equivale a una sola con AND:
+
+```text
+σ_{c1}(σ_{c2}(R)) = σ_{c1 ∧ c2}(R)
+```
+
+### Proyección (π)
+
+Elige **columnas**. Conserva los atributos que pidas y elimina el resto. Como el resultado es un conjunto, si al quitar columnas quedan tuplas idénticas, se colapsan en una sola.
+
+**Notación:** `π_{A1, A2, …}(R)`
+
+**Ejemplo:** los salarios que existen en la empresa.
+
+```text
+π_{salario}(Empleado)
+```
+
+| salario |
+| :-- |
+| 4000 |
+| 3000 |
+| 5000 |
+| 2500 |
+
+El valor 3000 aparece dos veces en la tabla original, en Luis y en Sofía, pero una sola vez en el resultado.
+
+**En SQL:**
+
+```sql
+SELECT DISTINCT salario
+FROM Empleado;
+```
+
+Aquí está la primera trampa. En SQL, `SELECT salario FROM Empleado` sin `DISTINCT` devolvería cinco filas, con el 3000 repetido. **La proyección del álgebra equivale a `SELECT DISTINCT`**, no a un `SELECT` a secas.
+
+### Unión (∪)
+
+Junta las tuplas de dos relaciones. Si una tupla está en ambas, aparece una sola vez.
+
+**Condición de compatibilidad:** las dos relaciones deben tener el mismo número de atributos, y los atributos correspondientes deben tener dominios compatibles. Los nombres pueden diferir; el esquema del resultado suele tomarse de la primera relación.
+
+**Ejemplo:** ids de empleados que son del departamento 10 **o** ganan 4000 o más.
+
+```text
+A = π_{id}(σ_{depto_id = 10}(Empleado))     →  {1, 2}
+B = π_{id}(σ_{salario ≥ 4000}(Empleado))    →  {1, 3}
+A ∪ B                                       →  {1, 2, 3}
+```
+
+**En SQL:**
+
+```sql
+SELECT id FROM Empleado WHERE depto_id = 10
+UNION
+SELECT id FROM Empleado WHERE salario >= 4000;
+```
+
+`UNION` elimina duplicados, igual que el operador teórico. `UNION ALL` los conserva y es más rápido, pero ya no es unión de conjuntos.
+
+### Diferencia (−)
+
+`R − S` devuelve las tuplas que están en R y **no** están en S. Exige la misma compatibilidad que la unión. Es el único operador primitivo que expresa negación, y por eso aparece detrás de todas las consultas del tipo «los que no…».
+
+A diferencia de la unión, **no es conmutativa**: `R − S` y `S − R` dan resultados distintos.
+
+**Ejemplo:** del conjunto A anterior, los que no están en B.
+
+```text
+A − B  →  {2}
+B − A  →  {3}
+```
+
+**En SQL:**
+
+```sql
+SELECT id FROM Empleado WHERE depto_id = 10
+EXCEPT
+SELECT id FROM Empleado WHERE salario >= 4000;
+```
+
+Oracle la llama `MINUS`. En MySQL, `EXCEPT` e `INTERSECT` existen desde la versión 8.0.31.
+
+### Producto cartesiano (×)
+
+Combina **cada** tupla de R con **cada** tupla de S. Si R tiene *m* tuplas y S tiene *n*, el resultado tiene *m × n*. Los atributos del resultado son los de R seguidos de los de S.
+
+`Empleado × Departamento` produce 5 × 3 = 15 tuplas. Algunas son absurdas —Ana emparejada con el departamento Legal—, y ahí se ve para qué sirve el producto: casi nunca se usa solo. Es la materia prima del join, que lo filtra con una condición.
+
+**En SQL:**
+
+```sql
+SELECT *
+FROM Empleado CROSS JOIN Departamento;
+-- también: FROM Empleado, Departamento
+```
+
+Fíjate en que ambas relaciones tienen atributos llamados `id` y `nombre`. En álgebra, el resultado tendría atributos con nombre repetido, lo cual no está permitido. Se resuelve con el siguiente operador.
+
+### Renombrado (ρ)
+
+Cambia el nombre de una relación, de sus atributos, o de ambos. Parece menor, pero es obligatorio en dos situaciones: evitar conflictos de nombres en un producto o join, y comparar una relación consigo misma.
+
+**Notación:**
+
+- `ρ_{E}(Empleado)` renombra la relación a E.
+- `ρ_{sueldo ← salario}(Empleado)` renombra un atributo.
+
+**En SQL:**
+
+```sql
+SELECT salario AS sueldo
+FROM Empleado AS E;
+```
+
+`AS` cumple la función de ρ. Cuando se hace un autojoin con dos alias de la misma tabla, se está aplicando renombrado aunque no se note.
+
+## Los operadores derivados
+
+Se llaman derivados porque se pueden escribir con los seis primitivos. Existen porque expresarlos así sería tedioso, y porque el motor los implementa con algoritmos especializados.
+
+### Intersección (∩)
+
+Las tuplas que están en ambas relaciones.
+
+```text
+R ∩ S = R − (R − S)
+```
+
+**Ejemplo:** `A ∩ B` con los conjuntos de antes da `{1}`.
+
+```sql
+SELECT id FROM Empleado WHERE depto_id = 10
+INTERSECT
+SELECT id FROM Empleado WHERE salario >= 4000;
+```
+
+### Join theta (⋈θ)
+
+Un producto cartesiano seguido de una selección. Es el operador más usado de todo el álgebra.
+
+```text
+R ⋈_θ S = σ_θ(R × S)
+```
+
+**Ejemplo:** cada empleado con su departamento.
+
+```text
+Empleado ⋈_{Empleado.depto_id = Departamento.id} Departamento
+```
+
+| E.id | E.nombre | salario | depto_id | D.id | D.nombre |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| 1 | Ana | 4000 | 10 | 10 | Ventas |
+| 2 | Luis | 3000 | 10 | 10 | Ventas |
+| 3 | Marta | 5000 | 20 | 20 | Sistemas |
+| 5 | Sofía | 3000 | 20 | 20 | Sistemas |
+
+Pedro desaparece porque su `depto_id` es NULL y no coincide con nada. Legal desaparece porque ningún empleado apunta a él. Eso es lo que hace un **inner join**: solo sobreviven los que tienen pareja.
+
+```sql
+SELECT *
+FROM Empleado E
+JOIN Departamento D ON E.depto_id = D.id;
+```
+
+Cuando la condición θ es únicamente de igualdad, el join se llama **equijoin**. Es, con diferencia, el caso más frecuente.
+
+### Join natural (⋈)
+
+Es un equijoin que compara automáticamente **todos los atributos con el mismo nombre** y deja una sola copia de cada uno en el resultado. Se escribe sin condición: `R ⋈ S`.
+
+Con las tablas de ejemplo, un join natural directo sería un error. `Empleado` y `Departamento` comparten `id` y `nombre`, así que el motor exigiría que el id del empleado fuera igual al id del departamento y que los nombres coincidieran. Daría un resultado vacío. Para usarlo bien hay que renombrar antes:
+
+```text
+Empleado ⋈ ρ_{depto_id, depto_nombre}(Departamento)
+```
+
+```sql
+SELECT *
+FROM Empleado
+NATURAL JOIN (
+    SELECT id AS depto_id, nombre AS depto_nombre
+    FROM Departamento
+) D;
+```
+
+Muchos equipos evitan `NATURAL JOIN` en producción justamente por esto: si alguien agrega una columna con un nombre repetido, la consulta cambia de significado sin avisar. Lo más seguro es `JOIN … ON` o `JOIN … USING (columna)`.
+
+### Autojoin: una relación contra sí misma
+
+Hace falta renombrar. Ejemplo: parejas de empleados con el mismo salario.
+
+```text
+π_{E1.nombre, E2.nombre}(
+    σ_{E1.salario = E2.salario ∧ E1.id < E2.id}(
+        ρ_{E1}(Empleado) × ρ_{E2}(Empleado)
+    )
+)
+```
+
+El resultado es (Luis, Sofía). La condición `E1.id < E2.id` evita que cada pareja salga dos veces y que alguien se empareje consigo mismo.
+
+```sql
+SELECT E1.nombre, E2.nombre
+FROM Empleado E1
+JOIN Empleado E2
+  ON E1.salario = E2.salario AND E1.id < E2.id;
+```
+
+### Semijoin (⋉)
+
+Devuelve las tuplas de R que tienen al menos una pareja en S, **pero sin traer las columnas de S**. Es un join que solo sirve de filtro.
+
+```text
+R ⋉ S = π_{atributos de R}(R ⋈ S)
+```
+
+**Ejemplo:** empleados que participan en algún proyecto → Ana, Luis, Marta.
+
+SQL no tiene un operador propio, se usa `EXISTS`:
+
+```sql
+SELECT *
+FROM Empleado E
+WHERE EXISTS (
+    SELECT 1 FROM Asignacion A WHERE A.emp_id = E.id
+);
+```
+
+Con un join normal, Ana saldría dos veces, porque participa en P1 y en P2. El semijoin no tiene ese problema, y por eso `EXISTS` suele ser la forma más limpia de expresar «tiene al menos uno».
+
+### Antijoin (▷)
+
+Lo contrario: las tuplas de R que **no** tienen pareja en S.
+
+**Ejemplo:** empleados sin ningún proyecto → Pedro y Sofía.
+
+```sql
+SELECT *
+FROM Empleado E
+WHERE NOT EXISTS (
+    SELECT 1 FROM Asignacion A WHERE A.emp_id = E.id
+);
+```
+
+En álgebra puro se obtiene con una diferencia:
+
+```text
+Empleado − (Empleado ⋉ Asignacion)
+```
+
+### División (÷)
+
+El operador más difícil de ver al principio, pero responde una pregunta muy natural: **¿qué elementos se relacionan con todos los de un conjunto?**
+
+Dadas `R(X, Y)` y `S(Y)`, el resultado `R ÷ S` contiene los valores de X que aparecen en R emparejados con **cada** valor de S.
+
+**Ejemplo:** empleados asignados a todos los proyectos.
+
+```text
+Asignacion ÷ π_{id → proy_id}(Proyecto)
+```
+
+El resultado es `{1, 3}`, es decir, Ana y Marta. Luis solo está en P1, así que queda fuera.
+
+Se deriva de los primitivos así:
+
+```text
+R ÷ S = π_X(R) − π_X( (π_X(R) × S) − R )
+```
+
+Léelo de adentro hacia afuera. `π_X(R) × S` genera todas las combinaciones que *tendrían que existir* si cada X estuviera con cada Y. Restando R quedan las combinaciones que **faltan**. Proyectando X se obtiene los que tienen al menos una combinación faltante, y al restarlos del total quedan solo los que no les falta ninguna.
+
+SQL no tiene operador de división. Hay dos maneras habituales:
+
+```sql
+-- Doble NOT EXISTS: "no existe un proyecto en el que el empleado no esté"
+SELECT E.id
+FROM Empleado E
+WHERE NOT EXISTS (
+    SELECT 1 FROM Proyecto P
+    WHERE NOT EXISTS (
+        SELECT 1 FROM Asignacion A
+        WHERE A.emp_id = E.id AND A.proy_id = P.id
+    )
+);
+```
+
+```sql
+-- Con conteo: "participa en tantos proyectos como existen"
+SELECT A.emp_id
+FROM Asignacion A
+GROUP BY A.emp_id
+HAVING COUNT(DISTINCT A.proy_id) = (SELECT COUNT(*) FROM Proyecto);
+```
+
+Dos advertencias. Si la tabla `Proyecto` estuviera vacía, la versión de doble NOT EXISTS devolvería **todos** los empleados, porque la condición se cumple por vacuidad. Y la versión con conteo da resultados correctos solo si `proy_id` está garantizado por una clave foránea; de lo contrario, un proyecto inexistente podría inflar la cuenta.
+
+## Los operadores extendidos
+
+El álgebra clásica no puede contestar preguntas tan cotidianas como «¿cuál es el salario promedio por departamento?». Para cubrir esos huecos se añadieron operadores que hoy aparecen en cualquier libro de texto y en cualquier motor real.
+
+### Joins externos (⟕ ⟖ ⟗)
+
+El inner join descarta lo que no tiene pareja. El join externo lo conserva y rellena con NULL los atributos que no pudo llenar.
+
+- **Left outer join (⟕):** conserva todo lo de la relación izquierda.
+- **Right outer join (⟖):** conserva todo lo de la derecha.
+- **Full outer join (⟗):** conserva ambos lados.
+
+**Ejemplo:** `Empleado ⟕ Departamento` sobre `depto_id = id`.
+
+| E.nombre | D.nombre |
+| :-- | :-- |
+| Ana | Ventas |
+| Luis | Ventas |
+| Marta | Sistemas |
+| Sofía | Sistemas |
+| Pedro | NULL |
+
+Pedro vuelve a aparecer, con su departamento en NULL. Con `⟖` aparecería Legal con empleado NULL, y con `⟗` aparecerían ambos.
+
+```sql
+SELECT E.nombre, D.nombre
+FROM Empleado E
+LEFT JOIN Departamento D ON E.depto_id = D.id;
+-- RIGHT JOIN y FULL JOIN funcionan igual
+```
+
+MySQL no implementa `FULL JOIN`; se emula con la unión de un `LEFT JOIN` y un `RIGHT JOIN`.
+
+**Un error muy común.** Si se filtra por una columna de la tabla «opcional» en el `WHERE`, el outer join se comporta como un inner join, porque las filas con NULL no pasan la condición. Si el filtro debe aplicarse antes de unir, va en el `ON`:
+
+```sql
+-- Todos los empleados; el departamento solo si es Ventas
+SELECT E.nombre, D.nombre
+FROM Empleado E
+LEFT JOIN Departamento D
+  ON E.depto_id = D.id AND D.nombre = 'Ventas';
+```
+
+### Agrupamiento y agregación (γ)
+
+Agrupa las tuplas según uno o más atributos y calcula funciones de resumen sobre cada grupo: `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`.
+
+**Notación:** `_{atributos de agrupación} γ _{funciones}(R)`
+
+**Ejemplo:** salario promedio y número de empleados por departamento.
+
+```text
+_{depto_id} γ _{AVG(salario), COUNT(*)}(Empleado)
+```
+
+| depto_id | AVG(salario) | COUNT(*) |
+| :-- | :-- | :-- |
+| 10 | 3500 | 2 |
+| 20 | 4000 | 2 |
+| NULL | 2500 | 1 |
+
+```sql
+SELECT depto_id, AVG(salario), COUNT(*)
+FROM Empleado
+GROUP BY depto_id;
+```
+
+Se observa que `GROUP BY` trata todos los NULL como un mismo grupo, aunque `NULL = NULL` no sea verdadero en una comparación normal. Es una de las pocas excepciones a la regla.
+
+Si se omiten los atributos de agrupación, toda la relación es un único grupo y se obtiene una sola fila, por ejemplo el promedio global.
+
+**`WHERE` y `HAVING` no son lo mismo.** `WHERE` filtra filas *antes* de agrupar, es una σ previa a γ. `HAVING` filtra grupos *después* de agrupar, es una σ posterior a γ.
+
+```sql
+SELECT depto_id, AVG(salario) AS promedio
+FROM Empleado
+WHERE salario > 2000          -- σ antes de γ
+GROUP BY depto_id
+HAVING AVG(salario) > 3500;   -- σ después de γ
+```
+
+### Proyección generalizada
+
+La proyección clásica solo elige columnas. La generalizada admite **expresiones**: aritmética, concatenación, funciones.
+
+```text
+π_{nombre, salario × 12 → anual}(Empleado)
+```
+
+```sql
+SELECT nombre, salario * 12 AS anual
+FROM Empleado;
+```
+
+Es lo que se hace a diario en el `SELECT`, y casi nadie piensa que ya salió del álgebra clásica.
+
+### Ordenamiento (τ)
+
+Ordena el resultado. Como las relaciones teóricas no tienen orden, τ solo tiene sentido como paso final: no puede alimentar a otro operador algebraico.
+
+```text
+τ_{salario ↓}(Empleado)
+```
+
+```sql
+SELECT * FROM Empleado ORDER BY salario DESC;
+```
+
+`LIMIT`, `OFFSET` y `FETCH FIRST` pertenecen a esta misma categoría.
+
+### Eliminación de duplicados (δ)
+
+Solo importa en el álgebra de **multiconjuntos**, que es la que SQL realmente sigue. Convierte un multiconjunto en conjunto. En SQL equivale a `DISTINCT`.
+
+### Asignación (←)
+
+Guarda un resultado intermedio con nombre para reutilizarlo. Hace que las consultas largas sean legibles.
+
+```text
+Ventas ← σ_{nombre = 'Ventas'}(Departamento)
+Resultado ← π_{E.nombre}(Empleado ⋈_{depto_id = Ventas.id} Ventas)
+```
+
+En SQL cumple el papel de una subconsulta con nombre, un `WITH` o una vista.
+
+```sql
+WITH Ventas AS (
+    SELECT * FROM Departamento WHERE nombre = 'Ventas'
+)
+SELECT E.nombre
+FROM Empleado E JOIN Ventas V ON E.depto_id = V.id;
+```
+
+## Dónde SQL se aparta del álgebra
+
+SQL se inspira en el álgebra, pero no la sigue al pie de la letra. Estas diferencias explican la mayoría de los resultados que sorprenden a quien está aprendiendo.
+
+### Multiconjuntos en lugar de conjuntos
+
+Una tabla SQL puede tener filas repetidas, y las consultas no las eliminan por defecto. Cada operador tiene su versión sobre multiconjuntos:
+
+| Álgebra (conjuntos) | SQL conjunto | SQL multiconjunto |
+| :-- | :-- | :-- |
+| π | `SELECT DISTINCT` | `SELECT` |
+| ∪ | `UNION` | `UNION ALL` |
+| ∩ | `INTERSECT` | `INTERSECT ALL` |
+| − | `EXCEPT` | `EXCEPT ALL` |
+
+Con multiconjuntos, algunas equivalencias del álgebra clásica dejan de cumplirse. Un caso típico: `A ∩ B = A − (A − B)` es cierto con conjuntos, pero con duplicados hay que revisar con cuidado qué versión del operador se usa.
+
+### NULL y lógica de tres valores
+
+El álgebra clásica no tiene valores desconocidos. SQL sí, y por eso una comparación puede dar **verdadero, falso o desconocido**. Reglas básicas:
+
+- Cualquier comparación con NULL da desconocido, incluso `NULL = NULL`.
+- `WHERE` solo deja pasar las filas cuya condición da verdadero.
+- Para preguntar por NULL se usa `IS NULL` o `IS NOT NULL`.
+
+La consecuencia más famosa es `NOT IN`:
+
+```sql
+-- Si Asignacion.emp_id contuviera algún NULL, esto devolvería cero filas
+SELECT * FROM Empleado
+WHERE id NOT IN (SELECT emp_id FROM Asignacion);
+
+-- Esta versión se comporta como el antijoin del álgebra
+SELECT * FROM Empleado E
+WHERE NOT EXISTS (SELECT 1 FROM Asignacion A WHERE A.emp_id = E.id);
+```
+
+La razón: `id NOT IN (1, 2, NULL)` equivale a `id <> 1 AND id <> 2 AND id <> NULL`, y esa última comparación es desconocida, lo que contamina toda la conjunción.
+
+### Orden y duplicados de columnas
+
+SQL puede devolver filas ordenadas (`ORDER BY`) y permite columnas con el mismo nombre en un resultado. El álgebra clásica no admite ni lo uno ni lo otro.
+
+### Lo que el álgebra básica no puede expresar
+
+Tres cosas quedan fuera:
+
+- **Cierre transitivo:** «todos los ancestros de un empleado en una jerarquía».
+- **Cálculos y funciones:** `CASE`, funciones de texto, fechas, ventanas.
+- **Operaciones de escritura:** `INSERT`, `UPDATE`, `DELETE`.
+
+Para el cierre transitivo, SQL aporta las CTE recursivas (`WITH RECURSIVE`), que van más allá del poder expresivo del álgebra relacional clásica.
+
+## Equivalencias y optimización
+
+Las equivalencias algebraicas son las reglas que el optimizador usa para reescribir una consulta sin cambiar su resultado.
+
+**Propiedades de los operadores binarios**
+
+| Propiedad | Se cumple en |
+| :-- | :-- |
+| Conmutativa | ∪, ∩, ×, ⋈ |
+| Asociativa | ∪, ∩, ×, ⋈ |
+| No conmutativa | − |
+
+**Reglas de reescritura más usadas**
+
+- Cascada de selecciones: `σ_{c1 ∧ c2}(R) = σ_{c1}(σ_{c2}(R))`
+- Las selecciones conmutan entre sí.
+- **Empujar la selección bajo el join:** si `c` solo usa atributos de R, entonces `σ_c(R ⋈ S) = σ_c(R) ⋈ S`.
+- Empujar proyecciones hacia las hojas del árbol, conservando los atributos que se usarán después.
+- Reordenar joins aprovechando asociatividad y conmutatividad.
+- Combinar un producto seguido de una selección en un join.
+
+**Un ejemplo de reescritura.** Pregunta: nombres de empleados de Ventas que ganan más de 3000.
+
+Forma directa, tal como se escribiría primero:
+
+```text
+π_{E.nombre}(
+    σ_{D.nombre = 'Ventas' ∧ E.salario > 3000}(
+        Empleado ⋈_{E.depto_id = D.id} Departamento
+    )
+)
+```
+
+Forma optimizada: se filtra cada tabla **antes** de unirlas, de modo que el join trabaja con menos filas.
+
+```text
+π_{E.nombre}(
+    σ_{salario > 3000}(Empleado)
+    ⋈_{E.depto_id = D.id}
+    σ_{nombre = 'Ventas'}(Departamento)
+)
+```
+
+Ambas dan el mismo resultado: Ana. La segunda es más barata, y cuando las tablas tienen millones de filas esa diferencia es enorme. El optimizador de un motor real hace esta clase de transformación por su cuenta: se escribe la consulta como resulte natural y él la reordena.
+
+**Del álgebra al plan de ejecución.** En PostgreSQL o MySQL, `EXPLAIN` muestra el plan elegido. Lo que se ve ahí son operadores algebraicos con una implementación concreta:
+
+| Operador del álgebra | Lo que se ve en el plan |
+| :-- | :-- |
+| σ | Seq Scan con Filter, Index Scan |
+| π | Lista de columnas de salida |
+| ⋈ | Nested Loop, Hash Join, Merge Join |
+| γ | HashAggregate, GroupAggregate |
+| τ | Sort |
+| ∪ | Append, HashSetOp |
+
+## Un ejemplo completo, paso a paso
+
+**Pregunta:** para cada departamento con al menos un empleado, mostrar su nombre y el salario promedio, pero solo si el promedio supera 3500, ordenado de mayor a menor.
+
+**Paso 1.** Unir empleados con departamentos.
+
+```text
+T1 ← Empleado ⋈_{E.depto_id = D.id} Departamento
+```
+
+**Paso 2.** Agrupar por departamento y calcular el promedio.
+
+```text
+T2 ← _{D.nombre} γ _{AVG(salario) → promedio}(T1)
+```
+
+**Paso 3.** Filtrar los grupos.
+
+```text
+T3 ← σ_{promedio > 3500}(T2)
+```
+
+**Paso 4.** Ordenar.
+
+```text
+Resultado ← τ_{promedio ↓}(T3)
+```
+
+**En SQL**, las cuatro etapas quedan en una sola sentencia:
+
+```sql
+SELECT D.nombre, AVG(E.salario) AS promedio
+FROM Empleado E
+JOIN Departamento D ON E.depto_id = D.id
+GROUP BY D.nombre
+HAVING AVG(E.salario) > 3500
+ORDER BY promedio DESC;
+```
+
+Resultado: Sistemas, 4000. Ventas promedia 3500, que no supera 3500.
+
+Un buen hábito de estudio es hacer este ejercicio al revés: tomar una consulta SQL y escribir, en papel, su árbol de operadores.
+
+## Errores frecuentes
+
+- **Creer que π equivale a SELECT sin más.** Sin `DISTINCT` aparecen duplicados.
+- **Usar `NOT IN` con subconsultas que pueden traer NULL.** Mejor `NOT EXISTS`.
+- **Olvidar que NATURAL JOIN compara todas las columnas con igual nombre.**
+- **Filtrar en `WHERE` la tabla opcional de un outer join.** Anula el efecto del outer.
+- **Confundir `WHERE` con `HAVING`.** Uno filtra filas, el otro filtra grupos.
+- **Escribir un producto cartesiano por accidente.** Un join sin condición de unión multiplica las filas.
+- **Dar por hecho que SQL devuelve filas ordenadas.** Sin `ORDER BY`, no hay garantía.
+
+## Ejercicios
+
+Usan la base de datos de ejemplo. El objetivo es resolver cada uno en álgebra y en SQL antes de mirar la solución.
+
+**1.** Nombres de empleados del departamento 20.
+
+**2.** Nombres de empleados que no tienen departamento asignado.
+
+**3.** Nombres de empleados que participan en el proyecto P1 y también en P2.
+
+**4.** Departamentos sin ningún empleado.
+
+**5.** El salario más alto, usando únicamente los operadores primitivos.
+
+**6.** Cantidad de proyectos por empleado, incluyendo a quienes no tienen ninguno.
+
+<details>
+<summary><strong>Soluciones</strong></summary>
+
+**1.**
+
+```text
+π_{nombre}(σ_{depto_id = 20}(Empleado))
+```
+
+```sql
+SELECT nombre FROM Empleado WHERE depto_id = 20;
+```
+
+**2.** Se pregunta por NULL con `IS NULL`; `depto_id = NULL` nunca sería verdadero.
+
+```text
+π_{nombre}(σ_{depto_id IS NULL}(Empleado))
+```
+
+```sql
+SELECT nombre FROM Empleado WHERE depto_id IS NULL;
+```
+
+**3.** Una intersección de dos conjuntos de ids, y después un join para traer el nombre.
+
+```text
+A ← π_{emp_id}(σ_{proy_id = 'P1'}(Asignacion))
+B ← π_{emp_id}(σ_{proy_id = 'P2'}(Asignacion))
+π_{nombre}(Empleado ⋈_{id = emp_id} (A ∩ B))
+```
+
+```sql
+SELECT E.nombre
+FROM Empleado E
+WHERE E.id IN (
+    SELECT emp_id FROM Asignacion WHERE proy_id = 'P1'
+    INTERSECT
+    SELECT emp_id FROM Asignacion WHERE proy_id = 'P2'
+);
+```
+
+Resultado: Ana y Marta.
+
+**4.** Antijoin: los departamentos que no aparecen en ningún `depto_id`.
+
+```text
+π_{nombre}(Departamento ▷_{id = depto_id} Empleado)
+```
+
+```sql
+SELECT D.nombre
+FROM Departamento D
+WHERE NOT EXISTS (SELECT 1 FROM Empleado E WHERE E.depto_id = D.id);
+```
+
+Resultado: Legal.
+
+**5.** Sin agregación: se restan del total los salarios que tienen otro mayor.
+
+```text
+π_{salario}(Empleado)
+−
+π_{E1.salario}(σ_{E1.salario < E2.salario}(ρ_{E1}(Empleado) × ρ_{E2}(Empleado)))
+```
+
+Resultado: 5000.
+
+```sql
+SELECT salario FROM Empleado
+EXCEPT
+SELECT E1.salario
+FROM Empleado E1 JOIN Empleado E2 ON E1.salario < E2.salario;
+```
+
+En la práctica se usaría `SELECT MAX(salario) FROM Empleado`, pero el ejercicio muestra que el máximo no es un operador imprescindible.
+
+**6.** Hace falta un left outer join para no perder a Pedro y a Sofía; se cuenta una columna de `Asignacion`, no `*`.
+
+```text
+_{E.id, E.nombre} γ _{COUNT(proy_id)}(Empleado ⟕_{E.id = emp_id} Asignacion)
+```
+
+```sql
+SELECT E.id, E.nombre, COUNT(A.proy_id) AS proyectos
+FROM Empleado E
+LEFT JOIN Asignacion A ON A.emp_id = E.id
+GROUP BY E.id, E.nombre;
+```
+
+`COUNT(*)` contaría 1 para Pedro, porque la fila con NULLs existe, mientras que `COUNT(A.proy_id)` ignora los NULL y da 0, que es lo correcto.
+
+</details>
+
+## Tabla de referencia rápida
+
+| Operador | Símbolo | Tipo | Equivalente en SQL |
+| :-- | :-- | :-- | :-- |
+| Selección | σ | Primitivo | `WHERE` |
+| Proyección | π | Primitivo | `SELECT DISTINCT` |
+| Unión | ∪ | Primitivo | `UNION` |
+| Diferencia | − | Primitivo | `EXCEPT` / `MINUS` |
+| Producto cartesiano | × | Primitivo | `CROSS JOIN` |
+| Renombrado | ρ | Primitivo | `AS` |
+| Intersección | ∩ | Derivado | `INTERSECT` |
+| Join theta / equijoin | ⋈θ | Derivado | `JOIN … ON` |
+| Join natural | ⋈ | Derivado | `NATURAL JOIN` / `USING` |
+| Semijoin | ⋉ | Derivado | `WHERE EXISTS` |
+| Antijoin | ▷ | Derivado | `WHERE NOT EXISTS` |
+| División | ÷ | Derivado | Doble `NOT EXISTS` o `GROUP BY … HAVING COUNT` |
+| Join externo | ⟕ ⟖ ⟗ | Extendido | `LEFT` / `RIGHT` / `FULL JOIN` |
+| Agrupamiento | γ | Extendido | `GROUP BY` + agregados |
+| Proyección generalizada | π con expresiones | Extendido | `SELECT` con expresiones |
+| Ordenamiento | τ | Extendido | `ORDER BY` |
+| Eliminación de duplicados | δ | Extendido | `DISTINCT` |
+| Asignación | ← | Extendido | `WITH` / vista / subconsulta |
+
+## Bibliografía
+
+- Codd, E. F. (1970). *A Relational Model of Data for Large Shared Data Banks*. Communications of the ACM, 13(6), 377–387.
+- Codd, E. F. (1972). *Relational Completeness of Data Base Sublanguages*. En Rustin (ed.), *Data Base Systems*, Prentice-Hall.
+- Silberschatz, A., Korth, H. F., Sudarshan, S. *Database System Concepts*. McGraw-Hill. Capítulo sobre álgebra relacional.
+- Elmasri, R., Navathe, S. B. *Fundamentals of Database Systems*. Pearson. Capítulo sobre álgebra y cálculo relacional.
+- Ramakrishnan, R., Gehrke, J. *Database Management Systems*. McGraw-Hill. Capítulo sobre álgebra relacional y cálculo.
+- Garcia-Molina, H., Ullman, J. D., Widom, J. *Database Systems: The Complete Book*. Pearson. Tratamiento detallado del álgebra de multiconjuntos.
+- Date, C. J. *An Introduction to Database Systems*. Pearson. Perspectiva crítica sobre las diferencias entre SQL y el modelo relacional.
+
+Conviene contrastar la notación con el libro que use la cátedra: los símbolos para los joins externos, el semijoin y la agregación varían un poco entre autores.
+
+## Documento del trabajo
+
+- [Álgebra relacional y su traducción a SQL (DOCX)](/evidencias/algebra-relacional/algebra_relacional.docx)
+
+Este trabajo corresponde a la categoría **Álgebra Relacional** de la asignatura Bases de Datos 1.
