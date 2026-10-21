@@ -171,8 +171,11 @@
     & blockquote {
       @apply border-secondary bg-muted/40 text-foreground border-l-4 py-3 pr-4 pl-5 italic;
     }
-    & code {
+    & :not(pre) > code {
       @apply bg-muted border-border border-2 px-1.5 py-0.5 text-xs;
+    }
+    & pre {
+      @apply border-border overflow-x-auto border-4 p-4 text-sm;
     }
   }
 
