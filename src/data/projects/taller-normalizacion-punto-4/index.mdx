@@ -1,0 +1,226 @@
+---
+title: "Taller de Normalización — Punto 4"
+tagline: "Visitas médicas: de la Tabla No. 2 a la 3FN, con comprobación en BCNF"
+description: "Punto 4 del Taller de Normalización de Bases de Datos 1: forma normal de la Tabla No. 2 de visitas médicas, esquema relacional y descomposición paso a paso hasta la 3FN con PACIENTE, VISITA, PROVEEDOR y ATENCION."
+status: "complete"
+category: "normalizacion"
+moduleId: "BD1-NOR-004"
+order: 8
+thumbnail: "../../../assets/evidencias/taller-normalizacion-punto-4/thumbnail.png"
+thumbnailAlt: "Diagrama del esquema relacional en 3FN: PACIENTE, VISITA, PROVEEDOR y ATENCION"
+
+tech:
+  - "Normalización (1FN · 2FN · 3FN · BCNF)"
+  - "Dependencias funcionales"
+  - "Modelo relacional"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Visitas médicas: paciente, visita, profesional que atiende y diagnóstico"
+  - label: "Forma normal de partida"
+    value: "1FN — no cumple la 2FN por dependencias parciales"
+  - label: "Tablas resultantes"
+    value: "PACIENTE, VISITA, PROVEEDOR y ATENCION"
+  - label: "Alcance"
+    value: "Punto 4 del taller de repaso — literales a, b y d"
+
+features:
+  - lead: "Llave compuesta"
+    text: "Ni VisitaNo ni ProvNo identifican una fila por sí solos: la llave es (VisitaNo, ProvNo)."
+  - lead: "Dos dependencias parciales"
+    text: "Los datos de la visita dependen del número de visita; la especialidad, del profesional."
+  - lead: "Dependencia transitiva"
+    text: "En VISITA, PacEdad y PacCiudad dependen de PacNo, no de VisitaNo."
+  - lead: "Comprobación en BCNF"
+    text: "Cada determinante que sobrevive queda como llave candidata de su tabla."
+
+archCaption: "Esquema relacional final en 3FN (BCNF)"
+
+challenge:
+  title: "Problema"
+  body: "Determinar y justificar en qué forma normal se encuentra la Tabla No. 2, que registra qué profesional atendió a qué paciente en qué visita y con qué diagnóstico; escribir el esquema relacional que la representa; y llevarla hasta la 3FN mostrando el paso a paso del proceso y la justificación de cada decisión."
+solution:
+  title: "Solución"
+  body: "Se identificó la llave compuesta (VisitaNo, ProvNo) y se justificó que la tabla cumple 1FN pero no 2FN, con dos dependencias parciales: los datos de la visita y la especialidad del profesional. La descomposición se hizo en tres pasos —VISITA, PROVEEDOR y ATENCION en el paso a 2FN, y PACIENTE en el paso a 3FN— y el esquema resultante se comprobó contra BCNF."
+---
+
+## Descripción
+
+Este trabajo resuelve el **Punto 4 del Taller de Normalización de Bases de Datos 1** (Universidad El Bosque, docente Ing. Christian Felipe Duarte Arévalo).
+
+La Tabla No. 2 registra qué profesional atendió a qué paciente en una visita, con la fecha, la edad y la ciudad del paciente, la especialidad del profesional y el diagnóstico emitido.
+
+## La Tabla No. 2
+
+| VisitaNo | DiaVisita | PacNo | PacEdad | PacCiudad | ProvNo | ProvEspecialidad | Diagnostico |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| V10020 | 1/13/2019 | P1 | 35 | BOGOTA | D1 | INTERNISTA | INFECCIÓN DE OÍDO |
+| V10020 | 1/13/2019 | P1 | 35 | BOGOTA | D2 | PRACTICANTE ENFERMERÍA | INFLUENZA |
+| V93030 | 1/20/2019 | P3 | 17 | CALI | D2 | PRACTICANTE ENFERMERÍA | EMBARAZO |
+| V82110 | 1/18/2019 | P2 | 60 | CUCUTA | D3 | CARDIÓLOGO | SOPLO CARDIACO |
+
+Una visita con dos profesionales da dos filas. V10020 aparece dos veces porque en esa fecha atendieron a la misma paciente dos personas distintas, cada una con su diagnóstico.
+
+## Dependencias funcionales del enunciado
+
+| # | Dependencia funcional |
+| :-- | :-- |
+| 1 | PacNo → PacEdad, PacCiudad |
+| 2 | ProvNo → ProvEspecialidad |
+| 3 | VisitaNo → PacNo, DiaVisita, PacEdad, PacCiudad |
+| 4 | VisitaNo, ProvNo → Diagnostico |
+
+## Literal a — Forma normal de la tabla
+
+**La tabla está en Primera Forma Normal (1FN) y no llega a la Segunda.**
+
+### Por qué cumple 1FN
+
+Cada celda guarda un solo valor. `PacCiudad` dice BOGOTA, no una lista de ciudades; `DiaVisita` trae una sola fecha. No hay columnas repetidas ni grupos que se repitan dentro de una fila. Y las filas se pueden distinguir entre sí, siempre que se use la llave correcta.
+
+Esa llave es **(VisitaNo, ProvNo)**. Ninguno de los dos atributos sirve solo: V10020 aparece dos veces y D2 también. La pareja sí es única en toda la muestra.
+
+### Por qué falla 2FN
+
+La segunda forma normal exige que todo atributo que no es llave dependa de la llave completa. Con una llave compuesta eso se rompe fácil, y aquí se rompe en dos frentes:
+
+| Dependencia parcial | Qué pasa |
+| :-- | :-- |
+| VisitaNo → DiaVisita, PacNo, PacEdad, PacCiudad | Los datos de la visita y del paciente quedan fijados solo con el número de visita. |
+| ProvNo → ProvEspecialidad | La especialidad pertenece al profesional; la visita no interviene. |
+
+Solo **Diagnostico** necesita la llave completa, porque es lo que un profesional concreto dictaminó en una visita concreta.
+
+La muestra lo confirma: las dos filas de V10020 repiten fecha, paciente, edad y ciudad, y las dos filas de D2 repiten la especialidad. Es información guardada dos veces porque se amarró a una llave más grande de la que necesitaba.
+
+## Literal b — Esquema relacional
+
+La Tabla No. 2 se representa con una sola relación, **VISITA_MEDICA**, cuya llave primaria es (VisitaNo, ProvNo). No hay llaves foráneas porque todo vive en una sola tabla.
+
+Para confirmar que esa pareja es la llave, se calcula qué determina cada candidato con las dependencias del enunciado:
+
+| Conjunto | Lo que determina | ¿Cubre los 8 atributos? |
+| :-- | :-- | :-- |
+| `{VisitaNo}` | DiaVisita, PacNo, PacEdad, PacCiudad | No |
+| `{ProvNo}` | ProvEspecialidad | No |
+| `{VisitaNo, ProvNo}` | Los anteriores más Diagnostico | Sí |
+
+Ningún subconjunto propio alcanza, así que la pareja es llave candidata y además la única.
+
+## Literal d — De la Tabla No. 2 a la 3FN
+
+Se avanza en orden, una forma normal por paso. Cada vez se mira qué dependencia incumple la regla y se saca lo que sobra a una tabla propia, con su determinante como llave.
+
+### Paso 1. Primera forma normal
+
+Ya se cumple (literal a), así que no hay nada que descomponer. Lo único que se fija aquí es la llave **(VisitaNo, ProvNo)**, porque las decisiones de los pasos siguientes dependen de ella.
+
+### Paso 2. Segunda forma normal: quitar las dependencias parciales
+
+Las dependencias 3 y 2 del enunciado son las parciales. Cada una se lleva a una tabla donde su determinante sea la llave completa:
+
+- VisitaNo y todo lo que determina forman la tabla **VISITA**.
+- ProvNo y su especialidad forman la tabla **PROVEEDOR**.
+- Lo que requiere la pareja completa se queda en **ATENCION**.
+
+**VISITA al final del paso 2**
+
+| VisitaNo | DiaVisita | PacNo | PacEdad | PacCiudad |
+| :-- | :-- | :-- | :-- | :-- |
+| V10020 | 1/13/2019 | P1 | 35 | BOGOTA |
+| V93030 | 1/20/2019 | P3 | 17 | CALI |
+| V82110 | 1/18/2019 | P2 | 60 | CUCUTA |
+
+VISITA y PROVEEDOR tienen llave de un solo atributo, así que no pueden tener dependencias parciales. ATENCION conserva Diagnostico, que depende de la llave entera. V10020 tiene dos diagnósticos distintos porque lo atendieron dos profesionales, y esa tabla lo permite sin repetir nada más.
+
+### Paso 3. Tercera forma normal: quitar la dependencia transitiva
+
+VISITA todavía tiene un problema. PacEdad y PacCiudad no dependen de VisitaNo directamente: dependen de PacNo, y PacNo a su vez depende de VisitaNo. Es una cadena:
+
+**VisitaNo → PacNo → PacEdad, PacCiudad**
+
+PacNo no es llave en VISITA, así que esa dependencia es transitiva y la 3FN no la acepta. La muestra no lo deja ver, porque cada paciente tiene una sola visita. Si P1 vuelve la semana próxima, su edad y su ciudad se copiarían otra vez, y dos copias pueden terminar contradiciéndose.
+
+La decisión: sacar PacEdad y PacCiudad a una tabla **PACIENTE** con PacNo como llave. PacNo se queda en VISITA como llave foránea, y es lo que permite volver a unir ambas tablas.
+
+### Resultado en 3FN
+
+| Tabla | Columnas | Llave primaria | Llaves foráneas |
+| :-- | :-- | :-- | :-- |
+| PACIENTE | PacNo, PacEdad, PacCiudad | PacNo | — |
+| VISITA | VisitaNo, DiaVisita, PacNo | VisitaNo | PacNo → PACIENTE |
+| PROVEEDOR | ProvNo, ProvEspecialidad | ProvNo | — |
+| ATENCION | VisitaNo, ProvNo, Diagnostico | (VisitaNo, ProvNo) | VisitaNo → VISITA; ProvNo → PROVEEDOR |
+
+**PACIENTE**
+
+| PacNo | PacEdad | PacCiudad |
+| :-- | :-- | :-- |
+| P1 | 35 | BOGOTA |
+| P2 | 60 | CUCUTA |
+| P3 | 17 | CALI |
+
+**VISITA**
+
+| VisitaNo | DiaVisita | PacNo |
+| :-- | :-- | :-- |
+| V10020 | 1/13/2019 | P1 |
+| V82110 | 1/18/2019 | P2 |
+| V93030 | 1/20/2019 | P3 |
+
+**PROVEEDOR**
+
+| ProvNo | ProvEspecialidad |
+| :-- | :-- |
+| D1 | INTERNISTA |
+| D2 | PRACTICANTE ENFERMERÍA |
+| D3 | CARDIÓLOGO |
+
+**ATENCION**
+
+| VisitaNo | ProvNo | Diagnostico |
+| :-- | :-- | :-- |
+| V10020 | D1 | INFECCIÓN DE OÍDO |
+| V10020 | D2 | INFLUENZA |
+| V93030 | D2 | EMBARAZO |
+| V82110 | D3 | SOPLO CARDIACO |
+
+## Comprobación de Boyce-Codd
+
+BCNF pide que todo determinante sea llave candidata de su tabla. Se revisa cada dependencia que sobrevivió a la descomposición:
+
+| Tabla | Dependencia | ¿El determinante es llave? |
+| :-- | :-- | :-- |
+| PACIENTE | PacNo → PacEdad, PacCiudad | Sí, es la PK |
+| VISITA | VisitaNo → DiaVisita, PacNo | Sí, es la PK |
+| PROVEEDOR | ProvNo → ProvEspecialidad | Sí, es la PK |
+| ATENCION | VisitaNo, ProvNo → Diagnostico | Sí, es la PK compuesta |
+
+Las cuatro tablas pasan, así que el diseño ya está en BCNF y no hace falta otra descomposición. Era lo esperable: BCNF solo se separa de la 3FN cuando hay varias llaves candidatas que se solapan, y aquí cada tabla tiene una sola.
+
+## Qué se gana y qué no se pierde
+
+**Anomalías que desaparecen.** Antes, cambiar la ciudad de P1 obligaba a editar dos filas; ahora es una sola fila en PACIENTE. Antes no se podía registrar a un profesional que aún no hubiera atendido a nadie; ahora basta un INSERT en PROVEEDOR. Y borrar la visita V82110 ya no se lleva por delante al cardiólogo D3 ni al paciente P2.
+
+**La información sigue completa.** Cada corte se hizo siguiendo una dependencia funcional: lo que sale viaja con su determinante, que queda como llave en la tabla nueva y como llave foránea en la original. Por eso un JOIN devuelve exactamente la Tabla No. 2, sin filas de más ni de menos:
+
+```sql
+SELECT v.VisitaNo, v.DiaVisita, p.PacNo, p.PacEdad, p.PacCiudad,
+       pr.ProvNo, pr.ProvEspecialidad, a.Diagnostico
+FROM ATENCION a
+JOIN VISITA v     ON v.VisitaNo = a.VisitaNo
+JOIN PACIENTE p   ON p.PacNo    = v.PacNo
+JOIN PROVEEDOR pr ON pr.ProvNo  = a.ProvNo;
+```
+
+**Las cuatro dependencias se conservan.** La 1, la 2 y la 4 quedan completas dentro de PACIENTE, PROVEEDOR y ATENCION. De la 3, VisitaNo → DiaVisita y VisitaNo → PacNo viven en VISITA, y VisitaNo → PacEdad, PacCiudad se recupera por transitividad a través de PacNo.
+
+Una observación de diseño, fuera del alcance del taller: guardar la edad como dato fijo envejece mal. En un sistema real se almacenaría la fecha de nacimiento y la edad se calcularía al consultar.
+
+## Documento del trabajo
+
+- [Enunciado del taller de normalización (PDF)](/evidencias/taller-normalizacion/Ejercicios_Repaso_Normalizacion.pdf)
+- [Solución entregada del punto 4 (DOCX)](/evidencias/taller-normalizacion/Taller_Normalizacion_Punto4.docx)
+
+Este trabajo corresponde a la categoría **Normalización** de la asignatura Bases de Datos 1.
