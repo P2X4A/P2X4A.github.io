@@ -1,0 +1,246 @@
+---
+title: "Taller de Normalización — Punto 3"
+tagline: "Asistencia a cenas y menús: de la Tabla No. 3 a la 3FN"
+description: "Punto 3 del Taller de Normalización de Bases de Datos 1: valores multivaluados de la Tabla No. 3, esquema Member_Dinner en 1FN, diagrama de dependencias funcionales y descomposición hasta la 3FN con MEMBER, VENUE, FOOD, DINNER, ATTENDANCE y MENU."
+status: "complete"
+category: "normalizacion"
+moduleId: "BD1-NOR-004"
+order: 8
+thumbnail: "../../../assets/evidencias/taller-normalizacion-punto-3/thumbnail.png"
+thumbnailAlt: "Diagrama del esquema relacional en 3FN: MEMBER, VENUE, FOOD, DINNER, ATTENDANCE y MENU"
+
+tech:
+  - "Normalización (1FN · 2FN · 3FN)"
+  - "Dependencias funcionales"
+  - "Diagrama de dependencias"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Restaurante nocturno: miembros, cenas, salones y platos servidos"
+  - label: "Forma normal de partida"
+    value: "Fuera de 1FN — FOOD_CODE y FOOD_DESCRIPTION guardan varios valores por celda"
+  - label: "Tablas resultantes"
+    value: "MEMBER, VENUE, FOOD, DINNER, ATTENDANCE y MENU"
+  - label: "Alcance"
+    value: "Punto 3 del taller de repaso — literales a, b, c y d"
+
+features:
+  - lead: "Multivalorados emparejados"
+    text: "Los códigos de plato y sus descripciones se emparejan por posición, como en el punto 2."
+  - lead: "La llave se amplía"
+    text: "Desapilar los platos obliga a sumar el código del plato a la llave de la tabla."
+  - lead: "Diagrama de dependencias"
+    text: "Casi todo el diagrama son dependencias parciales; una de ellas es transitiva."
+  - lead: "Partir la llave triple"
+    text: "Asistencia y menú son hechos distintos, y por eso van en tablas separadas."
+
+archCaption: "Esquema relacional final en 3FN"
+
+challenge:
+  title: "Problema"
+  body: "Analizar la Tabla No. 3, que registra la asistencia a cenas de un restaurante nocturno con los platos servidos: identificar sus valores multivaluados, plantear el esquema Member_Dinner en 1FN, dibujar el diagrama de dependencias funcionales y llevar el resultado hasta la 3FN justificando cada paso."
+solution:
+  title: "Solución"
+  body: "Se identificaron FOOD_CODE y FOOD_DESCRIPTION como atributos multivaluados emparejados por posición, se desapiló cada plato a su propia fila y se amplió la llave a (MEMBER_NUM, DINNER_NUM, FOOD_CODE). Con el diagrama de dependencias se sacaron las parciales (MEMBER, DINNER, FOOD) y la transitiva (VENUE), y la llave triple se partió en ATTENDANCE y MENU."
+---
+
+## Descripción
+
+Este trabajo resuelve el **Punto 3 del Taller de Normalización de Bases de Datos 1** (Universidad El Bosque, docente Ing. Christian Felipe Duarte Arévalo).
+
+El restaurante nocturno de la empresa quiere un sistema que le ayude a planificar las comidas y a controlar quién asiste a cada cena. La Tabla No. 3 guarda esa información: cada fila es la asistencia de un miembro a una cena, con los platos de esa cena apilados en las dos últimas columnas.
+
+Un miembro puede ir a varias cenas, pero no a más de una en la misma fecha. Y una cena puede tener desde un solo plato hasta los que el chef quiera.
+
+## La Tabla No. 3
+
+| MEMBER_NUM | MEMBER_NAME | MEMBER_ADDRESS | DINNER_NUM | DINNER_DATE | VENUE_CODE | VENUE_DESCRIPTION | FOOD_CODE | FOOD_DESCRIPTION |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| 214 | Peter Wong | Meadow Park | D0001 | 15-Mar-10 | B01 | Grand Ball Room | EN3, DE1 | Stuffed crab, Chocolate mousse |
+| 235 | Marylee | 123 Rose Court | D0002 | 15-Mar-10 | B02 | Petit Ball Room | EN5, DE1 | Marinated steak, Chocolate mousse |
+| 250 | Peter Wong | 9 Nine Ave | D0003 | 20-Mar-10 | C01 | Café | S01, EN5, DE2 | Pumpkin soup, Marinated steak, Apple pie |
+| 235 | Marylee | 123 Rose Court | D0003 | 20-Mar-10 | C01 | Café | S01, EN5, DE2 | Pumpkin soup, Marinated steak, Apple pie |
+| 200 | Paul Lee | 123 Rose Court | D0004 | 20-Mar-10 | B02 | Petit Ball Room | DE2 | Apple pie |
+
+> **Nota sobre los datos.** En el archivo original las filas y las columnas venían muy desordenadas. Se reconstruyó cada fila a partir de lo que se alcanza a leer, y esa es la tabla usada en toda la solución. El razonamiento depende de la estructura de la tabla, no del valor exacto de cada código.
+
+## Literal a — Valores multivaluados
+
+**Sí. FOOD_CODE y FOOD_DESCRIPTION son multivaluados.**
+
+Una cena puede tener varios platos, y la tabla los guarda todos en la misma fila, uno sobre otro. La cena D0003, por ejemplo, sirve Pumpkin soup (S01), Marinated steak (EN5) y Apple pie (DE2). Los tres códigos están en una sola celda y las tres descripciones en otra, tanto en la fila de Peter Wong (250) como en la de Marylee (235).
+
+Los dos campos son multivaluados a la vez y van emparejados por posición: el primer código corresponde a la primera descripción, el segundo a la segunda. Es el mismo problema del punto 2.
+
+### Lo que sí es atómico
+
+El resto de las columnas guarda un solo valor por fila. Que Marylee aparezca en varias cenas no genera multivaluados, porque cada asistencia es una fila distinta. Que el nombre se repita tampoco: hay dos Peter Wong (214 y 250) y son personas distintas, por eso la tabla se apoya en el número de miembro y no en el nombre.
+
+## Literal b — Esquema Member_Dinner en 1FN
+
+Para llegar a 1FN hay que desapilar los platos: cada plato pasa a su propia fila, y los datos del miembro y de la cena se repiten en cada una. Así cada celda queda con un solo valor.
+
+El enunciado define la llave de la tabla original como número de miembro más número de cena. Esa llave ya no alcanza. Un mismo miembro en una misma cena ahora ocupa una fila por plato, así que hay que sumarle el código del plato.
+
+**Member_Dinner (1FN)** · PK: (MEMBER_NUM, DINNER_NUM, FOOD_CODE)
+
+| MEMBER_NUM | MEMBER_NAME | MEMBER_ADDRESS | DINNER_NUM | DINNER_DATE | VENUE_CODE | VENUE_DESCRIPTION | FOOD_CODE | FOOD_DESCRIPTION |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| 214 | Peter Wong | Meadow Park | D0001 | 15-Mar-10 | B01 | Grand Ball Room | EN3 | Stuffed crab |
+| 214 | Peter Wong | Meadow Park | D0001 | 15-Mar-10 | B01 | Grand Ball Room | DE1 | Chocolate mousse |
+| 235 | Marylee | 123 Rose Court | D0002 | 15-Mar-10 | B02 | Petit Ball Room | EN5 | Marinated steak |
+| 235 | Marylee | 123 Rose Court | D0002 | 15-Mar-10 | B02 | Petit Ball Room | DE1 | Chocolate mousse |
+| 250 | Peter Wong | 9 Nine Ave | D0003 | 20-Mar-10 | C01 | Café | S01 | Pumpkin soup |
+| 250 | Peter Wong | 9 Nine Ave | D0003 | 20-Mar-10 | C01 | Café | EN5 | Marinated steak |
+| 250 | Peter Wong | 9 Nine Ave | D0003 | 20-Mar-10 | C01 | Café | DE2 | Apple pie |
+| 235 | Marylee | 123 Rose Court | D0003 | 20-Mar-10 | C01 | Café | S01 | Pumpkin soup |
+| 235 | Marylee | 123 Rose Court | D0003 | 20-Mar-10 | C01 | Café | EN5 | Marinated steak |
+| 235 | Marylee | 123 Rose Court | D0003 | 20-Mar-10 | C01 | Café | DE2 | Apple pie |
+| 200 | Paul Lee | 123 Rose Court | D0004 | 20-Mar-10 | B02 | Petit Ball Room | DE2 | Apple pie |
+
+Cada celda guarda un solo valor y hay llave, así que está en 1FN. Lo que no resuelve es la redundancia: los datos de Marylee se escriben cinco veces y la descripción de Café, seis. De eso se ocupa el literal d.
+
+## Literal c — Diagrama de dependencias funcionales
+
+El enunciado pide suponer las dependencias, y en el literal d habla de unas "proveídas previamente" que no vienen en el archivo. Se usan las que salen del significado de cada dato:
+
+- MEMBER_NUM → MEMBER_NAME, MEMBER_ADDRESS
+- DINNER_NUM → DINNER_DATE, VENUE_CODE
+- VENUE_CODE → VENUE_DESCRIPTION
+- FOOD_CODE → FOOD_DESCRIPTION
+
+Ningún atributo que no es llave depende de la llave completa. Asistir a una cena y servirse un plato no generan datos propios; lo que hay son relaciones entre las partes de la llave. Por eso casi todo el diagrama son dependencias parciales.
+
+<img
+  src="/evidencias/taller-normalizacion/diagrama-dependencias-punto-3.png"
+  alt="Diagrama de dependencias funcionales de Member_Dinner en 1FN, con la llave compuesta (MEMBER_NUM, DINNER_NUM, FOOD_CODE) y las dependencias parciales y transitiva marcadas"
+  loading="lazy"
+  width="1590"
+  height="779"
+/>
+
+VENUE_DESCRIPTION merece una mención aparte. Depende de la cena, pero solo a través del código del salón: DINNER_NUM → VENUE_CODE → VENUE_DESCRIPTION. Esa cadena es lo que el diagrama marca como transitiva.
+
+## Literal d — De la 1FN a la 3FN
+
+Primero se quitan las dependencias parciales (2FN) y después la transitiva (3FN). Al final hay un paso extra sobre la tabla que queda sin atributos propios.
+
+### Paso 1. Partir de la 1FN y fijar la llave
+
+Se parte de Member_Dinner, con llave (MEMBER_NUM, DINNER_NUM, FOOD_CODE) y las dependencias del literal c. La tabla está en 1FN y no cumple 2FN, porque casi todos sus atributos dependen de una sola parte de la llave.
+
+### Paso 2. Pasar a 2FN: sacar las dependencias parciales
+
+Cada grupo de atributos que depende de una sola parte de la llave se va a su propia tabla, con esa parte como llave primaria:
+
+- MEMBER_NUM determina nombre y dirección: tabla **MEMBER**.
+- DINNER_NUM determina fecha y salón: tabla **DINNER**.
+- FOOD_CODE determina la descripción del plato: tabla **FOOD**.
+
+VENUE_DESCRIPTION viaja por ahora con DINNER, porque depende de la cena, aunque sea de rebote. Se corrige en el paso siguiente. De Member_Dinner solo quedan las tres columnas de la llave, sin ningún atributo propio.
+
+### Paso 3. Pasar a 3FN: sacar la dependencia transitiva
+
+En DINNER hay una cadena: DINNER_NUM → VENUE_CODE → VENUE_DESCRIPTION. VENUE_CODE no es llave y aun así determina la descripción. Eso es una dependencia transitiva, y la 3FN no la admite.
+
+La decisión es sacar el salón a una tabla propia, **VENUE**, con VENUE_CODE como llave primaria. DINNER conserva VENUE_CODE como llave foránea. Con esto, la descripción de Café se guarda una vez, no seis.
+
+### Paso 4. Partir la tabla de llave triple
+
+Lo que sobró, (MEMBER_NUM, DINNER_NUM, FOOD_CODE), ya cumple 3FN tal como está: no tiene atributos fuera de la llave, así que no hay dependencias que molesten. Pero guardarla así tiene un costo. Mezcla dos hechos que no tienen que ver entre sí: quién asistió a cada cena y qué platos tuvo cada cena.
+
+El menú no cambia según quién se sienta a la mesa. Los dos asistentes a D0003 comen los mismos tres platos. En la tabla triple, una cena con 20 asistentes y 5 platos ocupa 100 filas, contra 25 si los dos hechos van separados. Y no se puede registrar el menú de una cena a la que todavía no asiste nadie, porque la llave exige un miembro.
+
+Por eso se parte en dos: ATTENDANCE(MEMBER_NUM, DINNER_NUM) y MENU(DINNER_NUM, FOOD_CODE). Este paso ya va más allá de lo que exige la 3FN: lo pide la cuarta forma normal. Si el ejercicio se quisiera cerrar estrictamente en 3FN, la tabla triple sería un punto de parada válido. Aquí la separación es la que mejor refleja cómo funciona el restaurante.
+
+### Paso 5. Cómo quedan los datos
+
+**MEMBER** · PK: MEMBER_NUM
+
+| MEMBER_NUM | MEMBER_NAME | MEMBER_ADDRESS |
+| :-- | :-- | :-- |
+| 200 | Paul Lee | 123 Rose Court |
+| 214 | Peter Wong | Meadow Park |
+| 235 | Marylee | 123 Rose Court |
+| 250 | Peter Wong | 9 Nine Ave |
+
+**VENUE** · PK: VENUE_CODE
+
+| VENUE_CODE | VENUE_DESCRIPTION |
+| :-- | :-- |
+| B01 | Grand Ball Room |
+| B02 | Petit Ball Room |
+| C01 | Café |
+
+**FOOD** · PK: FOOD_CODE
+
+| FOOD_CODE | FOOD_DESCRIPTION |
+| :-- | :-- |
+| DE1 | Chocolate mousse |
+| DE2 | Apple pie |
+| EN3 | Stuffed crab |
+| EN5 | Marinated steak |
+| S01 | Pumpkin soup |
+
+**DINNER** · PK: DINNER_NUM · FK: VENUE_CODE
+
+| DINNER_NUM | DINNER_DATE | VENUE_CODE |
+| :-- | :-- | :-- |
+| D0001 | 15-Mar-10 | B01 |
+| D0002 | 15-Mar-10 | B02 |
+| D0003 | 20-Mar-10 | C01 |
+| D0004 | 20-Mar-10 | B02 |
+
+**ATTENDANCE** · PK: (MEMBER_NUM, DINNER_NUM)
+
+| MEMBER_NUM | DINNER_NUM |
+| :-- | :-- |
+| 214 | D0001 |
+| 235 | D0002 |
+| 235 | D0003 |
+| 250 | D0003 |
+| 200 | D0004 |
+
+**MENU** · PK: (DINNER_NUM, FOOD_CODE)
+
+| DINNER_NUM | FOOD_CODE |
+| :-- | :-- |
+| D0001 | DE1 |
+| D0001 | EN3 |
+| D0002 | DE1 |
+| D0002 | EN5 |
+| D0003 | DE2 |
+| D0003 | EN5 |
+| D0003 | S01 |
+| D0004 | DE2 |
+
+### Paso 6. Esquema final y verificación
+
+| Tabla | Columnas | Llave primaria | Llave foránea |
+| :-- | :-- | :-- | :-- |
+| MEMBER | MEMBER_NUM, MEMBER_NAME, MEMBER_ADDRESS | MEMBER_NUM | — |
+| VENUE | VENUE_CODE, VENUE_DESCRIPTION | VENUE_CODE | — |
+| FOOD | FOOD_CODE, FOOD_DESCRIPTION | FOOD_CODE | — |
+| DINNER | DINNER_NUM, DINNER_DATE, VENUE_CODE | DINNER_NUM | VENUE_CODE → VENUE |
+| ATTENDANCE | MEMBER_NUM, DINNER_NUM | (MEMBER_NUM, DINNER_NUM) | MEMBER_NUM → MEMBER; DINNER_NUM → DINNER |
+| MENU | DINNER_NUM, FOOD_CODE | (DINNER_NUM, FOOD_CODE) | DINNER_NUM → DINNER; FOOD_CODE → FOOD |
+
+Antes de dar el resultado por bueno se revisan tres cosas:
+
+- Cada atributo depende de la llave de su tabla, y de nada más.
+- Unir ATTENDANCE y MENU por DINNER_NUM devuelve las 11 filas de Member_Dinner.
+- Con MEMBER, DINNER, VENUE y FOOD se recuperan nombres, fechas, salones y platos.
+
+Las 11 filas salen de multiplicar asistentes por platos en cada cena: 1×2 en D0001, 1×2 en D0002, 2×3 en D0003 y 1×1 en D0004.
+
+## Qué pasó con la redundancia
+
+La dirección de Marylee vive ahora en una sola fila de MEMBER, no en cinco. Un salón o un plato nuevo se registra sin esperar a que alguien asista. Y borrar la asistencia de Paul Lee a D0004 no borra a Paul Lee ni la cena: ambos siguen en MEMBER y DINNER.
+
+## Documento del trabajo
+
+- [Enunciado del taller de normalización (PDF)](/evidencias/taller-normalizacion/Ejercicios_Repaso_Normalizacion.pdf)
+- [Solución entregada del punto 3 (DOCX)](/evidencias/taller-normalizacion/Taller_Normalizacion_Punto3.docx)
+
+Este trabajo corresponde a la categoría **Normalización** de la asignatura Bases de Datos 1.
