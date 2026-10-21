@@ -59,10 +59,14 @@ const { label: statusLabel, variant: statusVariant } = statusMeta(status);
   <!-- Content Split (node 72:218): left column 2/3, right column 1/3; stacks below lg. -->
   <div class="grid gap-6 lg:grid-cols-3">
     <div class="flex flex-col gap-6 lg:col-span-2">
-      <!-- Overview Card — heading + the rendered MDX body (node 72:220) -->
+      <!-- Overview Card — heading + the rendered MDX body (node 72:220). `project-body` styles the
+           MDX markup (headings, lists, tables — see global.css); `overflow-x-auto` lets a wide table
+           scroll inside the card instead of stretching the panel. -->
       <PixelPanel class="flex flex-col gap-4 p-6 sm:p-7">
         <h2 class="h3 text-secondary-700 dark:text-secondary">Project Overview</h2>
-        <div class="text-muted-foreground space-y-4 text-base leading-relaxed">
+        <div
+          class="project-body text-muted-foreground space-y-4 text-base leading-relaxed overflow-x-auto"
+        >
           <slot />
         </div>
       </PixelPanel>
