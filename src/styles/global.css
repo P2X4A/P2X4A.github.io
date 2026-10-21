@@ -135,6 +135,47 @@
     @apply text-base-700 dark:text-base-200 md:text-lg;
   }
 
+  /* The MDX body of a project detail (the "Project Overview" slot in ProjectArticle.astro).
+     GLOBAL (not scoped): the markup comes from MDX, which Astro's scoped styles can't reach.
+     Tokens only, so it flips with the theme. The tables matter most here — several projects are
+     table-heavy (normalization walkthroughs, ER-to-table resolutions) and an unstyled table reads
+     as broken — so they get the pixel frame treatment of the rest of the site. */
+  .project-body {
+    & h2 {
+      @apply text-secondary-700 dark:text-secondary mt-8 font-display text-lg uppercase md:text-xl;
+    }
+    & h3 {
+      @apply text-info mt-6 font-display text-sm uppercase md:text-base;
+    }
+    & ul {
+      @apply flex list-disc flex-col gap-2 pl-6;
+    }
+    & ol {
+      @apply flex list-decimal flex-col gap-2 pl-6;
+    }
+    & strong {
+      @apply text-info font-bold;
+    }
+    & a {
+      @apply text-info hover:text-success underline underline-offset-2 transition-colors;
+    }
+    & table {
+      @apply w-full border-collapse text-sm;
+    }
+    & th {
+      @apply border-border bg-muted/40 border-2 px-3 py-2 text-left font-bold uppercase;
+    }
+    & td {
+      @apply border-border border-2 px-3 py-2 align-top;
+    }
+    & blockquote {
+      @apply border-secondary bg-muted/40 text-foreground border-l-4 py-3 pr-4 pl-5 italic;
+    }
+    & code {
+      @apply bg-muted border-border border-2 px-1.5 py-0.5 text-xs;
+    }
+  }
+
   .site-container {
     @apply mx-auto max-w-[1100px] px-4;
   }

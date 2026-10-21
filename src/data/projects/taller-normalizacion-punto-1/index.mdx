@@ -1,0 +1,211 @@
+---
+title: "Taller de Normalización — Punto 1"
+tagline: "De la 1FN a la 3FN: la tabla de proyectos, empleados y horas asignadas"
+description: "Punto 1 del Taller de Normalización de Bases de Datos 1: forma normal de la Tabla No. 1, dependencias funcionales y descomposición paso a paso hasta la 3FN con PROYECTO, PROFESION, EMPLEADO y ASIGNACION."
+status: "complete"
+category: "normalizacion"
+moduleId: "BD1-NOR-002"
+order: 6
+thumbnail: "../../../assets/evidencias/taller-normalizacion-punto-1/thumbnail.png"
+thumbnailAlt: "Esquema relacional final en 3FN del taller de normalización"
+
+tech:
+  - "Normalización (1FN · 2FN · 3FN)"
+  - "Dependencias funcionales"
+  - "Modelo relacional"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Proyectos, empleados y horas asignadas, con tarifa por profesión"
+  - label: "Forma normal de partida"
+    value: "1FN — no cumple la 2FN por dependencias parciales"
+  - label: "Tablas resultantes"
+    value: "PROYECTO, PROFESION, EMPLEADO y ASIGNACION"
+  - label: "Alcance"
+    value: "Punto 1 del taller de repaso — literales a y b"
+
+features:
+  - lead: "Llave compuesta"
+    text: "La llave es (cod_proyecto, cod_empleado): un empleado trabaja en varios proyectos y un proyecto tiene varios empleados."
+  - lead: "Dependencias funcionales"
+    text: "cod_proyecto → nom_proyecto; cod_empleado → nom_empleado, profesion; profesion → vlr_hora; (cod_proyecto, cod_empleado) → hrs_asignadas."
+  - lead: "Dependencias parciales"
+    text: "nom_proyecto, nom_empleado, profesion y vlr_hora dependen de una sola mitad de la llave: la tabla cumple 1FN pero no 2FN."
+  - lead: "Dependencia transitiva"
+    text: "En EMPLEADO, profesion → vlr_hora es transitiva: la tarifa sale a su propia tabla PROFESION para cerrar la 3FN."
+
+archCaption: "Esquema relacional final en 3FN"
+
+challenge:
+  title: "Problema"
+  body: "Determinar en qué forma normal se encuentra la Tabla No. 1 —que registra qué empleados trabajan en qué proyectos, con su profesión, su valor por hora y las horas asignadas— y justificar la respuesta. Luego convertirla a la 3FN mostrando el paso a paso del proceso de normalización y la justificación de cada decisión, apoyándose en las dependencias funcionales del enunciado."
+
+solution:
+  title: "Solución"
+  body: "Se identificó la llave compuesta (cod_proyecto, cod_empleado) y las dependencias funcionales deducidas de los datos, y se justificó que la tabla cumple 1FN pero no 2FN. La descomposición se hizo en cuatro pasos: PROYECTO, EMPLEADO y ASIGNACION en el paso a 2FN, y PROFESION en el paso a 3FN. El esquema final deja cada atributo dependiendo únicamente de la llave de su tabla y elimina las tres anomalías de actualización, inserción y borrado."
+---
+
+## Descripción
+
+Este trabajo resuelve el **Punto 1 del Taller de Normalización de Bases de Datos 1** (Universidad El Bosque, docente Ing. Christian Felipe Duarte Arévalo).
+
+La Tabla No. 1 registra qué empleados trabajan en qué proyectos, con su profesión, el valor por hora y las horas asignadas en cada proyecto. El ejercicio pide dos cosas: decir en qué forma normal está la tabla justificando la respuesta, y después convertirla a la **3FN** mostrando el paso a paso del proceso y la justificación de cada decisión.
+
+## La Tabla No. 1
+
+| cod_proyecto | nom_proyecto | cod_empleado | nom_empleado | profesion | vlr_hora | hrs_asignadas |
+|:------------:|:------------:|:------------:|:------------:|:---------:|:--------:|:-------------:|
+| 1010 | ERP | 2010 | Sandra | Ingeniero | 100000 | 20 |
+| 1010 | ERP | 2020 | Claudia | Analista | 50000 | 10 |
+| 1010 | ERP | 2030 | Yamile | Programador | 20000 | 10 |
+| 1020 | CRM | 2010 | Sandra | Ingeniero | 100000 | 10 |
+| 1020 | CRM | 2020 | Claudia | Analista | 50000 | 15 |
+| 1020 | CRM | 2030 | Yamile | Programador | 20000 | 20 |
+| 1030 | BI | 2010 | Sandra | Ingeniero | 100000 | 10 |
+| 1030 | BI | 2020 | Claudia | Analista | 50000 | 15 |
+| 1030 | BI | 2030 | Yamile | Programador | 20000 | 10 |
+| 1010 | ERP | 2040 | Andrea | Ingeniero | 100000 | 40 |
+
+> **Nota sobre los datos.** El archivo original llegó con algunas celdas vacías y errores de escritura (por ejemplo «Programa dor» y «Llamile»). Se completaron con el valor que se repite en las demás filas del mismo proyecto o empleado, y son los datos usados en toda la solución.
+
+## Literal a — Forma normal de la tabla
+
+**La Tabla No. 1 está en Primera Forma Normal (1FN) y no cumple la Segunda (2FN).**
+
+### Llave primaria
+
+Un empleado trabaja en varios proyectos y un proyecto tiene varios empleados, así que ninguna columna sola identifica una fila: el empleado 2010 (Sandra) aparece en tres filas y el proyecto 1010 en cuatro. La pareja sí es única, de modo que la llave primaria es **(cod_proyecto, cod_empleado)**.
+
+### Dependencias funcionales
+
+El enunciado remite a dependencias funcionales provistas previamente, pero no venían en el archivo, así que se dedujeron de los datos de la tabla:
+
+- cod_proyecto → nom_proyecto
+- cod_empleado → nom_empleado, profesion
+- profesion → vlr_hora
+- (cod_proyecto, cod_empleado) → hrs_asignadas
+
+La tercera es la que más pesa en la decisión: en toda la tabla cada profesión trae siempre el mismo valor por hora (Ingeniero 100000, Analista 50000, Programador 20000). Si el docente entregó otras dependencias, el procedimiento es el mismo y solo cambiarían las tablas finales.
+
+### Justificación
+
+**Por qué sí cumple 1FN.** Cada celda guarda un único valor, no hay listas ni columnas repetidas, y la tabla tiene una llave que distingue una fila de otra.
+
+**Por qué no cumple 2FN.** Con una llave compuesta, todo atributo que no hace parte de la llave debe depender de la llave completa. En esta tabla solo `hrs_asignadas` lo hace: las horas dependen de qué empleado y de qué proyecto. El resto depende de una sola mitad de la llave:
+
+- `nom_proyecto` depende solo de `cod_proyecto`.
+- `nom_empleado` y `profesion` dependen solo de `cod_empleado`.
+- `vlr_hora` también se resuelve desde `cod_empleado`, pasando por `profesion`.
+
+La redundancia se ve a simple vista: Sandra, con su profesión y su tarifa, se repite tres veces, y el nombre ERP cuatro. Esa repetición produce las tres anomalías clásicas:
+
+- **Actualización:** cambiar la tarifa de Ingeniero obliga a tocar 4 filas.
+- **Inserción:** no se puede registrar un proyecto o un empleado sin una asignación.
+- **Borrado:** si se elimina la fila de Andrea en ERP, desaparece Andrea.
+
+## Literal b — De la Tabla No. 1 a la 3FN
+
+El camino son cuatro pasos. En cada uno se revisa qué se revisa, qué se decide y por qué.
+
+### Paso 1. Confirmar la 1FN y fijar la llave
+
+La tabla ya está en 1FN (ver literal a), así que su estructura no cambia. Lo que sí queda fijo es la llave: **(cod_proyecto, cod_empleado)**. Ninguna de las dos columnas puede quedar vacía, porque ambas forman parte de la llave.
+
+### Paso 2. Pasar a 2FN: sacar las dependencias parciales
+
+Se busca todo atributo que dependa de solo una parte de la llave y se saca a una tabla propia. La parte de la llave que lo determina se vuelve la llave primaria de la tabla nueva. Salen tres tablas:
+
+**PROYECTO** · PK: cod_proyecto
+
+| cod_proyecto | nom_proyecto |
+|:------------:|:------------:|
+| 1010 | ERP |
+| 1020 | CRM |
+| 1030 | BI |
+
+**EMPLEADO** (versión 2FN) · PK: cod_empleado
+
+| cod_empleado | nom_empleado | profesion | vlr_hora |
+|:------------:|:------------:|:---------:|:--------:|
+| 2010 | Sandra | Ingeniero | 100000 |
+| 2020 | Claudia | Analista | 50000 |
+| 2030 | Yamile | Programador | 20000 |
+| 2040 | Andrea | Ingeniero | 100000 |
+
+**ASIGNACION** · PK: (cod_proyecto, cod_empleado) · FK: cod_proyecto, cod_empleado
+
+| cod_proyecto | cod_empleado | hrs_asignadas |
+|:------------:|:------------:|:-------------:|
+| 1010 | 2010 | 20 |
+| 1010 | 2020 | 10 |
+| 1010 | 2030 | 10 |
+| 1020 | 2010 | 10 |
+| 1020 | 2020 | 15 |
+| 1020 | 2030 | 20 |
+| 1030 | 2010 | 10 |
+| 1030 | 2020 | 15 |
+| 1030 | 2030 | 10 |
+| 1010 | 2040 | 40 |
+
+El criterio es agrupar los atributos que dependen exactamente de lo mismo. PROYECTO guarda lo que se sabe de un proyecto, EMPLEADO lo que se sabe de un empleado y ASIGNACION lo que solo existe cuando se cruzan los dos: las horas. En ASIGNACION, `cod_proyecto` y `cod_empleado` quedan como llaves foráneas, y así se conserva el vínculo con las otras dos tablas. Ahora ERP se guarda una vez, no cuatro.
+
+Por ahora EMPLEADO conserva `profesion` y `vlr_hora`, porque ambos dependen de `cod_empleado`. Ahí queda un problema pendiente.
+
+### Paso 3. Pasar a 3FN: sacar la dependencia transitiva
+
+Se revisa cada tabla buscando un atributo que no es llave y que determina a otro que tampoco lo es. PROYECTO y ASIGNACION están limpias. En EMPLEADO hay una cadena:
+
+- cod_empleado → profesion
+- profesion → vlr_hora
+
+`profesion` no es llave y, aun así, determina `vlr_hora`. Entonces `vlr_hora` depende de `cod_empleado` solo de rebote. Eso es una dependencia transitiva, y es justo lo que la 3FN no admite.
+
+La decisión es sacar `profesion` y `vlr_hora` a una tabla propia, con `profesion` como llave primaria. En EMPLEADO se queda `profesion` como llave foránea hacia esa tabla.
+
+**PROFESION** · PK: profesion
+
+| profesion | vlr_hora |
+|:---------:|:--------:|
+| Ingeniero | 100000 |
+| Analista | 50000 |
+| Programador | 20000 |
+
+**EMPLEADO** (versión 3FN) · PK: cod_empleado · FK: profesion
+
+| cod_empleado | nom_empleado | profesion |
+|:------------:|:------------:|:---------:|
+| 2010 | Sandra | Ingeniero |
+| 2020 | Claudia | Analista |
+| 2030 | Yamile | Programador |
+| 2040 | Andrea | Ingeniero |
+
+Con esto la tarifa de Ingeniero se guarda una sola vez: cambiarla es modificar una fila, no cuatro. Y se puede registrar una profesión nueva sin que todavía exista un empleado con ella.
+
+Dos aclaraciones sobre esta decisión. Depende de que `vlr_hora` sea una tarifa por profesión, que es lo que muestran los datos; si cada empleado tuviera su tarifa propia, `vlr_hora` se quedaría en EMPLEADO y este paso no haría falta. Y se usó el nombre de la profesión como llave porque es lo que hay en la tabla: en un sistema real iría un código (`cod_profesion`), porque basta una diferencia de mayúsculas o una errata para crear dos «profesiones» distintas.
+
+### Paso 4. Verificar el resultado
+
+| Tabla | Columnas | Llave primaria | Llave foránea |
+|:---|:---|:---|:---|
+| PROYECTO | cod_proyecto, nom_proyecto | cod_proyecto | — |
+| PROFESION | profesion, vlr_hora | profesion | — |
+| EMPLEADO | cod_empleado, nom_empleado, profesion | cod_empleado | profesion → PROFESION |
+| ASIGNACION | cod_proyecto, cod_empleado, hrs_asignadas | (cod_proyecto, cod_empleado) | cod_proyecto → PROYECTO; cod_empleado → EMPLEADO |
+
+Antes de dar el resultado por bueno se revisan tres cosas:
+
+- Cada atributo depende de la llave de su tabla, y de nada más.
+- Al unir las cuatro tablas por sus llaves se recuperan las 10 filas originales.
+- Ninguna de las dependencias de partida se pierde en la descomposición.
+
+## Qué pasó con las anomalías
+
+Las tres del literal a ya no ocurren. La tarifa de Ingeniero vive en una sola fila de PROFESION. Un proyecto nuevo se registra en PROYECTO sin necesidad de empleados. Y borrar la asignación de Andrea en ERP elimina una fila de ASIGNACION, pero Andrea sigue existiendo en EMPLEADO.
+
+## Documento del trabajo
+
+- [Enunciado del taller de normalización (PDF)](/evidencias/taller-normalizacion-punto-1/Ejercicios_Repaso_Normalizacion.pdf)
+- [Solución entregada del punto 1 (DOCX)](/evidencias/taller-normalizacion-punto-1/Taller_Normalizacion_Punto1.docx)
+
+Este trabajo corresponde a la categoría **Normalización** de la asignatura Bases de Datos 1.
