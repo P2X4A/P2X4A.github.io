@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Portada: un modelo Entidad-Relación con entidad, relación 1:N y atributo, al lado de un diagrama de dependencias funcionales, unidos por un signo igual">
+  <title>Diseño E-R y dependencias funcionales: el mismo problema</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <!-- grupo izquierdo: modelo E-R -->
+    <rect x="16" y="56" width="92" height="30" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="26" y="75" fill="#63de86" font-size="9">ENTIDAD</text>
+
+    <polygon points="145,48 180,71 145,94 110,71" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="145" y="75" fill="#f4677a" font-size="9" text-anchor="middle">1:N</text>
+    <path d="M108 71 H110" stroke="#8a8ab8" stroke-width="2" fill="none" />
+
+    <ellipse cx="62" cy="128" rx="42" ry="19" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="62" y="132" fill="#62b4f8" font-size="8" text-anchor="middle">ATRIBUTO</text>
+    <path d="M62 86 V109" stroke="#8a8ab8" stroke-width="2" fill="none" />
+
+    <!-- vinculo -->
+    <text x="238" y="92" fill="#63de86" font-size="38" text-anchor="middle">=</text>
+    <text x="238" y="116" fill="#b8b8d8" font-size="8" font-weight="normal" text-anchor="middle">mismo problema</text>
+
+    <!-- grupo derecho: dependencias funcionales -->
+    <rect x="296" y="56" width="74" height="28" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="306" y="74" fill="#62b4f8" font-size="9">LLAVE</text>
+    <path d="M370 70 H392" stroke="#8a8ab8" stroke-width="2" fill="none" />
+    <polygon points="390,64 400,70 390,76" fill="#8a8ab8" />
+    <rect x="400" y="56" width="60" height="28" fill="#171740" stroke="#8a8ab8" stroke-width="3" />
+    <text x="412" y="74" fill="#c8c8e0" font-size="9">ATR</text>
+
+    <text x="16" y="240" fill="#63de86" font-size="10">E-R ⟷ DEPENDENCIAS</text>
+    <text x="186" y="240" fill="#b8b8d8" font-size="8" font-weight="normal">decidir en que tabla vive cada dato</text>
+  </g>
+</svg>

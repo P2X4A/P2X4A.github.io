@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-label="Los dos diagramas Entidad-Relación que la normalización reconstruyó: punto 4, PACIENTE, VISITA y PROVEEDOR con Diagnostico como atributo de la relación; punto 5, RENTAL, MOVIE y CATEGORY con la relación N:M de alquiler y película">
+  <title>Diagramas E-R reconstruidos por la normalización (puntos 4 y 5)</title>
+
+  <rect width="1200" height="430" fill="#0d0d26" />
+  <rect x="8" y="8" width="1184" height="414" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="1168" height="398" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <!-- titulos -->
+    <text x="40" y="66" fill="#63de86" font-size="16">PUNTO 4 · VISITAS MEDICAS</text>
+    <text x="680" y="66" fill="#63de86" font-size="16">PUNTO 5 · ALQUILER DE DVD</text>
+
+    <!-- ============ punto 4 ============ -->
+    <!-- entidad PACIENTE -->
+    <rect x="40" y="220" width="120" height="48" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="52" y="240" fill="#63de86" font-size="12">PACIENTE</text>
+    <text x="52" y="257" fill="#b8b8d8" font-size="9" font-weight="normal">PacNo PK</text>
+
+    <!-- entidad VISITA -->
+    <rect x="270" y="220" width="120" height="48" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="282" y="240" fill="#63de86" font-size="12">VISITA</text>
+    <text x="282" y="257" fill="#b8b8d8" font-size="9" font-weight="normal">VisitaNo PK</text>
+
+    <!-- entidad PROVEEDOR -->
+    <rect x="500" y="220" width="140" height="48" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="512" y="240" fill="#63de86" font-size="12">PROVEEDOR</text>
+    <text x="512" y="257" fill="#b8b8d8" font-size="9" font-weight="normal">ProvNo PK</text>
+
+    <!-- relacion ES DE -->
+    <polygon points="215,218 260,244 215,270 170,244" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="215" y="248" fill="#f4677a" font-size="9" text-anchor="middle">ES DE</text>
+    <path d="M160 244 H170" stroke="#8a8ab8" stroke-width="2" />
+    <path d="M260 244 H270" stroke="#8a8ab8" stroke-width="2" />
+    <text x="166" y="232" fill="#8a8ab8" font-size="9" font-weight="normal">1</text>
+    <text x="258" y="232" fill="#8a8ab8" font-size="9" font-weight="normal">N</text>
+
+    <!-- relacion ATIENDE -->
+    <polygon points="445,218 490,244 445,270 400,244" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="445" y="248" fill="#f4677a" font-size="8" text-anchor="middle">ATIENDE</text>
+    <path d="M390 244 H400" stroke="#8a8ab8" stroke-width="2" />
+    <path d="M490 244 H500" stroke="#8a8ab8" stroke-width="2" />
+    <text x="390" y="232" fill="#8a8ab8" font-size="9" font-weight="normal">N</text>
+    <text x="490" y="232" fill="#8a8ab8" font-size="9" font-weight="normal">M</text>
+
+    <!-- atributo de la relacion -->
+    <path d="M445 218 V174" stroke="#8a8ab8" stroke-width="2" />
+    <ellipse cx="445" cy="150" rx="70" ry="22" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="445" y="155" fill="#62b4f8" font-size="12" text-anchor="middle">Diagnostico</text>
+
+    <!-- tablas resultantes -->
+    <text x="40" y="322" fill="#b8b8d8" font-size="11" font-weight="normal">PACIENTE · VISITA · PROVEEDOR · ATENCION</text>
+
+    <!-- ============ punto 5 ============ -->
+    <!-- entidad RENTAL -->
+    <rect x="680" y="220" width="110" height="48" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="692" y="240" fill="#63de86" font-size="12">RENTAL</text>
+    <text x="692" y="257" fill="#b8b8d8" font-size="9" font-weight="normal">RentalID</text>
+
+    <!-- entidad MOVIE -->
+    <rect x="900" y="220" width="110" height="48" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="912" y="240" fill="#63de86" font-size="12">MOVIE</text>
+    <text x="912" y="257" fill="#b8b8d8" font-size="9" font-weight="normal">Title PK</text>
+
+    <!-- entidad CATEGORY -->
+    <rect x="1040" y="220" width="110" height="48" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="1052" y="240" fill="#63de86" font-size="12">CATEGORY</text>
+    <text x="1052" y="257" fill="#b8b8d8" font-size="9" font-weight="normal">MovieCategory</text>
+
+    <!-- relacion INCLUYE -->
+    <polygon points="845,216 888,244 845,272 802,244" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="845" y="248" fill="#f4677a" font-size="8" text-anchor="middle">INCLUYE</text>
+    <path d="M790 244 H802" stroke="#8a8ab8" stroke-width="2" />
+    <path d="M888 244 H900" stroke="#8a8ab8" stroke-width="2" />
+    <text x="788" y="232" fill="#8a8ab8" font-size="9" font-weight="normal">N</text>
+    <text x="886" y="232" fill="#8a8ab8" font-size="9" font-weight="normal">M</text>
+
+    <!-- relacion N:1 entre pelicula y categoria -->
+    <path d="M1010 244 H1040" stroke="#8a8ab8" stroke-width="2" />
+    <text x="1012" y="232" fill="#8a8ab8" font-size="9" font-weight="normal">N:1</text>
+
+    <!-- tablas resultantes -->
+    <text x="680" y="322" fill="#b8b8d8" font-size="11" font-weight="normal">RENTAL · MOVIE · RENTAL_MOVIE · CATEGORY</text>
+
+    <!-- separador -->
+    <path d="M640 60 V340" stroke="#1c1c4a" stroke-width="3" stroke-dasharray="8 8" />
+
+    <!-- nota -->
+    <text x="40" y="382" fill="#f5b041" font-size="12">Ninguno de los dos diagramas existia antes: la normalizacion los reconstruyo tabla por tabla.</text>
+  </g>
+</svg>

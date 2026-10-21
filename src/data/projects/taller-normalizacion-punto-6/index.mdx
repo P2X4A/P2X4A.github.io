@@ -1,0 +1,246 @@
+---
+title: "Taller de Normalización — Punto 6"
+tagline: "Diseño E-R y normalización: dos maneras de decidir en qué tabla vive cada dato"
+description: "Punto 6 del Taller de Normalización de Bases de Datos 1: reflexión sobre cómo se relacionan el diseño Entidad-Relación y la descomposición de dependencias funcionales, con los puntos 2, 4 y 5 del taller como evidencia y ocho fuentes de la literatura consultadas."
+status: "complete"
+category: "normalizacion"
+moduleId: "BD1-NOR-007"
+order: 11
+thumbnail: "../../../assets/evidencias/taller-normalizacion-punto-6/thumbnail.png"
+thumbnailAlt: "Un modelo Entidad-Relación con entidad, relación 1:N y atributo, junto a un diagrama de dependencias funcionales, unidos por un signo igual"
+
+tech:
+  - "Modelado E-R"
+  - "Normalización (1FN · 2FN · 3FN · BCNF)"
+  - "Dependencias funcionales"
+  - "Análisis de requisitos"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Naturaleza"
+    value: "Reflexión escrita, con afirmaciones justificadas una por una"
+  - label: "Evidencia propia"
+    value: "Los puntos 2, 4 y 5 del mismo taller, revisados como caso de estudio"
+  - label: "Fuentes consultadas"
+    value: "Ocho referencias de la literatura sobre E-R y dependencias funcionales"
+  - label: "Alcance"
+    value: "Punto 6 del taller de repaso — último literal"
+
+features:
+  - lead: "La idea central"
+    text: "Modelar y normalizar deciden lo mismo: en qué tabla vive cada dato."
+  - lead: "Cada pieza del E-R es una dependencia"
+    text: "Entidades, cardinalidades y atributos dibujan lo mismo que la 3FN desarma."
+  - lead: "Control cruzado"
+    text: "El E-R aporta el sentido del negocio; la normalización, el rigor formal."
+  - lead: "Lo que ninguno garantiza"
+    text: "Un buen diagrama no asegura la 3FN, y una tabla en BCNF no asegura un buen modelo."
+
+archCaption: "Los dos diagramas E-R que la normalización reconstruyó"
+
+challenge:
+  title: "Problema"
+  body: "Escribir una reflexión que explique cómo se relaciona un buen diseño Entidad-Relación con la normalización y la descomposición de dependencias funcionales, justificando cada una de las afirmaciones que se planteen con el mayor detalle posible."
+solution:
+  title: "Solución"
+  body: "La reflexión se apoya en los puntos 2, 4 y 5 del taller: se muestra que cada elemento del E-R corresponde a una dependencia funcional, que la normalización de los ejercicios 4 y 5 reconstruyó diagramas E-R que nadie había hecho, y que ninguno de los dos métodos sustituye al otro. Cierra con el flujo de trabajo de seis pasos y con ocho fuentes de la literatura."
+---
+
+## Descripción
+
+Este trabajo resuelve el **Punto 6 del Taller de Normalización de Bases de Datos 1** (Universidad El Bosque, docente Ing. Christian Felipe Duarte Arévalo), el último del taller.
+
+El enunciado pide una reflexión escrita que explique cómo se relaciona un buen diseño Entidad-Relación con la normalización y la descomposición de dependencias funcionales, con cada afirmación justificada.
+
+Para sostenerla se usan los **puntos 2, 4 y 5 del propio taller** y ocho fuentes consultadas sobre el modelo E-R, listadas al final. Todo el argumento se mantiene entre la primera forma normal y Boyce-Codd.
+
+## La idea central
+
+El diseño E-R y la normalización resuelven el mismo problema desde dos lados: decidir en qué tabla vive cada dato.
+
+El E-R lo decide razonando sobre el negocio — "un paciente tiene muchas visitas". La normalización lo comprueba razonando sobre dependencias — "PacNo determina la edad y la ciudad". Dicen lo mismo con lenguajes distintos.
+
+De ahí salen dos consecuencias que se ven con los ejercicios:
+
+- Con un E-R bien hecho, la normalización casi no encuentra nada que arreglar.
+- Sin E-R, la normalización va reconstruyendo el diagrama que faltaba, paso a paso.
+
+## Las dos herramientas, lado a lado
+
+| | Diseño E-R | Normalización |
+| :-- | :-- | :-- |
+| Pregunta que responde | ¿Qué cosas existen y cómo se relacionan? | ¿Cada dato depende de lo que debe depender? |
+| Material de trabajo | Entidades, atributos, relaciones, cardinalidades, identificadores | Dependencias funcionales, llaves, formas normales (1FN a BCNF) |
+| Momento | Antes de tener tablas | Sobre tablas ya planteadas |
+| Lenguaje | El del negocio | Formal y matemático |
+| Resultado | Un diagrama | Tablas sin redundancia ni anomalías |
+
+La diferencia de lenguaje es la que hace que muchos las vean como temas separados. En la práctica se alimentan mutuamente.
+
+## Dónde se tocan: cada pieza del E-R es una dependencia
+
+Un diagrama E-R ya contiene dependencias funcionales. Solo que están dibujadas como cajas y líneas en vez de flechas.
+
+| Elemento del E-R | Su forma como dependencia | Ejemplo del taller |
+| :-- | :-- | :-- |
+| Entidad con identificador | El identificador determina los demás atributos | PacNo → PacEdad, PacCiudad |
+| Relación 1:N | El lado N determina al lado 1 | VisitaNo → PacNo |
+| Relación N:M | Llave compuesta; lo que depende de ambos lados va en la relación | (VisitaNo, ProvNo) → Diagnostico |
+| Cardinalidad | Fija el sentido de la flecha | Un alquiler, un cliente: RentalID → CustomerID, no al revés |
+| Atributo multivaluado | Rompe 1FN si se deja dentro de la entidad | Courses y GradePoints del punto 2 |
+| Entidad débil | Llave del dueño más una llave parcial | No aparece en los ejercicios |
+
+Las dependencias que nacen del E-R son exactamente las que luego alimentan las formas normales. Existe literatura dedicada a derivar las dependencias funcionales directamente a partir del modelo E-R (Ram, 1995), y los ejemplos didácticos escriben un diagrama completo como lista de dependencias. Una relación N:M sin atributos propios queda como una dependencia trivial, porque solo contiene las llaves.
+
+## Lo que mostraron los ejercicios 4 y 5
+
+La mejor prueba de que ambos temas son el mismo está en los resultados de los ejercicios. Las tablas finales de cada uno son, casi literalmente, un diagrama E-R pasado a tablas.
+
+### Punto 4: visitas médicas
+
+La tabla de partida mezclaba tres entidades y una relación en una sola fila. El diagrama que faltaba era este:
+
+```text
+PACIENTE ──1:N── VISITA ──N:M── PROVEEDOR
+                    │
+            Diagnostico (atributo de la relación N:M)
+```
+
+Cada paso de normalización recuperó una pieza:
+
+| Paso | Qué hizo | Qué descubrió del E-R |
+| :-- | :-- | :-- |
+| 2FN | Separar VISITA y PROVEEDOR | Eran dos entidades distintas, cada una con su identificador |
+| 2FN | Dejar Diagnostico en ATENCION | Era el atributo de la relación N:M entre visita y proveedor |
+| 3FN | Sacar PACIENTE de VISITA | Había una tercera entidad escondida dentro de VISITA |
+| BCNF | Nada que cambiar | El diagrama ya no tenía dependencias mal ubicadas |
+
+### Punto 5: alquiler de DVD
+
+```text
+RENTAL ──N:M── MOVIE ──N:1── CATEGORY
+```
+
+| Paso | Qué hizo | Qué descubrió del E-R |
+| :-- | :-- | :-- |
+| 2FN | Separar RENTAL y MOVIE | Alquiler y película son entidades distintas |
+| 2FN | Crear RENTAL_MOVIE | Era la relación N:M, sin atributos propios |
+| 3FN | Sacar CATEGORY de MOVIE | Price era de la categoría, no de la película: otra entidad escondida |
+| BCNF | Nada que cambiar | Cada determinante ya era llave de su tabla |
+
+En los dos casos pasó lo mismo. La tabla original era un E-R aplastado en una sola tabla, y cada forma normal fue separando una pieza.
+
+<img
+  src="/evidencias/taller-normalizacion/diagrama-er-reconstruido-punto-6.png"
+  alt="Los dos diagramas Entidad-Relación que la normalización reconstruyó: en el punto 4, PACIENTE, VISITA y PROVEEDOR con Diagnostico como atributo de la relación; en el punto 5, RENTAL, MOVIE y CATEGORY con la relación N:M de alquiler y película"
+  loading="lazy"
+  width="1600"
+  height="573"
+/>
+
+## Cómo un buen E-R facilita la normalización
+
+**Evita las dependencias parciales y transitivas desde el origen.** Ambas aparecen cuando atributos de entidades distintas comparten tabla. Un E-R correcto los pone en cajas separadas, así que al pasar a tablas cada caja ya trae su propia llave y no hay nada parcial ni transitivo que separar después. Hay respaldo en la literatura: si el modelo E-R se elabora con cuidado y teniendo en cuenta las reglas del negocio, las relaciones que salen de él ya quedan normalizadas, mientras que los diseños armados directamente en tablas, sin diagrama, tienden a salir mal (Vimala et al., 2013). También hay trabajo formal que define una forma normal para los diagramas E-R y demuestra que las relaciones generadas desde ellos quedan en 3FN o superior (Ling, s. f.).
+
+**Fija las llaves correctas.** Las formas normales se definen respecto a la llave. Con una llave mal elegida, el veredicto sale equivocado. En el punto 4, reconocer que la relación visita-proveedor era N:M llevó directo a la llave compuesta (VisitaNo, ProvNo), y de ahí salieron las dependencias parciales. El E-R da esa información antes de escribir una sola dependencia.
+
+**Marca el sentido de las dependencias.** Una dependencia va en la dirección que dicta la cardinalidad. En el literal a-iii del punto 5, la muestra permitía creer que Director → Title se cumplía. Pero en el E-R la relación entre director y película es 1:N, un director con varias películas, así que la flecha correcta es Title → Director. El diagrama evita el error que los datos disimulan.
+
+**Resuelve los atributos multivaluados antes de que molesten.** En el punto 2, la tabla de estudiantes guardaba listas como "NN204, SI204, IT221" dentro de una celda. Visto con E-R, ese es un error de modelado: los cursos de un estudiante no son un atributo, son una relación N:M entre estudiante y curso, y la nota es atributo de esa relación. La 1FN se cumple sola cuando el diagrama está bien. Los autores que proponen eliminar el modelado de atributos multivaluados en el E-R lo justifican por esta misma razón: con ello desaparece la necesidad de las formas normales que tratan con ellos (Vimala et al., 2013).
+
+**Corregir un diagrama cuesta menos que corregir tablas con datos.** Mover una línea en un diagrama toma un minuto. Reestructurar tablas que ya tienen información cargada obliga a partir columnas, redistribuir valores y revisar todo lo que dependía de ellas. Esta afirmación es una consecuencia del orden de trabajo, no una cifra medida: el costo de un cambio crece mientras más avanzado esté el diseño.
+
+## Cómo la normalización mejora un E-R
+
+La relación no va en un solo sentido.
+
+**Sirve de auditoría.** Un E-R se juzga a ojo: dos diseñadores pueden dibujar diagramas distintos para el mismo problema y ambos parecer razonables. Las formas normales dan un criterio formal. Una fuente de referencia sobre diseño relacional lo resume así: trabajar desde el diagrama es sencillo, pero cuesta confirmar que quedó bien; el apoyo en la teoría de la normalización es lo que da esa confirmación (O'Reilly, *Relational Database Design and Implementation*).
+
+**Descubre entidades que el diagrama no mostraba.** En el punto 5, Price parecía un atributo más de MOVIE. Solo al plantear MovieCategory → Price apareció la entidad CATEGORY. Lo mismo con PACIENTE en el punto 4: vivía dentro de VISITA como tres atributos sueltos.
+
+**Cubre lo que el diagrama no dice.** Los diagramas E-R no tienen dónde anotar las dependencias funcionales. Esa información se agrega más tarde, y si luego cambian los atributos de una entidad, el diagrama y la lista de dependencias pueden quedar inconsistentes entre sí. Hay propuestas que ven la normalización como un refinamiento del E-R justamente por esa cercanía (referencia en el apartado de fuentes). Las dependencias entre atributos que no son llave, como MovieCategory → Price, son las que más fácil se escapan: en el diagrama aparecen como un atributo más, sin ninguna línea que las delate.
+
+## El vínculo técnico: descomposición y diseño E-R
+
+Descomponer no es partir tablas al azar. Hay cuatro puntos donde el vínculo con el E-R se ve con claridad.
+
+### Cada corte es una entidad
+
+Un corte separa un determinante junto con lo que determina. Eso es lo mismo que una entidad: un identificador más los hechos que dependen de él. Los trabajos clásicos sobre el tema señalan que las dependencias funcionales gobiernan por completo las reglas de descomposición de la normalización (Bernstein, Swenson y Tsichritzis, 1975). Por eso cada paso de 2FN y 3FN en los ejercicios nació de una dependencia concreta.
+
+### Lo que une las piezas es una relación
+
+Para no perder información, los fragmentos deben compartir un atributo que sea llave de uno de ellos. En el diagrama E-R, esa pieza compartida es la línea que une las dos cajas. En el punto 4, PacNo es llave de PACIENTE y llave foránea en VISITA: esa línea es la relación 1:N entre ambos. Sin ella, las tablas separadas no permitirían recomponer la tabla original.
+
+### Cada dependencia debe quedar dentro de una entidad o de una relación
+
+Esa es la idea de conservar dependencias. En el punto 4, tres de las cuatro dependencias quedaron completas dentro de una tabla, y VisitaNo → PacEdad, PacCiudad se recupera por transitividad a través de PacNo. No se perdió nada, solo dejó de estar en una sola tabla.
+
+### BCNF aparece cuando el diagrama esconde una restricción
+
+En los ejercicios, 3FN y BCNF dieron el mismo resultado porque cada entidad tenía una sola llave candidata. La diferencia aparece cuando hay llaves candidatas que se cruzan. El caso clásico es una relación entre Estudiante, Curso y Profesor, donde cada profesor dicta un solo curso:
+
+```text
+(Estudiante, Curso) → Profesor
+Profesor → Curso
+```
+
+Las llaves candidatas son (Estudiante, Curso) y (Estudiante, Profesor). La dependencia Profesor → Curso tiene un determinante que no es llave, pero como Curso forma parte de una llave, la 3FN la deja pasar y BCNF no. Para llegar a BCNF hay que separar (Profesor, Curso) y (Estudiante, Profesor), y la dependencia (Estudiante, Curso) → Profesor ya no queda dentro de una sola tabla.
+
+En términos de E-R, la regla "un profesor dicta un solo curso" es una restricción interna de la relación que el diagrama casi nunca muestra, y es la normalización la que la saca a la luz.
+
+## Lo que ninguno de los dos garantiza
+
+**Un E-R bien dibujado no asegura 3FN.** Basta con ubicar un atributo en la entidad equivocada, o con una cardinalidad mal puesta, para que reaparezcan dependencias parciales o transitivas. El diagrama baja el riesgo, no lo elimina.
+
+**Una tabla en BCNF no asegura un buen modelo.** La normalización mira dependencias, no significado. No habría rechazado Director → Title en el punto 5: los datos la sostenían. Solo el conocimiento del negocio, que es lo que el E-R captura, descarta esa regla. Y un esquema perfectamente normalizado puede estar modelando un mundo incompleto, por ejemplo uno sin la entidad que el negocio sí necesita.
+
+Por eso conviene verlos como control cruzado: el E-R aporta el sentido, la normalización aporta el rigor.
+
+## Flujo de trabajo que se desprende
+
+1. Levantar los requisitos y escribir las reglas del negocio.
+2. Dibujar el E-R con entidades, relaciones, cardinalidades e identificadores.
+3. Pasar el diagrama a relaciones.
+4. Declarar las dependencias funcionales de cada relación, empezando por las del diagrama.
+5. Verificar de 1FN a BCNF y descomponer lo que falle.
+6. Volver al diagrama y ajustar si la normalización reveló una entidad o regla nueva.
+
+El paso 6 es el que se suele olvidar. Si la normalización descubre una entidad escondida y el diagrama no se actualiza, el diseño queda con dos versiones distintas de la verdad.
+
+## Lo que deja el taller
+
+Los ejercicios enseñan a normalizar tablas ya hechas, y eso tiene su valor. Pero lo más útil que se ve es el camino contrario: pensar bien las entidades y relaciones desde el principio para que la normalización sea una verificación y no una reparación.
+
+Normalizar el punto 4 o el 5 fue, en la práctica, redibujar un diagrama E-R que nadie había hecho. En un proyecto real, esa es una señal de que el trabajo de modelado se saltó.
+
+## Fuentes consultadas
+
+- [Ram, S. (1995). *Deriving functional dependencies from the entity-relationship model*. Communications of the ACM, 38(9), 95–111.](https://experts.arizona.edu/en/publications/deriving-functional-dependencies-from-the-entity-relationship-mod/)
+- [Bernstein, P., Swenson, J. R. y Tsichritzis, D. (1975). *A Unified Approach to Functional Dependencies and Relations*. ACM SIGMOD.](https://vldb.org/dblp/db/conf/sigmod/BernsteinST75.html)
+- [Vimala, S., Khanna Nehemiah, H., Saranya, G. y Kannan, A. (2013). *Analysis and Modeling of multivalued attributes in entity-relationship Modeling*. Computer Systems Science and Engineering, 28(4), 217–223.](https://amrita.edu/?p=410124)
+- [Ling, T. W. *A Normal Form for Entity-Relationship Diagrams*. National University of Singapore.](https://www.comp.nus.edu.sg/~lingtw/papers/er85.nferd.pdf)
+- [Carleton University. *Representing Entity-Relationship Models with Functional Dependencies*.](https://people.scs.carleton.ca/~ldnel/normalizer/er_models_with_fds.html)
+- [*Conceptual Data Modeling: Entity-Relationship Models as Thinging Machines* (sección 7, sobre dependencias funcionales y E-R).](https://arxiv.org/pdf/2109.14717)
+- [Elmasri, R. y Navathe, S. *Relational Database Design by ER- and EER-to-Relational Mapping* (diapositivas, capítulo 9).](https://www.cs.purdue.edu/homes/bb/cs448_Fall2017/lpdf/Chapter09.pdf)
+- [O'Reilly. *Relational Database Design and Implementation*, capítulo de normalización.](https://www.oreilly.com/library/view/relational-database-design/9780123747303/B9780123747303000061.xhtml)
+
+## Ver el diagrama en tamaño completo
+
+La imagen de los dos diagramas E-R tiene **1600 × 573 px**. Dentro de la página se ve entera, pero las cardinalidades y los rótulos de cada relación se leen mejor en una pestaña aparte.
+
+<a
+  href="/evidencias/taller-normalizacion/diagrama-er-reconstruido-punto-6.png"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="pixel-btn pixel-btn--blue px-5 py-3 text-sm uppercase"
+>
+  Abrir el diagrama original
+</a>
+
+## Documento del trabajo
+
+- [Enunciado del taller de normalización (PDF)](/evidencias/taller-normalizacion/Ejercicios_Repaso_Normalizacion.pdf)
+- [Reflexión entregada del punto 6 (DOCX)](/evidencias/taller-normalizacion/Taller_Normalizacion_Punto6.docx)
+
+Este trabajo corresponde a la categoría **Normalización** de la asignatura Bases de Datos 1.
