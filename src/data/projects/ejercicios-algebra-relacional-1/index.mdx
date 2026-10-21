@@ -1,0 +1,647 @@
+---
+title: "Ejercicios de álgebra relacional (1) — Resolución paso a paso"
+tagline: "Once ejercicios sobre clientes, productos, ventas y facturas, resueltos con los operadores del álgebra relacional"
+description: "Resolución paso a paso de once ejercicios de álgebra relacional sobre los esquemas CLIENTES, PRODUCTO, VENTA y FACTURA, con una base de datos de prueba que tiene trampas puestas a propósito: clientes sin compras, código igual a descripción, límite de 500 unidades y división sobre todos los productos."
+status: "complete"
+category: "algebra-relacional"
+moduleId: "BD1-ALG-003"
+order: 14
+thumbnail: "../../../assets/evidencias/ejercicios-algebra-relacional-1/thumbnail.png"
+thumbnailAlt: "El método de la resolución paso a paso: una expresión completa, sus pasos intermedios y el resultado sobre la base de datos de prueba"
+
+tech:
+  - "Álgebra relacional extendida"
+  - "División de relaciones"
+  - "Diferencia y producto cartesiano"
+  - "Renombrado de atributos (ρ)"
+  - "Base de datos de prueba con datos trampa"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Empresa comercial: clientes, productos, ventas y facturas"
+  - label: "Esquemas"
+    value: "CLIENTES, PRODUCTO, VENTA y FACTURA"
+  - label: "Ejercicios"
+    value: "Once, con dos lecturas en el ejercicio 3 y una variante en el 11"
+  - label: "Alcance"
+    value: "Resolución paso a paso, con resultados verificables contra datos de prueba"
+
+features:
+  - lead: "División, dos veces"
+    text: "Los ejercicios 5 y 9 piden «todos los productos»: es el operador de división."
+  - lead: "Diferencia de conjuntos"
+    text: "Los ejercicios 4, 7 y 11 se resuelven restando, no filtrando."
+  - lead: "Trampas a propósito"
+    text: "Pedro no ha comprado nada, A3 vale igual que su descripción, 500 es límite exacto."
+  - lead: "Una pieza compartida"
+    text: "CV se define una vez y se reutiliza en seis de los once ejercicios."
+
+archCaption: "El método: expresión, pasos intermedios y resultado"
+
+challenge:
+  title: "Problema"
+  body: "Resolver once consultas de álgebra relacional sobre un esquema comercial de clientes, productos y ventas, y sobre un segundo esquema con facturas añadido después. Cada consulta exige filtrar, proyectar, unir, restar, intersectar o dividir, y el enunciado incluye casos límite que ponen a prueba la lectura exacta."
+solution:
+  title: "Solución"
+  body: "Cada ejercicio se resuelve en álgebra relacional extendida con expresión completa, pasos intermedios nombrados con ← y resultado calculado sobre una base de datos de prueba de cinco clientes, cuatro productos y nueve ventas. Las trampas del enunciado (límite de 500 unidades, homónimos, NULL implícito) se señalan donde aparecen."
+---
+
+## Descripción
+
+Este trabajo resuelve **once ejercicios de álgebra relacional** sobre un esquema comercial de clientes, productos y ventas, con un segundo esquema de facturas añadido para los dos últimos. Cada ejercicio se resuelve desde cero, con la expresión completa, los pasos intermedios nombrados con `←` y el resultado calculado sobre una base de datos de prueba pequeña, para que cada paso se pueda seguir con lápiz y papel.
+
+La resolución va **solo en álgebra relacional**, sin SQL, según la convención del curso.
+
+## Convenciones antes de empezar
+
+### Nombres de atributos
+
+El enunciado usa nombres con tilde y espacios (`Nº Cliente`, `Cod Producto`). Para poder escribirlos igual en álgebra y en cualquier otro lenguaje, aquí se usan estas versiones:
+
+| Enunciado | En este documento |
+| :-- | :-- |
+| Nº Cliente | NumCliente |
+| Cod Producto | CodProducto |
+| Descripción | Descripcion |
+| Población | Poblacion |
+| Id Venta | IdVenta |
+| Nº Factura | NumFactura |
+
+### Símbolos que se usan
+
+| Símbolo | Operador | Se traduce a |
+| :-- | :-- | :-- |
+| `σ condicion(R)` | Selección | `WHERE` |
+| `π atributos(R)` | Proyección | `SELECT DISTINCT A, B` |
+| `R ⋈ S` | Join natural | `NATURAL JOIN` o `JOIN … ON` |
+| `R ∩ S` | Intersección | `INTERSECT` |
+| `R − S` | Diferencia | `EXCEPT` / `NOT EXISTS` |
+| `R × S` | Producto cartesiano | `CROSS JOIN` |
+| `R ÷ S` | División | doble `NOT EXISTS` o `HAVING COUNT` |
+| `ρ nuevo ← viejo(R)` | Renombrado | `AS` |
+| `γ grupo; función(R)` | Agrupamiento y agregación | `GROUP BY` |
+| `T ← expresión` | Asignación | `WITH` (CTE) |
+
+### Formato de escritura
+
+Todo operador unario se escribe igual: el símbolo, lo que lleva entre subíndice (atributos o condición) y, entre paréntesis, la relación o la expresión sobre la que actúa. Por ejemplo, `π Nombre(σ Poblacion = 'Palencia'(Clientes))` se lee de adentro hacia afuera: primero se filtra `Clientes` y después se proyecta el nombre.
+
+En `γ`, lo que va antes del punto y coma son los atributos de agrupación, y lo que va después, las funciones de agregación. Cuando un operador binario (`⋈`, `−`, `∩`, `÷`) trabaja con expresiones largas, se agrupan con paréntesis.
+
+Cada ejercicio muestra primero la expresión completa en una sola línea con este formato y luego la misma consulta partida en pasos con resultados intermedios.
+
+### Tres precisiones que conviene tener claras
+
+- **La proyección del álgebra elimina duplicados.** En SQL ese comportamiento se consigue con `DISTINCT`, y se pone solo cuando de verdad pueden repetirse filas.
+- **Cuando dos relaciones comparten atributos con el mismo nombre, el join natural los iguala automáticamente.** Aquí es seguro: `Clientes` y `Venta` comparten únicamente `NumCliente`, y `Producto` y `Venta` comparten únicamente `CodProducto`.
+- **Los resultados intermedios se nombran con `←`** para que cada paso se lea por separado.
+
+## La base de datos de prueba
+
+Se usa en los ejercicios 1 al 9.
+
+**Clientes**(NumCliente, Nombre, Direccion, Telefono, Poblacion)
+
+| NumCliente | Nombre | Direccion | Telefono | Poblacion |
+| :-- | :-- | :-- | :-- | :-- |
+| 1 | Ana | C/ Mayor 12 | 979111111 | Palencia |
+| 2 | Luis | Av. Salamanca 5 | 983222222 | Valladolid |
+| 3 | Marta | C/ Burgos 8 | 979333333 | Palencia |
+| 4 | Pedro | C/ Real 3 | 947444444 | Burgos |
+| 5 | Sofía | Pº Zorrilla 20 | 983555555 | Valladolid |
+
+**Producto**(CodProducto, Descripcion, Precio)
+
+| CodProducto | Descripcion | Precio |
+| :-- | :-- | :-- |
+| A1 | Martillo | 12.50 |
+| A2 | Sierra | 20.00 |
+| A3 | A3 | 3.00 |
+| A4 | Taladro | 80.00 |
+
+**Venta**(CodProducto, NumCliente, Cantidad, IdVenta)
+
+| IdVenta | CodProducto | NumCliente | Cantidad |
+| :-- | :-- | :-- | :-- |
+| 15 | A1 | 1 | 100 |
+| 16 | A2 | 1 | 600 |
+| 17 | A1 | 3 | 700 |
+| 18 | A2 | 3 | 300 |
+| 19 | A1 | 2 | 500 |
+| 20 | A2 | 2 | 200 |
+| 21 | A3 | 2 | 50 |
+| 22 | A4 | 2 | 450 |
+| 23 | A4 | 5 | 450 |
+
+Los datos tienen trampas puestas a propósito:
+
+- Pedro no ha comprado nada.
+- El producto A3 tiene el código igual a su descripción.
+- La venta 19 vende exactamente 500 unidades, justo en el límite del ejercicio 3.
+- Luis es el único que ha comprado los cuatro productos.
+
+### La pieza compartida: CV
+
+Varios ejercicios necesitan saber quién compró qué y dónde vive. Para no repetir el mismo paso nueve veces, se define una sola vez:
+
+```text
+CV ← Clientes ⋈ Venta
+```
+
+El join se hace por `NumCliente`, el único atributo que comparten. Cada venta se une con los datos de su cliente. Pedro no aparece, porque no tiene ventas. Para que quepa en pantalla se muestran solo las columnas que se usan después (el resultado real también lleva `Direccion` y `Telefono`):
+
+| NumCliente | Nombre | Poblacion | IdVenta | CodProducto | Cantidad |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| 1 | Ana | Palencia | 15 | A1 | 100 |
+| 1 | Ana | Palencia | 16 | A2 | 600 |
+| 3 | Marta | Palencia | 17 | A1 | 700 |
+| 3 | Marta | Palencia | 18 | A2 | 300 |
+| 2 | Luis | Valladolid | 19 | A1 | 500 |
+| 2 | Luis | Valladolid | 20 | A2 | 200 |
+| 2 | Luis | Valladolid | 21 | A3 | 50 |
+| 2 | Luis | Valladolid | 22 | A4 | 450 |
+| 5 | Sofía | Valladolid | 23 | A4 | 450 |
+
+## Ejercicios 1 al 9
+
+### 1. Nombre de los clientes de Palencia
+
+**Cómo pensarlo.** Hay que filtrar filas (los de Palencia) y después quedarse con una sola columna (el nombre). Un filtro seguido de una proyección: el patrón más básico que existe.
+
+**Expresión completa.**
+
+```text
+π Nombre(σ Poblacion = 'Palencia'(Clientes))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+PalClientes ← σ Poblacion = 'Palencia'(Clientes)
+Resultado   ← π Nombre(PalClientes)
+```
+
+Tras el primer paso quedan las filas de Ana y Marta completas. Tras el segundo, solo la columna del nombre.
+
+**Resultado.**
+
+| Nombre |
+| :-- |
+| Ana |
+| Marta |
+
+Una observación de fondo: la proyección algebraica colapsaría dos clientes que se llamen igual. Si se necesita una fila por cliente, se proyecta también `NumCliente`.
+
+### 2. Código y descripción de los productos cuyo código coincide con su descripción
+
+**Cómo pensarlo.** La condición compara dos atributos de la misma fila. No hay ninguna constante: se pregunta si `CodProducto` vale lo mismo que `Descripcion`.
+
+**Expresión completa.**
+
+```text
+π CodProducto, Descripcion(σ CodProducto = Descripcion(Producto))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+Iguales   ← σ CodProducto = Descripcion(Producto)
+Resultado ← π CodProducto, Descripcion(Iguales)
+```
+
+Se recorre `Producto` fila por fila. A1 ≠ Martillo, A2 ≠ Sierra, A3 = A3 (pasa), A4 ≠ Taladro.
+
+**Resultado.**
+
+| CodProducto | Descripcion |
+| :-- | :-- |
+| A3 | A3 |
+
+Si el código fuese numérico y la descripción texto, algunos motores pedirían una conversión explícita (`CAST`) para poder compararlos.
+
+### 3. Nombre del cliente, identificador de venta y cantidad, de las ventas de más de 500 unidades
+
+**Cómo pensarlo.** El enunciado admite dos lecturas. La más directa: ventas individuales cuya cantidad supera 500. La segunda: productos cuyo total vendido supera 500, y mostrar todas sus ventas. Se resuelven las dos.
+
+**Lectura A: la venta supera 500 unidades**
+
+**Expresión completa.**
+
+```text
+π Nombre, IdVenta, Cantidad(Clientes ⋈ σ Cantidad > 500(Venta))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+Grandes   ← σ Cantidad > 500(Venta)
+Union     ← Clientes ⋈ Grandes
+Resultado ← π Nombre, IdVenta, Cantidad(Union)
+```
+
+El primer paso deja las ventas 16 (600) y 17 (700). La venta 19 tiene exactamente 500 y se queda fuera, porque la condición es estrictamente mayor. El join añade el nombre del cliente de cada una.
+
+**Resultado.**
+
+| Nombre | IdVenta | Cantidad |
+| :-- | :-- | :-- |
+| Ana | 16 | 600 |
+| Marta | 17 | 700 |
+
+**Lectura B: el producto acumula más de 500 unidades**
+
+Primero hay que agrupar para saber cuánto se vendió de cada producto.
+
+**Expresión completa.**
+
+```text
+π Nombre, IdVenta, Cantidad(Clientes ⋈ Venta ⋈ π CodProducto(σ Total > 500(γ CodProducto; SUM(Cantidad) → Total(Venta))))
+```
+
+**Paso a paso.**
+
+```text
+Totales   ← γ CodProducto; SUM(Cantidad) → Total(Venta)
+Populares ← π CodProducto(σ Total > 500(Totales))
+Resultado ← π Nombre, IdVenta, Cantidad(Clientes ⋈ Venta ⋈ Populares)
+```
+
+`Totales` resulta: A1 = 1300, A2 = 1100, A3 = 50, A4 = 900. Pasan A1, A2 y A4. El último paso trae todas las ventas de esos tres productos con el nombre del cliente.
+
+**Resultado.**
+
+| Nombre | IdVenta | Cantidad |
+| :-- | :-- | :-- |
+| Ana | 15 | 100 |
+| Ana | 16 | 600 |
+| Marta | 17 | 700 |
+| Marta | 18 | 300 |
+| Luis | 19 | 500 |
+| Luis | 20 | 200 |
+| Luis | 22 | 450 |
+| Sofía | 23 | 450 |
+
+### 4. Clientes que no aparecen en ventas (no han comprado nada)
+
+**Cómo pensarlo.** «Los que no» es diferencia de conjuntos. Del total de clientes se restan los que sí compraron. Lo delicado es qué se resta: si se restan nombres, dos clientes homónimos se pisan —uno con compras y otro sin ellas, y el sin compras desaparecería—. Se resta por clave.
+
+**Expresión completa.**
+
+```text
+π Nombre(Clientes ⋈ (π NumCliente(Clientes) − π NumCliente(Venta)))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+Todos     ← π NumCliente(Clientes)
+Compraron ← π NumCliente(Venta)
+SinCompra ← Todos − Compraron
+Resultado ← π Nombre(Clientes ⋈ SinCompra)
+```
+
+`Todos = {1, 2, 3, 4, 5}`. `Compraron = {1, 2, 3, 5}`. La resta deja `{4}`. El join recupera el nombre de ese cliente.
+
+**Resultado.**
+
+| Nombre |
+| :-- |
+| Pedro |
+
+### 5. Clientes que han comprado todos los productos
+
+**Cómo pensarlo.** Aquí aparece «todos», y eso es división. La división necesita una relación con dos columnas (cliente, producto) dividida por otra con la columna de producto que debe cubrirse completa.
+
+**Expresión completa.**
+
+```text
+π Nombre(Clientes ⋈ (π NumCliente, CodProducto(Venta) ÷ π CodProducto(Producto)))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+Pares     ← π NumCliente, CodProducto(Venta)
+Todos     ← π CodProducto(Producto)
+Cumplen   ← Pares ÷ Todos
+Resultado ← π Nombre(Clientes ⋈ Cumplen)
+```
+
+`Pares` guarda qué cliente compró qué producto, sin repetir:
+
+| NumCliente | CodProducto |
+| :-- | :-- |
+| 1 | A1 |
+| 1 | A2 |
+| 3 | A1 |
+| 3 | A2 |
+| 2 | A1 |
+| 2 | A2 |
+| 2 | A3 |
+| 2 | A4 |
+| 5 | A4 |
+
+`Todos = {A1, A2, A3, A4}`.
+
+**Qué hace la división por dentro.** Se puede desarmar en operadores básicos:
+
+```text
+X         ← π NumCliente(Pares)                {1, 2, 3, 5}
+Posibles  ← X × Todos                          (4 × 4 = 16 combinaciones)
+Faltan    ← Posibles − Pares                   (lo que debería existir y no existe)
+Incumplen ← π NumCliente(Faltan)
+Cumplen   ← X − Incumplen
+```
+
+`Faltan` contiene 7 combinaciones:
+
+| NumCliente | CodProducto |
+| :-- | :-- |
+| 1 | A3 |
+| 1 | A4 |
+| 3 | A3 |
+| 3 | A4 |
+| 5 | A1 |
+| 5 | A2 |
+| 5 | A3 |
+
+`Incumplen = {1, 3, 5}`. Restándolos de `X` queda `Cumplen = {2}`.
+
+**Resultado.**
+
+| Nombre |
+| :-- |
+| Luis |
+
+### 6. Ventas cuya cantidad supera la de la venta número 18
+
+**Cómo pensarlo.** Hay que comparar cada venta contra un valor de referencia que sale de la propia tabla. Se aísla ese valor en una relación de una sola fila, se combina con todas las ventas y se filtra.
+
+**Expresión completa.**
+
+```text
+π IdVenta(σ Cantidad > CantRef(Venta × ρ CantRef ← Cantidad(π Cantidad(σ IdVenta = 18(Venta)))))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+Fila18    ← σ IdVenta = 18(Venta)
+Ref       ← ρ CantRef ← Cantidad(π Cantidad(Fila18))
+Combinada ← Venta × Ref
+Mayores   ← σ Cantidad > CantRef(Combinada)
+Resultado ← π IdVenta(Mayores)
+```
+
+`Fila18` es la fila `(18, A2, 3, 300)`. `Ref` queda con un solo atributo, `CantRef`, de valor 300. El renombrado evita que choque con `Cantidad`. `Combinada` pega ese 300 a cada una de las 9 ventas. `Mayores` conserva las que tienen `Cantidad > 300`: 600, 700, 500, 450 y 450.
+
+La propia venta 18 queda fuera: 300 no es mayor que 300.
+
+**Resultado.**
+
+| IdVenta |
+| :-- |
+| 16 |
+| 17 |
+| 19 |
+| 22 |
+| 23 |
+
+### 7. Productos que no se han comprado nunca en Palencia
+
+**Cómo pensarlo.** De nuevo «los que no»: diferencia. Se calcula primero el conjunto de productos que sí se compraron en Palencia y se resta del total de productos.
+
+**Expresión completa.**
+
+```text
+π CodProducto, Descripcion(Producto ⋈ (π CodProducto(Producto) − π CodProducto(σ Poblacion = 'Palencia'(Clientes ⋈ Venta))))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+EnPalencia ← π CodProducto(σ Poblacion = 'Palencia'(CV))
+Todos      ← π CodProducto(Producto)
+Nunca      ← Todos − EnPalencia
+Resultado  ← π CodProducto, Descripcion(Producto ⋈ Nunca)
+```
+
+Se parte de `CV` (la pieza compartida). Las ventas a clientes de Palencia son las 15 y 16 (Ana) y la 17 y 18 (Marta), que involucran A1 y A2. Entonces `EnPalencia = {A1, A2}`. Restando de `{A1, A2, A3, A4}` quedan `{A3, A4}`. El último join recupera las descripciones.
+
+**Resultado.**
+
+| CodProducto | Descripcion |
+| :-- | :-- |
+| A3 | A3 |
+| A4 | Taladro |
+
+### 8. Productos vendidos tanto en Palencia como en Valladolid
+
+**Cómo pensarlo.** «Tanto… como…» es intersección. Se calcula el conjunto de productos de cada ciudad por separado y se intersectan. Ojo con el significado: el producto debe haberse vendido en cada ciudad, aunque no sea al mismo cliente ni en la misma venta.
+
+**Expresión completa.**
+
+```text
+π CodProducto, Descripcion(Producto ⋈ (π CodProducto(σ Poblacion = 'Palencia'(Clientes ⋈ Venta)) ∩ π CodProducto(σ Poblacion = 'Valladolid'(Clientes ⋈ Venta))))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+EnPalencia   ← π CodProducto(σ Poblacion = 'Palencia'(CV))
+EnValladolid ← π CodProducto(σ Poblacion = 'Valladolid'(CV))
+Ambas        ← EnPalencia ∩ EnValladolid
+Resultado    ← π CodProducto, Descripcion(Producto ⋈ Ambas)
+```
+
+`EnPalencia = {A1, A2}`. `EnValladolid`: Luis compró A1, A2, A3, A4 y Sofía A4, así que `= {A1, A2, A3, A4}`. La intersección deja `{A1, A2}`.
+
+**Resultado.**
+
+| CodProducto | Descripcion |
+| :-- | :-- |
+| A1 | Martillo |
+| A2 | Sierra |
+
+### 9. Poblaciones a las que hemos vendido todos nuestros productos
+
+**Cómo pensarlo.** Misma estructura que el ejercicio 5, con «población» ocupando el lugar de «cliente». Se arma la relación (población, producto) y se divide por la lista completa de productos.
+
+**Expresión completa.**
+
+```text
+π Poblacion, CodProducto(Clientes ⋈ Venta) ÷ π CodProducto(Producto)
+```
+
+**Álgebra, paso a paso.**
+
+```text
+PobProd   ← π Poblacion, CodProducto(CV)
+Todos     ← π CodProducto(Producto)
+Resultado ← PobProd ÷ Todos
+```
+
+`PobProd` tiene seis filas:
+
+| Poblacion | CodProducto |
+| :-- | :-- |
+| Palencia | A1 |
+| Palencia | A2 |
+| Valladolid | A1 |
+| Valladolid | A2 |
+| Valladolid | A3 |
+| Valladolid | A4 |
+
+Desarmando la división:
+
+```text
+X         ← π Poblacion(PobProd)            {Palencia, Valladolid}
+Posibles  ← X × Todos                       (8 combinaciones)
+Faltan    ← Posibles − PobProd              {(Palencia, A3), (Palencia, A4)}
+Incumplen ← π Poblacion(Faltan)             {Palencia}
+Resultado ← X − Incumplen                   {Valladolid}
+```
+
+**Resultado.**
+
+| Poblacion |
+| :-- |
+| Valladolid |
+
+Burgos no aparece en ningún paso, porque su único cliente no tiene ventas y el join con `Venta` lo descarta. Es coherente: a Burgos no se le ha vendido nada.
+
+## El esquema con facturas (ejercicios 10 y 11)
+
+El enunciado cambia el diseño: aparece `Factura`, y `Venta` deja de apuntar al cliente para apuntar a la factura.
+
+```text
+Factura(NumFactura, Fecha, Pagada, NumCliente)   Venta(CodProducto, NumFactura, Cantidad, IdVenta)
+```
+
+`Pagada` vale 1 si la factura está pagada y 0 si no. Para llegar de una venta a su cliente ahora hay que pasar por `Factura`. Los dos ejercicios siguientes solo necesitan `Clientes` y `Factura`, así que `Venta` no interviene.
+
+**Factura**
+
+| NumFactura | Fecha | Pagada | NumCliente |
+| :-- | :-- | :-- | :-- |
+| F1 | 2026-01-10 | 1 | 1 |
+| F2 | 2026-01-15 | 0 | 1 |
+| F3 | 2026-02-03 | 1 | 2 |
+| F4 | 2026-02-20 | 1 | 2 |
+| F5 | 2026-03-05 | 0 | 3 |
+| F6 | 2026-03-12 | 1 | 5 |
+
+Los clientes son los mismos de antes. Ana tiene una factura pagada y otra no, Luis tiene todas pagadas, Marta tiene la única que tiene sin pagar, Sofía tiene una pagada y Pedro no tiene ninguna.
+
+### 10. Nombre de los clientes con alguna factura sin pagar
+
+**Cómo pensarlo.** «Alguna» se resuelve con un filtro directo: basta con que exista una factura con `Pagada = 0`. No hace falta división ni diferencia.
+
+**Expresión completa.**
+
+```text
+π Nombre(Clientes ⋈ σ Pagada = 0(Factura))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+SinPagar  ← σ Pagada = 0(Factura)
+Union     ← Clientes ⋈ SinPagar
+Resultado ← π Nombre(Union)
+```
+
+`SinPagar` contiene F2 (cliente 1) y F5 (cliente 3). El join, por `NumCliente`, les pone nombre. La proyección final elimina repeticiones, de modo que un cliente con varias facturas sin pagar sale una sola vez.
+
+**Resultado.**
+
+| Nombre |
+| :-- |
+| Ana |
+| Marta |
+
+### 11. Clientes que han pagado todas sus facturas
+
+**Cómo pensarlo.** Aquí no sirve el atajo evidente. Si se filtra `Pagada = 1`, sale cualquier cliente con alguna factura pagada, aunque tenga otras pendientes. Con los datos de prueba sale Ana, que pagó F1 pero debe F2. El error es fácil de cometer y devuelve un resultado de apariencia razonable.
+
+La forma correcta: partir de los clientes con facturas y quitar a los que tienen alguna sin pagar. «Todas pagadas» equivale a «ninguna sin pagar».
+
+**Expresión completa.**
+
+```text
+π Nombre(Clientes ⋈ (π NumCliente(Factura) − π NumCliente(σ Pagada = 0(Factura))))
+```
+
+**Álgebra, paso a paso.**
+
+```text
+ConFacturas ← π NumCliente(Factura)
+Deudores    ← π NumCliente(σ Pagada = 0(Factura))
+Pagadores   ← ConFacturas − Deudores
+Resultado   ← π Nombre(Clientes ⋈ Pagadores)
+```
+
+`ConFacturas = {1, 2, 3, 5}`. `Deudores = {1, 3}`. `Pagadores = {2, 5}`.
+
+**Resultado.**
+
+| Nombre |
+| :-- |
+| Luis |
+| Sofía |
+
+**Si Pedro también debe salir.** Pedro no tiene facturas, así que no debe nada. Según la lectura, «pagó todas sus facturas» puede incluirlo (verdad por vacuidad) o excluirlo (no hay nada que haya pagado). La solución de arriba lo excluye. Si el profesor lo quiere dentro, solo cambia el punto de partida: en lugar de los clientes con facturas, se parte de todos los clientes.
+
+**Expresión completa.**
+
+```text
+π Nombre(Clientes ⋈ (π NumCliente(Clientes) − π NumCliente(σ Pagada = 0(Factura))))
+```
+
+**Paso a paso.**
+
+```text
+Todos     ← π NumCliente(Clientes)
+Pagadores ← Todos − Deudores
+Resultado ← π Nombre(Clientes ⋈ Pagadores)
+```
+
+`Pagadores = {1, 2, 3, 4, 5} − {1, 3} = {2, 4, 5}`, que da Luis, Pedro y Sofía.
+
+## Tabla de resultados
+
+| Ej. | Pide | Operadores clave | Resultado con los datos de prueba |
+| :-- | :-- | :-- | :-- |
+| 1 | Clientes de Palencia | σ, π | Ana, Marta |
+| 2 | Código igual a descripción | σ, π | A3 |
+| 3 | Ventas de más de 500 unidades | σ, ⋈, π (y γ en la lectura B) | Ana (16), Marta (17) |
+| 4 | Clientes sin compras | −, ⋈ | Pedro |
+| 5 | Clientes que compraron todo | ÷ | Luis |
+| 6 | Ventas mayores que la 18 | ×, ρ, σ | 16, 17, 19, 22, 23 |
+| 7 | Productos nunca comprados en Palencia | − | A3, A4 |
+| 8 | Productos en Palencia y Valladolid | ∩ | A1, A2 |
+| 9 | Poblaciones con todos los productos | ÷ | Valladolid |
+| 10 | Clientes con factura sin pagar | σ, ⋈ | Ana, Marta |
+| 11 | Clientes con todo pagado | −, ⋈ | Luis, Sofía |
+
+Los tres patrones de fondo se repiten:
+
+- **«Existe alguno»:** selección y join.
+- **«No existe ninguno»:** diferencia de conjuntos.
+- **«Para todos»:** división, o una diferencia doble.
+
+## Errores que aparecen en estos ejercicios
+
+- **Restar nombres en lugar de claves (ej. 4).** Los homónimos se confunden.
+- **Usar `NOT IN` con columnas que admiten NULL.** Devuelve vacío sin avisar.
+- **Contar sin `DISTINCT` en las divisiones por conteo (ej. 5 y 9).** Infla el total.
+- **Confundir «alguna pagada» con «todas pagadas» (ej. 11).** Son preguntas opuestas.
+- **Olvidar que `>` es estricto (ej. 3 y 6).** La venta de 500 unidades no entra.
+- **Proyectar sin `DISTINCT` en SQL.** El álgebra elimina duplicados; SQL, no.
+
+## Documento del trabajo
+
+- [Ejercicios de álgebra relacional (1) — Resolución paso a paso (DOCX)](/evidencias/algebra-relacional/algebra_resuelto.docx)
+
+Este trabajo corresponde a la categoría **Álgebra Relacional** de la asignatura Bases de Datos 1.

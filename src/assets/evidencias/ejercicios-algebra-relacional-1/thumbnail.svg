@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Portada: el método de la resolución paso a paso, una expresión completa, sus pasos intermedios y el resultado sobre la base de datos de prueba">
+  <title>Resolución paso a paso</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <text x="16" y="44" fill="#63de86" font-size="13">RESOLUCIÓN PASO A PASO</text>
+    <text x="16" y="62" fill="#b8b8d8" font-size="8" font-weight="normal">expresion, pasos intermedios y resultado</text>
+
+    <!-- panel 1: expresion -->
+    <rect x="16" y="78" width="132" height="104" fill="#171740" stroke="#62b4f8" stroke-width="2" />
+    <text x="26" y="96" fill="#62b4f8" font-size="9">EXPRESION</text>
+    <g font-size="8" fill="#cfe6ff" font-weight="normal">
+      <text x="26" y="116">π Nombre(</text>
+      <text x="26" y="130">σ Poblacion =</text>
+      <text x="26" y="144">'Palencia'(</text>
+      <text x="26" y="158">Clientes))</text>
+    </g>
+
+    <!-- flecha -->
+    <path d="M152 130 H168" stroke="#8a8ab8" stroke-width="2" />
+    <polygon points="166,124 176,130 166,136" fill="#8a8ab8" />
+
+    <!-- panel 2: paso a paso -->
+    <rect x="180" y="78" width="130" height="104" fill="#171740" stroke="#f4677a" stroke-width="2" />
+    <text x="190" y="96" fill="#f4677a" font-size="9">PASO A PASO</text>
+    <g font-size="8" fill="#cfe6ff" font-weight="normal">
+      <text x="190" y="116">PalClientes ←</text>
+      <text x="190" y="130">σ Poblacion =</text>
+      <text x="190" y="144">'Palencia'(</text>
+      <text x="190" y="158">Clientes)</text>
+      <text x="190" y="172">Resultado ←</text>
+    </g>
+
+    <!-- flecha -->
+    <path d="M314 130 H330" stroke="#8a8ab8" stroke-width="2" />
+    <polygon points="328,124 338,130 328,136" fill="#8a8ab8" />
+
+    <!-- panel 3: resultado -->
+    <rect x="342" y="78" width="122" height="104" fill="#171740" stroke="#63de86" stroke-width="2" />
+    <text x="352" y="96" fill="#63de86" font-size="9">RESULTADO</text>
+    <g font-size="8" font-weight="normal">
+      <rect x="352" y="108" width="102" height="16" fill="#0f0f2e" stroke="#63de86" stroke-width="1" />
+      <text x="360" y="119" fill="#63de86">Nombre</text>
+      <rect x="352" y="124" width="102" height="16" fill="#0f0f2e" stroke="#2e2e60" stroke-width="1" />
+      <text x="360" y="135" fill="#cfe6ff">Ana</text>
+      <rect x="352" y="140" width="102" height="16" fill="#0f0f2e" stroke="#2e2e60" stroke-width="1" />
+      <text x="360" y="151" fill="#cfe6ff">Marta</text>
+    </g>
+
+    <text x="16" y="214" fill="#63de86" font-size="9">11 EJERCICIOS</text>
+    <text x="104" y="214" fill="#b8b8d8" font-size="8" font-weight="normal">clientes · producto · venta · factura</text>
+    <text x="16" y="236" fill="#b8b8d8" font-size="8" font-weight="normal">con datos de prueba que tienen trampas puestas a proposito</text>
+  </g>
+</svg>
