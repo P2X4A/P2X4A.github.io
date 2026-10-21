@@ -20,7 +20,7 @@ const projectsCollection = defineCollection({
       description: z.string(), // listing card excerpt + SEO meta description
       tagline: z.string(), // detail hero intro line
       status: z.enum(["complete", "in-progress"]),
-      category: z.enum(["modelado", "normalizacion", "sql", "proyecto"]),
+      category: z.enum(["modelado", "normalizacion", "algebra-relacional", "sql", "proyecto"]),
       moduleId: z.string(), // shown on the detail hero, e.g. "#01_CHAT"
       order: z.number(), // listing sort key (ascending)
       thumbnail: image(),
