@@ -177,6 +177,11 @@
     & pre {
       @apply border-border overflow-x-auto border-4 p-4 text-sm;
     }
+    /* The diagrams are authored wide (1600px). Without this they overflow the card on narrow
+       viewports and force the body to scroll sideways; the full-resolution copy stays linked. */
+    & img {
+      @apply h-auto max-w-full;
+    }
   }
 
   .site-container {

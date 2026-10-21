@@ -1,0 +1,304 @@
+---
+title: "Taller de Normalización — Punto 5"
+tagline: "Alquiler de DVD por correo: la Tabla No. 4, sus dependencias y la comprobación en BCNF"
+description: "Punto 5 del Taller de Normalización de Bases de Datos 1: análisis de las dependencias funcionales de la Tabla No. 4 de alquileres de DVD, esquema relacional Rentals, diagrama de dependencias y descomposición hasta la 3FN con RENTAL, MOVIE, RENTAL_MOVIE y CATEGORY, más la comprobación en BCNF."
+status: "complete"
+category: "normalizacion"
+moduleId: "BD1-NOR-006"
+order: 10
+thumbnail: "../../../assets/evidencias/taller-normalizacion-punto-5/thumbnail.png"
+thumbnailAlt: "Diagrama del esquema relacional en 3FN: RENTAL, MOVIE, RENTAL_MOVIE y CATEGORY"
+
+tech:
+  - "Normalización (1FN · 2FN · 3FN · BCNF)"
+  - "Dependencias funcionales"
+  - "Diagrama de dependencias"
+  - "Modelo relacional"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Alquiler de DVD por correo: pedidos, películas, clientes y precios por categoría"
+  - label: "Forma normal de partida"
+    value: "1FN — no cumple la 2FN por dependencias parciales"
+  - label: "Tablas resultantes"
+    value: "RENTAL, MOVIE, RENTAL_MOVIE y CATEGORY"
+  - label: "Alcance"
+    value: "Punto 5 del taller de repaso — literales a, b, c, d, e y f"
+
+features:
+  - lead: "Dependencias que la muestra no sostiene"
+    text: "Director → Title se cumple en los datos y aun así no es una dependencia válida."
+  - lead: "Llave compuesta"
+    text: "Un alquiler lleva varias películas y una película se alquila muchas veces."
+  - lead: "Dos cortes, no uno"
+    text: "Primero las dependencias parciales, después la transitiva del precio."
+  - lead: "BCNF sin esfuerzo extra"
+    text: "El resultado de la 3FN ya cumple Boyce-Codd: una sola llave candidata."
+
+archCaption: "Esquema relacional final en 3FN (BCNF)"
+
+challenge:
+  title: "Problema"
+  body: "Analizar la Tabla No. 4, que registra los alquileres de DVD de la división de correo de Netflix: determinar si las dependencias funcionales propuestas se sostienen con la muestra, plantear el esquema relacional Rentals, especificar sus dependencias funcionales, dibujar el diagrama de dependencias de la 1FN, descomponer hasta la 3FN con sus claves primarias y foráneas, y explicar qué cambiaría si se exigiera Boyce-Codd."
+solution:
+  title: "Solución"
+  body: "Se juzgó cada dependencia contra los datos y contra el negocio: RentalID → CustomerID se sostiene, Director → Title no, aunque la muestra no la contradiga. Con cuatro dependencias más la llave se descompuso en RENTAL, MOVIE y RENTAL_MOVIE (2FN) y CATEGORY (3FN), y el resultado se comprobó contra BCNF: no cambia nada, porque el esquema tiene una sola llave candidata."
+---
+
+## Descripción
+
+Este trabajo resuelve el **Punto 5 del Taller de Normalización de Bases de Datos 1** (Universidad El Bosque, docente Ing. Christian Felipe Duarte Arévalo).
+
+La Tabla No. 4 es la tabla de alquileres de la división de DVD por correo de Netflix. Cada fila es una película incluida en un alquiler, con el cliente que lo pidió, la fecha en que salió, el director, la categoría y el precio.
+
+Es el punto con más literales del taller: seis, del a al f. Además de descomponer, hay que juzgar si las dependencias que se enuncian se sostienen con la muestra y si el negocio las respalda.
+
+## La Tabla No. 4
+
+| RentalID | Title | CustomerID | MailedOutDate | Director | MovieCategory | Price |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| 1 | Die Hard | 1001 | 3/3/2010 | John McTiernan | Old | $4.25 |
+| 1 | The last man standing | 1001 | 3/3/2010 | Walter Hill | Old | $4.25 |
+| 1 | Wedding Crashers | 1001 | 3/3/2010 | David Dobkin | New | $5.50 |
+| 2 | Dodgeball | 1002 | 3/4/2010 | Rawson Marshall Thurber | New | $5.50 |
+| 2 | Die Hard | 1002 | 3/4/2010 | John McTiernan | Old | $4.25 |
+| 3 | As good as it gets | 1003 | 1/7/2011 | James Brooks | Old | $4.25 |
+| 4 | Forest Gump | 1001 | 1/7/2011 | Robert Zemeckis | Old | $4.25 |
+
+La llave primaria que da el enunciado es la compuesta **(RentalID, Title)**: un alquiler puede llevar varias películas y una misma película se puede alquilar varias veces.
+
+## Literal a — ¿Son verdaderas estas dependencias?
+
+Una dependencia A → B se cumple cuando cada valor de A aparece siempre con el mismo valor de B. La muestra puede desmentir una dependencia, pero no demostrarla a fondo; por eso, además de mirar los datos, se pregunta si la regla tiene sentido en el negocio.
+
+### i. RentalID → CustomerID — Verdadera
+
+Agrupando por número de alquiler:
+
+| RentalID | Clientes que aparecen |
+| :-- | :-- |
+| 1 (tres filas) | 1001 |
+| 2 (dos filas) | 1002 |
+| 3 | 1003 |
+| 4 | 1001 |
+
+Ningún alquiler aparece con dos clientes, y tiene lógica: un alquiler lo hace una sola persona. La inversa no vale: el cliente 1001 aparece en los alquileres 1 y 4, así que CustomerID → RentalID es falsa.
+
+### ii. RentalID → CustomerID — Verdadera (el enunciado repite la del literal i)
+
+El enunciado repite exactamente la misma dependencia en los literales i y ii, así que la respuesta es la misma: verdadera, por las razones ya expuestas.
+
+Si lo que se quería preguntar era por la fecha de envío, **RentalID → MailedOutDate** también es verdadera: el alquiler 1 sale siempre el 3/3/2010, el 2 el 3/4/2010, y el 3 y el 4 el 1/7/2011. La fecha pertenece al alquiler, no a cada película.
+
+### iii. Director → Title — Se cumple en la muestra, pero no es una dependencia válida
+
+Cada director aparece con un solo título: John McTiernan sale dos veces y en las dos con Die Hard, los demás salen una vez. Los datos no la contradicen.
+
+El problema es que un director hace varias películas. Basta con que el catálogo incorpore una segunda película de Walter Hill para que la dependencia se rompa. Lo que sí tiene sentido es la dirección contraria, **Title → Director**, porque una película tiene un director.
+
+La lección práctica: las dependencias se declaran por lo que dicta el negocio, no por lo que casualmente muestra una muestra pequeña.
+
+## Literal b — Esquema relacional
+
+```text
+Rentals ( RentalID, Title, CustomerID, MailedOutDate, Director, MovieCategory, Price )
+```
+
+- **Llave primaria:** (RentalID, Title)
+- **Llaves foráneas:** ninguna, porque todo vive en una sola relación
+
+## Literal c — Dependencias funcionales
+
+| # | Dependencia | Por qué se plantea |
+| :-- | :-- | :-- |
+| 1 | RentalID → CustomerID, MailedOutDate | Un alquiler tiene un cliente y una fecha de envío. |
+| 2 | Title → Director, MovieCategory | Cada película tiene un director y una categoría. |
+| 3 | MovieCategory → Price | El precio lo fija la categoría: Old $4.25, New $5.50. |
+| 4 | RentalID, Title → los demás atributos | Es la llave primaria. |
+
+De la 2 y la 3 sale una derivada por transitividad: **Title → Price**, a través de MovieCategory.
+
+Quedan descartadas dos dependencias que podrían tentar: Director → Title (literal a-iii) y CustomerID → RentalID, porque un cliente hace varios alquileres.
+
+El supuesto de la dependencia 2 es que cada título tiene un solo director y una sola categoría, lo cual es razonable para este catálogo.
+
+### Comprobación de la llave
+
+| Conjunto | Lo que determina | ¿Cubre los 7 atributos? |
+| :-- | :-- | :-- |
+| `{RentalID}` | CustomerID, MailedOutDate | No |
+| `{Title}` | Director, MovieCategory, Price | No |
+| `{RentalID, Title}` | Todos | Sí |
+
+La pareja es la única llave candidata, y ningún subconjunto propio alcanza.
+
+## Literal d — Diagrama de dependencias (1FN)
+
+La tabla cumple 1FN: cada celda tiene un solo valor, no hay grupos repetidos y la llave distingue todas las filas. Sus dependencias se ven así:
+
+```text
+  (RentalID, Title)   llave primaria
+        │
+        ├─ RentalID ──┬──► CustomerID
+        │             └──► MailedOutDate
+        │
+        └─ Title ─────┬──► Director
+                      └──► MovieCategory ──► Price
+```
+
+| Dependencia | Tipo |
+| :-- | :-- |
+| RentalID → CustomerID, MailedOutDate | Parcial: depende solo de RentalID |
+| Title → Director, MovieCategory | Parcial: depende solo de Title |
+| Title → MovieCategory → Price | Parcial y además transitiva |
+
+Ningún atributo que no es llave depende de la llave completa: todos cuelgan de una de sus mitades, y Price además pasa por MovieCategory. Eso es lo que hay que desarmar en 2FN y 3FN.
+
+<img
+  src="/evidencias/taller-normalizacion/diagrama-dependencias-punto-5.png"
+  alt="Diagrama de dependencias funcionales de Rentals en 1FN, con la llave compuesta (RentalID, Title) enmarcada, las dependencias parciales de cada mitad de la llave y la dependencia transitiva de MovieCategory hacia Price"
+  loading="lazy"
+  width="1600"
+  height="747"
+/>
+
+## Literal e — Descomposición en 3FN
+
+### Paso 1. Primera forma normal
+
+Ya se cumple. No hay nada que cambiar.
+
+### Paso 2. Segunda forma normal: quitar las dependencias parciales
+
+Cada parte de la llave se lleva a su propia tabla, junto con todo lo que determina:
+
+- **RENTAL** recibe lo que depende solo de RentalID.
+- **MOVIE** recibe lo que depende solo de Title.
+- **RENTAL_MOVIE** guarda la relación entre alquileres y películas.
+
+RENTAL y MOVIE tienen llave de un atributo, así que no pueden tener dependencias parciales. RENTAL_MOVIE solo tiene atributos de la llave.
+
+### Paso 3. Tercera forma normal: quitar la dependencia transitiva
+
+MOVIE todavía tiene el problema de Price: depende de MovieCategory, y MovieCategory depende de Title. MovieCategory no es llave en MOVIE, así que la cadena Title → MovieCategory → Price es transitiva y la 3FN no la admite.
+
+Se saca MovieCategory con su precio a una tabla propia, y en MOVIE queda como llave foránea.
+
+### Resultado
+
+| Tabla | Columnas | Llave primaria | Llaves foráneas |
+| :-- | :-- | :-- | :-- |
+| RENTAL | RentalID, CustomerID, MailedOutDate | RentalID | — |
+| RENTAL_MOVIE | RentalID, Title | (RentalID, Title) | RentalID → RENTAL; Title → MOVIE |
+| MOVIE | Title, Director, MovieCategory | Title | MovieCategory → CATEGORY |
+| CATEGORY | MovieCategory, Price | MovieCategory | — |
+
+CustomerID queda como atributo normal de RENTAL: el enunciado no da más datos del cliente (nombre, dirección), así que no hay nada que mover a una tabla CUSTOMER. Si existieran, CustomerID pasaría a ser llave foránea hacia esa tabla.
+
+**RENTAL**
+
+| RentalID | CustomerID | MailedOutDate |
+| :-- | :-- | :-- |
+| 1 | 1001 | 3/3/2010 |
+| 2 | 1002 | 3/4/2010 |
+| 3 | 1003 | 1/7/2011 |
+| 4 | 1001 | 1/7/2011 |
+
+**RENTAL_MOVIE**
+
+| RentalID | Title |
+| :-- | :-- |
+| 1 | Die Hard |
+| 1 | The last man standing |
+| 1 | Wedding Crashers |
+| 2 | Dodgeball |
+| 2 | Die Hard |
+| 3 | As good as it gets |
+| 4 | Forest Gump |
+
+**MOVIE**
+
+| Title | Director | MovieCategory |
+| :-- | :-- | :-- |
+| Die Hard | John McTiernan | Old |
+| The last man standing | Walter Hill | Old |
+| Wedding Crashers | David Dobkin | New |
+| Dodgeball | Rawson Marshall Thurber | New |
+| As good as it gets | James Brooks | Old |
+| Forest Gump | Robert Zemeckis | Old |
+
+**CATEGORY**
+
+| MovieCategory | Price |
+| :-- | :-- |
+| Old | $4.25 |
+| New | $5.50 |
+
+### Por qué cada tabla está en 3FN
+
+- **RENTAL:** CustomerID no determina la fecha, así que no hay cadenas.
+- **RENTAL_MOVIE:** solo tiene atributos de la llave, no hay nada que dependa de nada.
+- **MOVIE:** Title determina Director y MovieCategory, y ninguno de los dos determina otro atributo.
+- **CATEGORY:** MovieCategory determina Price y es la llave.
+
+### Qué se gana
+
+Die Hard guardaba su director dos veces, en los alquileres 1 y 2. Si el precio de la categoría Old subiera a $4.50, habría que corregir cinco filas; ahora es una sola, en CATEGORY. Tampoco se podía registrar una película que nadie hubiera alquilado, y borrar el alquiler 3 se llevaba por delante "As good as it gets" y a James Brooks. Con el diseño nuevo cada dato vive en un solo lugar y los tres problemas desaparecen.
+
+Las dependencias del literal c se conservan: la 1 en RENTAL, la 2 en MOVIE, la 3 en CATEGORY, y la 4 queda reflejada en RENTAL_MOVIE. Title → Price se recupera por transitividad a través de MovieCategory, y la información completa de la Tabla No. 4 se reconstruye sin pérdidas ni sobrantes porque cada corte se hizo siguiendo una dependencia funcional.
+
+```sql
+SELECT rm.RentalID, r.CustomerID, r.MailedOutDate,
+       m.Title, m.Director, c.MovieCategory, c.Price
+FROM RENTAL_MOVIE rm
+JOIN RENTAL   r ON r.RentalID     = rm.RentalID
+JOIN MOVIE    m ON m.Title        = rm.Title
+JOIN CATEGORY c ON c.MovieCategory = m.MovieCategory
+ORDER BY rm.RentalID, m.Title;
+```
+
+## Literal f — ¿Qué cambia con Boyce-Codd?
+
+**No cambia nada.** La descomposición del literal e ya está en BCNF.
+
+BCNF pide que todo determinante sea llave candidata de su tabla. Se revisa cada dependencia que sobrevivió a la descomposición:
+
+| Tabla | Dependencia | ¿El determinante es llave? |
+| :-- | :-- | :-- |
+| RENTAL | RentalID → CustomerID, MailedOutDate | Sí, es la PK |
+| MOVIE | Title → Director, MovieCategory | Sí, es la PK |
+| CATEGORY | MovieCategory → Price | Sí, es la PK |
+| RENTAL_MOVIE | Solo dependencias triviales | No hay determinantes que revisar |
+
+**Por qué 3FN y BCNF coinciden aquí.** BCNF es más estricta que 3FN solo cuando un determinante que no es llave apunta a una parte de la llave, algo que pasa con llaves candidatas que se solapan. En este problema hay una sola llave candidata y cada tabla se ajusta a una dependencia limpia, así que la diferencia nunca aparece.
+
+**Comprobación por el otro camino.** Aplicando el criterio de BCNF directamente sobre Rentals se llega al mismo resultado:
+
+1. RentalID → CustomerID, MailedOutDate tiene un determinante que no es llave. Se separa RENTAL.
+2. En lo que queda, Title → Director, MovieCategory, Price también viola la regla. Se separa MOVIE, y queda RENTAL_MOVIE.
+3. En MOVIE, MovieCategory → Price viola la regla. Se separa CATEGORY.
+
+Cuatro tablas, las mismas del literal e.
+
+**Una precisión sobre la definición del enunciado.** El texto dice que los determinantes deben ser llaves candidatas "(llave primaria o llave foránea)". Una llave foránea no es candidata por sí sola: apunta a otra tabla y puede repetirse muchas veces. MovieCategory es foránea en MOVIE y se repite en varias películas, pero eso no la hace llave de MOVIE. Una llave candidata es cualquier conjunto mínimo de atributos que identifica de forma única cada fila. En este ejercicio solo hay llaves primarias, y por eso el resultado no se ve afectado.
+
+## Ver el diagrama en tamaño completo
+
+La imagen del diagrama de dependencias tiene **1600 × 747 px**. Dentro de la página se ve entera, pero las flechas y los rótulos se leen mejor en una pestaña aparte.
+
+<a
+  href="/evidencias/taller-normalizacion/diagrama-dependencias-punto-5.png"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="pixel-btn pixel-btn--blue px-5 py-3 text-sm uppercase"
+>
+  Abrir el diagrama original
+</a>
+
+## Documento del trabajo
+
+- [Enunciado del taller de normalización (PDF)](/evidencias/taller-normalizacion/Ejercicios_Repaso_Normalizacion.pdf)
+- [Solución entregada del punto 5 (DOCX)](/evidencias/taller-normalizacion/Taller_Normalizacion_Punto5.docx)
+
+Este trabajo corresponde a la categoría **Normalización** de la asignatura Bases de Datos 1.

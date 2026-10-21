@@ -21,7 +21,7 @@ async function findSources(dir) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) {
       found.push(...(await findSources(path)));
-    } else if (entry.name.endsWith(".svg")) {
+    } else if (entry.name === "thumbnail.svg") {
       found.push([path, path.replace(/\.svg$/, ".png")]);
     }
   }
