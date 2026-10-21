@@ -156,7 +156,7 @@
     & strong {
       @apply text-info font-bold;
     }
-    & a {
+    & a:not([class]) {
       @apply text-info hover:text-success underline underline-offset-2 transition-colors;
     }
     & table {
