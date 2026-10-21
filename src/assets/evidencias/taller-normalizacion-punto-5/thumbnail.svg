@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Esquema relacional en 3FN: RENTAL, MOVIE, RENTAL_MOVIE y CATEGORY">
+  <title>Esquema relacional en 3FN — alquiler de DVD por correo</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <!-- fila 1 -->
+    <rect x="16" y="26" width="140" height="40" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="26" y="44" fill="#63de86" font-size="10">RENTAL</text>
+    <text x="26" y="59" fill="#b8b8d8" font-size="9" font-weight="normal">RentalID PK</text>
+
+    <rect x="324" y="26" width="140" height="40" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="334" y="44" fill="#62b4f8" font-size="10">MOVIE</text>
+    <text x="334" y="59" fill="#b8b8d8" font-size="9" font-weight="normal">Title PK</text>
+
+    <!-- fila 2 -->
+    <rect x="170" y="170" width="140" height="40" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="180" y="188" fill="#f4677a" font-size="9">RENTAL_MOVIE</text>
+    <text x="180" y="203" fill="#b8b8d8" font-size="8" font-weight="normal">(RentalID, Title) PK</text>
+
+    <rect x="324" y="170" width="140" height="40" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="334" y="188" fill="#63de86" font-size="10">CATEGORY</text>
+    <text x="334" y="203" fill="#b8b8d8" font-size="8" font-weight="normal">MovieCategory PK</text>
+
+    <!-- relaciones -->
+    <g stroke="#8a8ab8" stroke-width="2" fill="none">
+      <path d="M86 66 V120 H200 V170" />
+      <path d="M394 66 V120 H280 V170" />
+      <path d="M454 66 V170" />
+    </g>
+    <g fill="#8a8ab8">
+      <rect x="196" y="166" width="8" height="8" />
+      <rect x="276" y="166" width="8" height="8" />
+      <rect x="450" y="166" width="8" height="8" />
+    </g>
+
+    <text x="16" y="240" fill="#63de86" font-size="10">3FN — 4 TABLAS</text>
+    <text x="150" y="240" fill="#b8b8d8" font-size="8" font-weight="normal">alquiler, pelicula, cruce y categoria</text>
+  </g>
+</svg>
