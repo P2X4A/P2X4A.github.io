@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Portada: los operadores del álgebra relacional, selección sigma, proyección pi y producto cartesiano, sobre los cinco esquemas de la guía">
+  <title>Álgebra relacional — Guía 1</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <!-- esquemas -->
+    <g font-size="8" text-anchor="middle">
+      <rect x="16" y="30" width="80" height="24" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="56" y="46" fill="#63de86">CLIENTE</text>
+      <rect x="108" y="30" width="80" height="24" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="148" y="46" fill="#63de86">PRODUCTO</text>
+      <rect x="200" y="30" width="80" height="24" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="240" y="46" fill="#63de86">FACTURA</text>
+      <rect x="292" y="30" width="80" height="24" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="332" y="46" fill="#63de86">DETALLE</text>
+      <rect x="384" y="30" width="80" height="24" fill="#171740" stroke="#63de86" stroke-width="2" />
+      <text x="424" y="46" fill="#63de86">LOCALIDAD</text>
+    </g>
+
+    <!-- operadores -->
+    <rect x="16" y="80" width="124" height="92" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="78" y="128" fill="#62b4f8" font-size="38" text-anchor="middle">σ</text>
+    <text x="78" y="154" fill="#b8b8d8" font-size="9" text-anchor="middle">SELECCIÓN</text>
+
+    <rect x="178" y="80" width="124" height="92" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="240" y="128" fill="#f4677a" font-size="38" text-anchor="middle">π</text>
+    <text x="240" y="154" fill="#b8b8d8" font-size="9" text-anchor="middle">PROYECCIÓN</text>
+
+    <rect x="340" y="80" width="124" height="92" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <polygon points="370,100 402,126 370,152" fill="none" stroke="#63de86" stroke-width="3" />
+    <polygon points="434,100 402,126 434,152" fill="none" stroke="#63de86" stroke-width="3" />
+    <text x="402" y="170" fill="#b8b8d8" font-size="9" text-anchor="middle">PRODUCTO</text>
+
+    <!--caption -->
+    <text x="16" y="224" fill="#63de86" font-size="10">GUÍA 1 · ÁLGEBRA RELACIONAL</text>
+    <text x="196" y="224" fill="#b8b8d8" font-size="8" font-weight="normal">11 ejercicios · álgebra y SQL</text>
+  </g>
+</svg>

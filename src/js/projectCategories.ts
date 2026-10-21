@@ -21,8 +21,9 @@ export const projectCategories = [
   {
     slug: "sql",
     label: "SQL",
-    tagline: "Consultas",
-    intro: "Scripts y consultas SQL: creación de tablas, inserciones y consultas del torneo.",
+    tagline: "Álgebra · Consultas",
+    intro:
+      "Consultas sobre esquemas reales: álgebra relacional extendida y su traducción a SQL.",
   },
   {
     slug: "proyecto",

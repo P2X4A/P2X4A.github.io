@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="420" viewBox="0 0 1200 420" role="img" aria-label="Esquema relacional de la guía de álgebra relacional: LOCALIDAD, CLIENTE, FACTURA, PRODUCTO y DETALLE, con sus claves primarias y foráneas y las relaciones uno a muchos entre ellos">
+  <title>Esquemas de la guía de álgebra relacional</title>
+
+  <rect width="1200" height="420" fill="#0d0d26" />
+  <rect x="8" y="8" width="1184" height="404" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="1168" height="388" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <text x="40" y="40" fill="#63de86" font-size="15">ESQUEMA DE LA GUÍA · CINCO RELACIONES</text>
+
+    <!-- LOCALIDAD -->
+    <rect x="40" y="66" width="230" height="92" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="54" y="90" fill="#63de86" font-size="15">LOCALIDAD</text>
+    <text x="54" y="112" fill="#cfe6ff" font-size="11" font-weight="normal">IdLocalidad PK</text>
+    <text x="54" y="130" fill="#cfe6ff" font-size="11" font-weight="normal">Nombre</text>
+
+    <!-- CLIENTE -->
+    <rect x="340" y="66" width="230" height="92" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="354" y="90" fill="#63de86" font-size="15">CLIENTE</text>
+    <text x="354" y="112" fill="#cfe6ff" font-size="11" font-weight="normal">Id_Cliente PK · Nombre</text>
+    <text x="354" y="130" fill="#cfe6ff" font-size="11" font-weight="normal">Dirección · Teléfono</text>
+    <text x="354" y="148" fill="#f5b041" font-size="11" font-weight="normal">IdLocalidad FK</text>
+
+    <!-- FACTURA -->
+    <rect x="660" y="66" width="230" height="92" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="674" y="90" fill="#63de86" font-size="15">FACTURA</text>
+    <text x="674" y="112" fill="#cfe6ff" font-size="11" font-weight="normal">IdFactura PK · Fecha</text>
+    <text x="674" y="130" fill="#cfe6ff" font-size="11" font-weight="normal">Pagada</text>
+    <text x="674" y="148" fill="#f5b041" font-size="11" font-weight="normal">IdCliente FK</text>
+
+    <!-- PRODUCTO -->
+    <rect x="340" y="266" width="230" height="80" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="354" y="290" fill="#63de86" font-size="15">PRODUCTO</text>
+    <text x="354" y="312" fill="#cfe6ff" font-size="11" font-weight="normal">IdProducto PK</text>
+    <text x="354" y="330" fill="#cfe6ff" font-size="11" font-weight="normal">Descripción · Precio</text>
+
+    <!-- DETALLE -->
+    <rect x="660" y="266" width="240" height="80" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="674" y="290" fill="#f4677a" font-size="15">DETALLE</text>
+    <text x="674" y="312" fill="#cfe6ff" font-size="11" font-weight="normal">(IdFactura, IdProducto) PK</text>
+    <text x="674" y="330" fill="#cfe6ff" font-size="11" font-weight="normal">Cantidad · PrecioVta</text>
+
+    <!-- relaciones -->
+    <g stroke="#8a8ab8" stroke-width="2" fill="none">
+      <path d="M270 112 H340" />
+      <path d="M570 112 H660" />
+      <path d="M770 158 V266" />
+      <path d="M570 306 H660" />
+    </g>
+    <g fill="#8a8ab8" font-size="10" font-weight="normal">
+      <text x="296" y="104">1:N</text>
+      <text x="606" y="104">1:N</text>
+      <text x="780" y="212">1:N</text>
+      <text x="606" y="298">1:N</text>
+    </g>
+    <g fill="#f5b041" font-size="10" font-weight="normal">
+      <text x="786" y="196">IdFactura</text>
+      <text x="584" y="288">IdProducto</text>
+      <text x="286" y="96">IdLocalidad</text>
+      <text x="582" y="96">IdCliente</text>
+    </g>
+  </g>
+</svg>
