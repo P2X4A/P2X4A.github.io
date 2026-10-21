@@ -1,6 +1,6 @@
 // Categorías de la sección Evidencias (/projects/).
 // Una definición por categoría: slug de URL, etiqueta, tagline e intro.
-// Las 4 subpáginas (/projects/<slug>/) y el índice comparten este registro
+// Las 5 subpáginas (/projects/<slug>/) y el índice comparten este registro
 // para que etiquetas y rutas no se dupliquen en cada página.
 
 export const projectCategories = [
@@ -19,11 +19,17 @@ export const projectCategories = [
       "Proceso de normalización: de la tabla sin normalizar hasta la tercera forma normal.",
   },
   {
-    slug: "sql",
-    label: "Consultas",
-    tagline: "Álgebra relacional",
+    slug: "algebra-relacional",
+    label: "Álgebra Relacional",
+    tagline: "Álgebra extendida",
     intro:
-      "Álgebra relacional extendida: las operaciones del modelo relacional aplicadas a un esquema comercial real.",
+      "Consultas sobre esquemas reales resueltas con los operadores del álgebra relacional extendida.",
+  },
+  {
+    slug: "sql",
+    label: "SQL",
+    tagline: "Consultas",
+    intro: "Scripts y consultas SQL: creación de tablas, inserciones y consultas sobre esquemas reales.",
   },
   {
     slug: "proyecto",
