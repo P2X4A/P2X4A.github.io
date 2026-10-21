@@ -6,8 +6,8 @@ status: "complete"
 category: "modelado"
 moduleId: "BD1-MOD-003"
 order: 4
-thumbnail: "../../../assets/evidencias/taller-reduccion-a-tablas/thumbnail-punto-1.png"
-thumbnailAlt: "Esquema relacional — punto 1 del taller de reducción a tablas"
+thumbnail: "../../../assets/evidencias/taller-reduccion-a-tablas-punto-1/taller-reduccion-a-tablas-punto-1.png"
+thumbnailAlt: "Diagrama del modelo Entidad–Relación reducido a tablas — sistema editorial y almacén"
 
 tech:
   - "Modelo Entidad–Relación Extendido"
@@ -86,6 +86,16 @@ Cada relación M:N se transformó en una **tabla intermedia** con clave primaria
 | **LIBRO_CESTA** | (ISBN, IDcesta) | ISBN → LIBRO, IDcesta → CESTA_DE_LA_COMPRA |
 | **LIBRO_ALMACÉN** | (ISBN, código_almacén) | ISBN → LIBRO, código_almacén → ALMACÉN |
 | **CLIENTE_CESTA** | (IDcesta, correo_electrónico) | IDcesta → CESTA_DE_LA_COMPRA, correo_electrónico → CLIENTE |
+
+## Diagrama Entidad–Relación
+
+<img
+  src="/evidencias/taller-reduccion-a-tablas/taller-reduccion-a-tablas-punto-1.png"
+  alt="Diagrama del punto 1: el modelo Entidad–Relación del sistema editorial reducido a tablas, con AUTOR, EDITOR, LIBRO, CLIENTE, CESTA_DE_LA_COMPRA y ALMACÉN, y las tablas intermedias de cada relación M:N"
+  loading="lazy"
+  width="3072"
+  height="2349"
+/>
 
 ## Documento del trabajo
 
