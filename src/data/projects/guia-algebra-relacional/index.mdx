@@ -1,7 +1,7 @@
 ---
 title: "Guía 1 — Ejercicios de álgebra relacional"
-tagline: "Once consultas sobre un esquema comercial, en álgebra relacional y en SQL"
-description: "Guía 1 de álgebra relacional de Bases de Datos 1: once ejercicios sobre los esquemas CLIENTE, PRODUCTO, FACTURA, DETALLE y LOCALIDAD, resueltos en álgebra relacional extendida y traducidos a SQL."
+tagline: "Once consultas sobre un esquema comercial, resueltas con los operadores del álgebra relacional"
+description: "Guía 1 de álgebra relacional de Bases de Datos 1: once ejercicios sobre los esquemas CLIENTE, PRODUCTO, FACTURA, DETALLE y LOCALIDAD, resueltos en álgebra relacional extendida."
 status: "complete"
 category: "sql"
 moduleId: "BD1-SQL-001"
@@ -11,8 +11,8 @@ thumbnailAlt: "Los operadores del álgebra relacional: selección, proyección y
 
 tech:
   - "Álgebra relacional extendida"
-  - "SQL (SELECT · JOIN · NOT EXISTS)"
-  - "División y diferencia de conjuntos"
+  - "División de relaciones"
+  - "Diferencia y producto cartesiano"
   - "Renombrado de atributos (ρ)"
   - "Bases de Datos 1"
 
@@ -31,26 +31,26 @@ features:
     text: "Los ejercicios 5 y 9 piden «todos los productos»: es el operador de división."
   - lead: "El atributo que se repite"
     text: "CLIENTE y LOCALIDAD comparten el atributo Nombre: hay que renombrar antes de unir."
-  - lead: "Diferencia y NOT EXISTS"
-    text: "Restar conjuntos y «no existe» son la misma idea escrita en dos lenguajes."
-  - lead: "Comparación correlacionada"
+  - lead: "Diferencia de conjuntos"
+    text: "El «no» de los ejercicios 4 y 11 se resuelve restando, no filtrando."
+  - lead: "Autoinforme"
     text: "El ejercicio 6 compara cada venta contra la factura 18, producto por producto."
 
 archCaption: "Los cinco esquemas de la guía y sus relaciones"
 
 challenge:
   title: "Problema"
-  body: "Resolver en álgebra relacional once consultas sobre un esquema comercial de cinco relaciones —CLIENTE, PRODUCTO, FACTURA, DETALLE y LOCALIDAD— que cubren selección, proyección, unión, diferencia, producto y división, incluyendo consultas con «todos», con «no ha comprado» y con comparación contra una factura concreta."
+  body: "Resolver once consultas en álgebra relacional sobre un esquema comercial de cinco relaciones —CLIENTE, PRODUCTO, FACTURA, DETALLE y LOCALIDAD— con selección, proyección, unión, diferencia, producto, división y renombrado, incluyendo las que piden «todos», las que piden «no ha comprado» y la que compara contra una factura concreta."
 solution:
   title: "Solución"
-  body: "Cada ejercicio se resuelve en álgebra relacional extendida y se traduce a SQL equivalente. Se cuida el renombrado de los atributos homónimos, la formulación de las divisiones mediante diferencia de conjuntos y el autoinforme que exige la comparación correlacionada del ejercicio 6."
+  body: "Cada consulta se resuelve en álgebra relacional extendida, cuidando el renombrado de los atributos homónimos, la formulación de las divisiones mediante diferencia de conjuntos y el autoinforme que exige la comparación del ejercicio 6."
 ---
 
 ## Descripción
 
-Esta guía reúne los ejercicios de álgebra relacional de **Bases de Datos 1**. El enunciado parte de un esquema comercial de cinco relaciones y pide once consultas que se resuelven con los operadores del álgebra relacional.
+Esta guía reúne los ejercicios de álgebra relacional de **Bases de Datos 1**. El enunciado parte de un esquema comercial de cinco relaciones y pide once consultas que se resuelven con los operadores del álgebra relacional extendida.
 
-Cada consulta se resuelve aquí de dos formas: primero en **álgebra relacional extendida**, que es donde se ve la estructura de la operación, y después en **SQL**, que es donde se ve la misma estructura traducida. Ver las dos en paralelo deja claro qué constructor de SQL corresponde a cada operador.
+La ventaja de trabajar en álgebra es que no deja nada implícito: cada filtro es una selección, cada lista de columnas es una proyección, y cada «no» es una diferencia de conjuntos. No hay atajos, y por eso las expresiones se leen como el razonamiento que las produjo.
 
 ## Los esquemas
 
@@ -88,25 +88,13 @@ Dos detalles del esquema se notan antes de empezar: `CLIENTE` y `LOCALIDAD` tien
 
 ### 1. Productos cuyo Id sea mayor a 100
 
-**Álgebra relacional**
-
 ```text
 π_{ IdProducto, Descripción } ( σ_{ IdProducto > 100 } ( PRODUCTO ) )
-```
-
-**SQL**
-
-```sql
-SELECT IdProducto, Descripcion
-FROM PRODUCTO
-WHERE IdProducto > 100;
 ```
 
 El orden de los operadores no es un detalle: la selección va primero porque necesita `IdProducto`, y la proyección viene después precisamente para poder descartar esa columna.
 
 ### 2. Nombres de los clientes de Luján
-
-**Álgebra relacional**
 
 ```text
 π_{ C.Nombre } (
@@ -118,20 +106,9 @@ El orden de los operadores no es un detalle: la selección va primero porque nec
 )
 ```
 
-**SQL**
-
-```sql
-SELECT c.Nombre
-FROM CLIENTE c
-JOIN LOCALIDAD l ON c.IdLocalidad = l.IdLocalidad
-WHERE l.Nombre = 'Luján';
-```
-
-El renombrado `ρ` es obligatorio en álgebra: las dos relaciones traen un atributo `Nombre` y, sin renombrarlos, la proyección no sabe a cuál se refiere. En SQL ese papel lo cumplen los alias `c` y `l`.
+El renombrado `ρ` es obligatorio: las dos relaciones traen un atributo `Nombre` y, sin renombrarlos, la proyección no sabe a cuál se refiere.
 
 ### 3. Cliente, factura, producto y cantidad, con más de 500 unidades
-
-**Álgebra relacional**
 
 ```text
 π_{ C.Nombre, IdFactura, IdProducto, Cantidad } (
@@ -143,41 +120,17 @@ El renombrado `ρ` es obligatorio en álgebra: las dos relaciones traen un atrib
 )
 ```
 
-**SQL**
-
-```sql
-SELECT c.Nombre, f.IdFactura, d.IdProducto, d.Cantidad
-FROM CLIENTE c
-JOIN FACTURA f ON c.Id_Cliente = f.IdCliente
-JOIN DETALLE d ON f.IdFactura  = d.IdFactura
-WHERE d.Cantidad > 500;
-```
-
 La condición se aplica a `DETALLE` porque es la única relación que tiene `Cantidad`, y la proyección final conserva los cuatro atributos pedidos.
 
 ### 4. Clientes que no han comprado nada
-
-**Álgebra relacional**
 
 ```text
 π_{ Nombre } ( CLIENTE − π_{ IdCliente } ( FACTURA ) )
 ```
 
-**SQL**
-
-```sql
-SELECT c.Nombre
-FROM CLIENTE c
-WHERE NOT EXISTS (
-  SELECT 1 FROM FACTURA f WHERE f.IdCliente = c.Id_Cliente
-);
-```
-
-En álgebra la diferencia de conjuntos ya resuelve el «no». En SQL hace falta el `NOT EXISTS`, y el `1` del `SELECT` es un placeholder: lo que importa es la condición de correlación.
+La diferencia de conjuntos resuelve el «no» en un solo paso: se resta el conjunto de clientes que aparecen en `FACTURA` al de todos los clientes.
 
 ### 5. Clientes que han comprado todos los productos de la empresa
-
-**Álgebra relacional**
 
 ```text
 D      ≡ π_{ IdCliente, IdProducto } ( FACTURA ⋈_{ IdFactura } DETALLE )
@@ -188,31 +141,11 @@ Faltan ≡ π_{ IdCliente } ( ( π_{ IdCliente } (D) × P ) − D )
   − π_{ Nombre } ( CLIENTE ⋈_{ CLIENTE.Id_Cliente = Faltan.IdCliente } Faltan )
 ```
 
-**SQL**
-
-```sql
-SELECT c.Nombre
-FROM CLIENTE c
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM PRODUCTO p
-  WHERE NOT EXISTS (
-    SELECT 1
-    FROM FACTURA f
-    JOIN DETALLE d ON f.IdFactura = d.IdFactura
-    WHERE f.IdCliente = c.Id_Cliente
-      AND d.IdProducto = p.IdProducto
-  )
-);
-```
-
 Este es el operador de división. La formulación con diferencia de conjuntos se lee así: se arma el producto cartesiano entre los clientes que compraron algo y todos los productos, se le quitan las combinaciones que sí ocurrieron, y los clientes que quedan con alguna combinación faltante son los que no compraron todo. Restarlos deja la respuesta.
 
-El doble `NOT EXISTS` del SQL es exactamente lo mismo: no hay ningún producto del catálogo que este cliente no haya comprado.
+La construcción es la misma que define la división: un cliente está en el resultado si y solo si el conjunto de productos que compró contiene a todos los de `P`.
 
 ### 6. IdFactura de las ventas cuya cantidad supera la cantidad vendida en la factura 18
-
-**Álgebra relacional**
 
 ```text
 π_{ D1.IdFactura } (
@@ -222,21 +155,9 @@ El doble `NOT EXISTS` del SQL es exactamente lo mismo: no hay ningún producto d
 )
 ```
 
-**SQL**
-
-```sql
-SELECT DISTINCT d1.IdFactura
-FROM DETALLE d1
-JOIN DETALLE d2 ON d1.IdProducto = d2.IdProducto
-WHERE d2.IdFactura = 18
-  AND d1.Cantidad > d2.Cantidad;
-```
-
-La tabla se une consigo misma: una copia es la venta que se busca y la otra es la factura 18. La comparación es por producto, porque `DETALLE` tiene clave (IdFactura, IdProducto) y cada venta se mide contra la venta del mismo artículo en la factura 18.
+La relación se une consigo misma: una copia es la venta que se busca y la otra es la factura 18. La comparación es por producto, porque `DETALLE` tiene clave (IdFactura, IdProducto) y cada venta se mide contra la venta del mismo artículo en la factura 18. Es el único caso de la guía donde el renombrado se aplica a una relación consigo misma.
 
 ### 7. Productos que no se han comprado en Luján
-
-**Álgebra relacional**
 
 ```text
 π_{ IdProducto } ( PRODUCTO )
@@ -252,27 +173,9 @@ La tabla se une consigo misma: una copia es la venta que se busca y la otra es l
     )
 ```
 
-**SQL**
-
-```sql
-SELECT p.IdProducto, p.Descripcion
-FROM PRODUCTO p
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM DETALLE   d
-  JOIN FACTURA   f ON d.IdFactura = f.IdFactura
-  JOIN CLIENTE   c ON f.IdCliente = c.Id_Cliente
-  JOIN LOCALIDAD l ON c.IdLocalidad = l.IdLocalidad
-  WHERE d.IdProducto = p.IdProducto
-    AND l.Nombre = 'Luján'
-);
-```
-
 El camino de las uniones va desde el producto hasta la localidad: producto → detalle → factura → cliente → localidad. Es el precio de llegar a un atributo que está en el otro extremo del esquema.
 
 ### 8. Productos que se han vendido tanto en Luján como en Cortines
-
-**Álgebra relacional**
 
 ```text
 P_Luján ≡ π_{ IdProducto } (
@@ -300,34 +203,9 @@ P_Cortines ≡ π_{ IdProducto } (
 P_Luján ∩ P_Cortines
 ```
 
-**SQL**
-
-```sql
-SELECT p.IdProducto, p.Descripcion
-FROM PRODUCTO p
-WHERE p.IdProducto IN (
-  SELECT d.IdProducto
-  FROM DETALLE   d
-  JOIN FACTURA   f ON d.IdFactura = f.IdFactura
-  JOIN CLIENTE   c ON f.IdCliente = c.Id_Cliente
-  JOIN LOCALIDAD l ON c.IdLocalidad = l.IdLocalidad
-  WHERE l.Nombre = 'Luján'
-)
-AND p.IdProducto IN (
-  SELECT d.IdProducto
-  FROM DETALLE   d
-  JOIN FACTURA   f ON d.IdFactura = f.IdFactura
-  JOIN CLIENTE   c ON f.IdCliente = c.Id_Cliente
-  JOIN LOCALIDAD l ON c.IdLocalidad = l.IdLocalidad
-  WHERE l.Nombre = 'Cortines'
-);
-```
-
-Los dos `IN` son la intersección. Aquí sí, porque las dos referencias son conjuntos concretos y cerrados: Luján y Cortines.
+Los dos conjuntos se intersecan. Aquí sí, porque las dos referencias son conjuntos concretos y cerrados: Luján y Cortines.
 
 ### 9. Nombre de las localidades a las que se han vendido todos los productos
-
-**Álgebra relacional**
 
 ```text
 D      ≡ π_{ IdLocalidad, IdProducto } (
@@ -345,30 +223,9 @@ Faltan ≡ π_{ IdLocalidad } ( ( π_{ IdLocalidad } (D) × P ) − D )
     )
 ```
 
-**SQL**
-
-```sql
-SELECT l.Nombre
-FROM LOCALIDAD l
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM PRODUCTO p
-  WHERE NOT EXISTS (
-    SELECT 1
-    FROM DETALLE d
-    JOIN FACTURA f ON d.IdFactura = f.IdFactura
-    JOIN CLIENTE c ON f.IdCliente = c.Id_Cliente
-    WHERE c.IdLocalidad = l.IdLocalidad
-      AND d.IdProducto = p.IdProducto
-  )
-);
-```
-
 Es el mismo operador de división del ejercicio 5, con las localidades en lugar de los clientes. La estructura se repite porque el «todos» siempre se resuelve igual.
 
 ### 10. Clientes que tienen alguna factura sin pagar
-
-**Álgebra relacional**
 
 ```text
 π_{ C.Nombre } (
@@ -378,20 +235,9 @@ Es el mismo operador de división del ejercicio 5, con las localidades en lugar 
 )
 ```
 
-**SQL**
-
-```sql
-SELECT DISTINCT c.Nombre
-FROM CLIENTE c
-JOIN FACTURA f ON c.Id_Cliente = f.IdCliente
-WHERE f.Pagada = FALSE;
-```
-
-El enunciado no declara el tipo de `Pagada`. Se asume booleano; si el atributo es texto, la condición pasa a ser `f.Pagada = 'No'`.
+El enunciado no declara el tipo de `Pagada`. Se asume booleano; si el atributo es texto, la condición pasa a ser `Pagada = 'No'`.
 
 ### 11. Clientes que han pagado todas sus facturas
-
-**Álgebra relacional**
 
 ```text
 π_{ C.Nombre } ( CLIENTE )
@@ -402,24 +248,11 @@ El enunciado no declara el tipo de `Pagada`. Se asume booleano; si el atributo e
     )
 ```
 
-**SQL**
-
-```sql
-SELECT c.Nombre
-FROM CLIENTE c
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM FACTURA f
-  WHERE f.IdCliente = c.Id_Cliente
-    AND f.Pagada = FALSE
-);
-```
-
 Es el ejercicio 4 con una condición distinta: se resta el conjunto de clientes con alguna factura impaga al de todos los clientes. El resultado es el complemento del ejercicio 10.
 
 ## Tres trampas del enunciado
 
-**El atributo `Nombre` está repetido.** Aparece en `CLIENTE` y en `LOCALIDAD`, y los ejercicios 2, 7, 8 y 9 unen las dos relaciones. En álgebra eso obliga a renombrar antes de proyectar; en SQL, a usar alias. Sin ese paso, la proyección devuelve dos columnas con el mismo nombre y la consulta deja de ser inequívoca.
+**El atributo `Nombre` está repetido.** Aparece en `CLIENTE` y en `LOCALIDAD`, y los ejercicios 2, 7, 8 y 9 unen las dos relaciones. El renombrado `ρ` es la única forma de que la proyección posterior sepa a cuál de los dos se refiere.
 
 **El ejercicio 6 no dice «del mismo producto».** La comparación tiene que hacerse por producto, y no por el total de la factura, porque la clave de `DETALLE` es (IdFactura, IdProducto): una factura puede tener varios productos y cada uno se compara con su homólogo de la factura 18.
 
@@ -427,9 +260,13 @@ Es el ejercicio 4 con una condición distinta: se resta el conjunto de clientes 
 
 ## Qué entrena esta guía
 
-Pasar por el álgebra obliga a decidir qué operación corresponde a cada constructor de SQL: `IN` es una unión, `NOT EXISTS` es una diferencia de conjuntos, una subconsulta correlacionada es un renombrado con autoinforme, y el doble `NOT EXISTS` es una división.
+**Nombrar la operación.** En álgebra no hay atajos: cada filtro es una `σ`, cada lista de columnas es una `π` y cada «no» es una diferencia. Nombrar la operación obliga a decidir cómo se encadenan los pasos, y esa decisión es la que después se traduce a cualquier lenguaje de consulta.
 
-La división aparece dos veces y es la parte que más cuesta: no tiene una forma canónica en SQL y su formulación en álgebra —producto cartesiano menos lo que sí ocurrió— es la que hace evidente por qué funciona.
+**La división, dos veces.** Los ejercicios 5 y 9 son divisiones, y es la parte que más cuesta. Su formulación —producto cartesiano menos lo que sí ocurrió— es la que hace evidente por qué funciona, y por eso conviene escribirla entera en lugar de usar el símbolo `÷` y darlo por sabido.
+
+**El renombrado `ρ`.** Es obligatorio en cualquier unión entre relaciones que compartan un nombre de atributo, y es el paso que más se pasa por alto al leer una expresión larga.
+
+**El autoinforme.** El ejercicio 6 obliga a unir una relación consigo misma. Sin renombrar las dos copias, la condición no se puede escribir.
 
 Una advertencia sobre el alcance: las soluciones están bien en su forma, pero el resultado sobre datos reales depende de que `DETALLE` tenga la clave (IdFactura, IdProducto) y de que no queden facturas huérfanas. Si algún producto no aparece nunca en `DETALLE`, el ejercicio 5 devuelve la lista vacía, que es la respuesta correcta para una empresa con catálogo y ventas desalineados.
 
@@ -450,4 +287,4 @@ La imagen del esquema tiene **1600 × 560 px**. Dentro de la página se ve enter
 
 - [Guía 1 · Ejercicios de álgebra relacional (PDF)](/evidencias/algebra-relacional/Ejercicios_algebra_relacional.pdf)
 
-Este trabajo corresponde a la categoría **SQL** de la asignatura Bases de Datos 1.
+Este trabajo corresponde a la categoría **Consultas** de la asignatura Bases de Datos 1.

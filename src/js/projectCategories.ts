@@ -20,10 +20,10 @@ export const projectCategories = [
   },
   {
     slug: "sql",
-    label: "SQL",
-    tagline: "Álgebra · Consultas",
+    label: "Consultas",
+    tagline: "Álgebra relacional",
     intro:
-      "Consultas sobre esquemas reales: álgebra relacional extendida y su traducción a SQL.",
+      "Álgebra relacional extendida: las operaciones del modelo relacional aplicadas a un esquema comercial real.",
   },
   {
     slug: "proyecto",

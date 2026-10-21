@@ -22,7 +22,7 @@ const cards = (await getProjectsByCategory("sql")).map(toProjectCard);
       <PixelIcon name="arrow-left" class="size-3.5" />
       Volver a Evidencias
     </a>
-    <HeroPanel headingId="sql-heading" tagline={category.tagline} heading="SQL" intro={category.intro} />
-    <CardGrid headingId="sql-list-heading" title="Evidencias de SQL" items={cards} />
+    <HeroPanel headingId="sql-heading" tagline={category.tagline} heading={category.label} intro={category.intro} />
+    <CardGrid headingId="sql-list-heading" title={`Evidencias de ${category.label}`} items={cards} />
   </div>
 </BaseLayout>
