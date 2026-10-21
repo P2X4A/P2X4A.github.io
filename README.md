@@ -11,7 +11,6 @@ Sitio con estética retro 8-bit / pixel-art donde presento mi perfil, proyectos,
 - **Inicio:** presentación, stats, proyectos destacados y últimas publicaciones.
 - **Presentación (`/about/`):** perfil, habilidades, logros y herramientas.
 - **Evidencias (`/projects/`):** proyectos y trabajos académicos, incluyendo *University Championship* (modelo Entidad-Relación).
-- **Blog (`/blog/`):** artículos y notas.
 - **Contacto (`/contact/`):** formulario que valida en el navegador y abre un mensaje prellenado (`mailto:`) hacia mi correo.
 
 ## Tecnologías

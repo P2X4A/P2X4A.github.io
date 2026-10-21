@@ -147,63 +147,6 @@ export function getSiteSchema({
   ];
 }
 
-export interface ArticleInput {
-  headline: string;
-  description: string;
-  /** canonical absolute URL of the article (also used as `mainEntityOfPage`) */
-  url: string;
-  /** absolute image URL */
-  image?: string;
-  /** ISO-8601 publish date, e.g. `date.toISOString()` */
-  datePublished: string;
-  /** ISO-8601 modified date; omitted from the node when absent (never invented from datePublished) */
-  dateModified?: string;
-  authorName: string;
-  authorUrl?: string;
-  /** BCP-47 language tag, e.g. "en-US" */
-  inLanguage: string;
-  /** `@id` of the publisher Organization (from `organizationId`) */
-  publisherId?: string;
-}
-
-/**
- * * BlogPosting node (a schema.org Article subtype) for a blog post.
- * @returns a JSON-LD BlogPosting. Pass it to a page's `schema` prop alongside a
- *          breadcrumb built with {@link getBreadcrumbSchema}.
- */
-export function getArticleSchema({
-  headline,
-  description,
-  url,
-  image,
-  datePublished,
-  dateModified,
-  authorName,
-  authorUrl,
-  inLanguage,
-  publisherId,
-}: ArticleInput): JsonLdNode {
-  return {
-    "@type": "BlogPosting",
-    "@id": `${url}#article`,
-    headline,
-    description,
-    url,
-    mainEntityOfPage: url,
-    inLanguage,
-    datePublished,
-    // only emit dateModified when the content was actually updated — never invent it from datePublished
-    ...(dateModified ? { dateModified } : {}),
-    author: {
-      "@type": "Person",
-      name: authorName,
-      ...(authorUrl ? { url: authorUrl } : {}),
-    },
-    ...(image ? { image: { "@type": "ImageObject", url: image } } : {}),
-    ...(publisherId ? { publisher: { "@id": publisherId } } : {}),
-  };
-}
-
 export interface BreadcrumbItem {
   name: string;
   /** absolute URL of the crumb's page */

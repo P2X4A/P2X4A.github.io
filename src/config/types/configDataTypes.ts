@@ -63,6 +63,10 @@ export interface LegalPageProps {
 export type LegalData = Record<"terms" | "privacy", LegalPageProps>;
 
 // --------------------------------------------------------
+// skill level shown in the Tech Stack lists (the About asides). One technology per row.
+export type SkillLevel = "Aprendiz" | "Intermedio" | "Avanzado";
+
+// --------------------------------------------------------
 // portfolio data (buyer-customized copy + values). See src/config/portfolioData.json.ts.
 // Only the facts a buyer is expected to make their own — identity, biography, experience/stat values,
 // the home intro, and the contact prompt. Presentational labels (SYS_SPECS, "Role:", stat colours)
@@ -77,6 +81,9 @@ export interface PortfolioDataProps {
     shortBio: string; // home About-section bio
     meta: { location: string; role: string; favorite: string }; // home About-section meta values
     skills: readonly { label: string; pct: number }[]; // DevProfile HP-style skill bars
+    // The Tech Stack list (one row per technology + its level) rendered in the About asides —
+    // the home section and /about/ share this ONE definition, so they can't drift.
+    techStack: readonly { label: string; level: SkillLevel }[];
   };
   // Retro scoreboard values (home Stats strip + About-hero strip). Display text only; each strip's
   // per-stat colours live in its component and pair by order.
@@ -85,7 +92,6 @@ export interface PortfolioDataProps {
     profile: readonly string[];
   };
   home: { tagline: string; heading: string; intro: string }; // home hero
-  contact: { prompt: string }; // home Contact-section prompt
 }
 
 // --------------------------------------------------------
