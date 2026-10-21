@@ -12,8 +12,8 @@ assert.equal(isActive("/about/", "/about/"), true);
 assert.equal(isActive("/about", "/about/"), true);
 assert.equal(isActive("/about/", "/about"), true);
 
-// a descendant activates its section root (blog post highlights `Blog`)
-assert.equal(isActive("/blog/hello-world/", "/blog/"), true);
+// a descendant activates its section root (an evidence detail highlights `Evidencias`)
+assert.equal(isActive("/projects/taller-reduccion/", "/projects/"), true);
 
 // sibling prefixes must NOT false-match ("/aboutus/" is not under "/about/")
 assert.equal(isActive("/aboutus/", "/about/"), false);

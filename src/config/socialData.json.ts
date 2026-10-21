@@ -25,24 +25,12 @@ export const socialPlatforms = {
     match: "github.com",
     fallback: "https://github.com/",
   },
-  linkedin: {
-    label: "LinkedIn",
-    icon: "linkedin",
-    match: "linkedin.com",
-    fallback: "https://www.linkedin.com/",
-  },
   // `author.twitter` wins when set, because a handle is more specific than a sameAs host match.
   twitter: {
     label: "Twitter/X",
     icon: "twitter",
     match: ["x.com", "twitter.com"],
     fallback: "https://x.com/",
-  },
-  youtube: {
-    label: "YouTube",
-    icon: "youtube",
-    match: "youtube.com",
-    fallback: "https://www.youtube.com/",
   },
   // No pixel glyph in the 18-icon set — used by InfoCards, which renders text values, not icons.
   discord: {

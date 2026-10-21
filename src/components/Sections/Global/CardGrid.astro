@@ -8,8 +8,8 @@
 //
 // Empty `items` renders a fallback panel rather than a heading over an empty <ul>, because the very
 // first thing a buyer does is delete the demo content (README → "Before you deploy") — which is what
-// /blog/ and /projects/ look like until they add their own. It keeps the heading, unlike
-// RelatedPosts, which drops out entirely: that strip is supplementary, whereas these ARE the page.
+// /projects/ looks like until they add their own. It keeps the heading, unlike RelatedPosts, which
+// drops out entirely: that strip is supplementary, whereas these ARE the page.
 import ContentCard, { type ContentCardProps } from "@components/Cards/ContentCard.astro";
 import { PixelPanel } from "@components/ui/pixel-panel";
 import { Reveal } from "@components/ui/reveal";

@@ -10,7 +10,7 @@ src/components/Cards/
 └── PixelCardLink.astro  # the shared hover-lift <a> shell (ui/pixel-panel surface + thumbnail tile)
 ```
 
-`ContentCard` renders the normalized card shape that `@js/postCards` (`toPostCard`) and `@js/projectCards`
+`ContentCard` renders the normalized card shape that `@js/projectCards` (`toProjectCard`)
 (`toProjectCard`) build from the collections — posts and projects share the `PixelCardLink` shell, so only
 the badge tone, the optional tags, and the CTA verb differ. Both build on **`ui/pixel-panel`** (via
 `PixelCardLink`), **not** `ui/card`: the pixel cards need `<a>`/`<article>` semantics and the pixel

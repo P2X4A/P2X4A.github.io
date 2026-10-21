@@ -1,21 +1,16 @@
 # Content collections
 
-Schemas live in `src/content.config.ts`. There are three collections, and the two MDX ones nest one
-folder deep so an entry can keep its images beside it, while `authors` is flat:
+Schemas live in `src/content.config.ts`. There is ONE collection, and it nests one folder deep so an
+entry can keep its images beside it:
 
 ```
 src/data/
-├── blog/<slug>/index.mdx       # entry id => "<slug>"
-├── projects/<slug>/index.mdx   # entry id => "<slug>"
-└── authors/<name>.md           # entry id => "<name>", e.g. authors/admin.md
+└── projects/<slug>/index.mdx   # entry id => "<slug>"
 ```
-
-Format post dates with `formatDate(date)` from `@js/textUtils`.
 
 ## Replacing the demo content
 
-The six posts and six projects are placeholders — delete them and add your own. Two things to know,
-both verified:
+The projects are placeholders — delete them and add your own. One thing to know, verified:
 
 **Clear the content-layer cache after deleting entries.** Astro's content layer keeps a persistent
 store at `node_modules/.astro/data-store.json`, and it survives `rm -rf .astro`. If you delete an
@@ -27,12 +22,15 @@ already removed, which is a confusing place to land. Fix:
 rm -rf node_modules/.astro .astro dist && pnpm build
 ```
 
-**Order doesn't matter, and deleting the author is safe.** Every sample post references the `admin`
-author, but the byline resolves with a fallback (`src/pages/blog/[slug].astro`) — delete
-`authors/admin.md` and posts still build, showing `siteData.author.name` with no avatar instead. So
-you can empty the collections in any order. With all three emptied, the build succeeds and `/blog/`
-and `/projects/` render `CardGrid`'s empty state; you will see a
-`The collection "blog" does not exist or is empty` warning, which is expected until you add an entry.
+With the collection emptied, the build succeeds and `/projects/` renders `CardGrid`'s empty state;
+you will see a `The collection "projects" does not exist or is empty` warning, which is expected
+until you add an entry.
 
-If you re-add i18n, nest per-locale folders (`blog/<locale>/<slug>/` → id `"<locale>/<slug>"`)
-and restore a language filter — the removed helpers are in git history.
+## The blog
+
+The site had a blog (a `blog` collection + an `authors` collection, its own routes, RSS feed and
+`.blog-prose` styles). It was removed for now — the posts were template demo content, and the
+portfolio's real content lives in `projects`. If you want it back, the removed pieces are in the
+git history: the `blog`/`authors` collections in `src/content.config.ts`, `src/pages/blog/*`,
+`src/pages/rss.xml.ts`, `src/components/Sections/Blog/*`, `@js/blogData`, `@js/postCards` and
+`@js/rss`, plus the `.blog-prose` block in `src/styles/global.css`.
