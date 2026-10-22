@@ -1,0 +1,902 @@
+---
+title: "Clase 9 — Álgebra relacional: operadores, restricciones y ejercicios resueltos"
+tagline: "Siete ejercicios resueltos sobre dos bases de datos, con el patrón de las cuatro preguntas y el ejemplo guiado de Navacerrada"
+description: "Material de la Clase 9, Unidad IV: los operadores del álgebra relacional con sus restricciones, el patrón de cuatro preguntas para consultas con dos relaciones, dos bases de datos de ejemplo (EMPLEADOS y Banco) y siete ejercicios resueltos paso a paso, incluido el ejemplo guiado de Navacerrada."
+status: "complete"
+category: "algebra-relacional"
+moduleId: "BD1-ALG-004"
+order: 15
+thumbnail: "../../../assets/evidencias/clase9-algebra-relacional/thumbnail.png"
+thumbnailAlt: "Las dos bases de datos de la Clase 9: EMPLEADOS con cuatro relaciones y Banco con seis, más los siete ejercicios resueltos"
+
+tech:
+  - "Álgebra relacional (σ, Π, ρ, ∪, −, ∩, ×)"
+  - "Condición de unión"
+  - "Prefijos de alias"
+  - "Patrón de cuatro preguntas"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Empleados de bancos y clientes de una red de sucursales"
+  - label: "Bases de datos"
+    value: "EMPLEADOS (4 relaciones) y Banco (6 relaciones)"
+  - label: "Ejercicios"
+    value: "Siete: cuatro sobre EMPLEADOS y tres sobre Banco"
+  - label: "Alcance"
+    value: "Clase 9, Unidad IV — operaciones sobre bases de datos relacionales"
+
+features:
+  - lead: "El patrón de las cuatro preguntas"
+    text: "Qué se pide, dónde está, qué condición se cumple y dónde está esa condición."
+  - lead: "La condición de unión"
+    text: "Sin ella, el producto cartesiano mezcla datos que no tienen relación entre sí."
+  - lead: "Alias y prefijos"
+    text: "Después del producto, los atributos homónimos se distinguen con el prefijo de la relación."
+  - lead: "Dos bases de datos"
+    text: "EMPLEADOS para el patrón básico y Banco para los casos con más relaciones."
+
+archCaption: "Las dos bases de datos de la Clase 9 y sus relaciones de enlace"
+
+challenge:
+  title: "Problema"
+  body: "Resolver siete consultas de álgebra relacional sobre dos bases de datos, EMPLEADOS y Banco, usando el patrón de las cuatro preguntas y el producto cartesiano con condición de unión, incluido el ejemplo guiado de Navacerrada que muestra por qué el producto solo no basta."
+solution:
+  title: "Solución"
+  body: "Cada ejercicio se resuelve con el patrón de cuatro preguntas, la expresión con selecciones anidadas y con ∧, el cálculo paso a paso sobre las instancias dadas y el resultado final. El ejemplo de Navacerrada muestra las 16 parejas del producto y cuáles sobreviven a la condición de unión."
+---
+
+## Descripción
+
+Este trabajo recoge el material de la **Clase 9, Unidad IV (Operaciones sobre bases de datos relacionales)**. El documento sigue este orden: primero los operadores con sus restricciones, luego las relaciones que usan los ejercicios y al final la resolución paso a paso de los siete ejercicios de repaso —cuatro sobre la base **EMPLEADOS** y tres sobre la base **Banco**—.
+
+Los esquemas son los de la clase. Las diapositivas no traen datos para `EMPLEADO` ni para `SUCURSAL`, `CUENTA`, `CLIENTE` e `IMPOSITOR`, así que esas instancias son inventadas y sirven solo para poder seguir los cálculos con lápiz. `PRÉSTAMO` y `PRESTATARIO` sí usan los datos que se muestran en clase.
+
+## 1. Notación
+
+Las expresiones se escriben en una sola línea, con el operador pegado a su parámetro y la relación entre paréntesis:
+
+```text
+Πatributos(relación)
+σpredicado(relación)
+```
+
+Un ejemplo completo, tomado de la clase:
+
+```text
+ΠE.nombre_empleado,E.ciudad(σE.nombre_empleado=T.nombre_empleado∧T.nombre_empresa='BANAMEX'(EMPLEADO×TRABAJA))
+```
+
+Se lee **de adentro hacia afuera**. Primero el producto `EMPLEADO×TRABAJA`, luego la selección y al final la proyección.
+
+### Alias y prefijos
+
+Después de un producto cartesiano, los atributos que se llaman igual en las dos relaciones (como `nombre_empleado`) quedan ambiguos. Para distinguirlos se antepone un prefijo corto, el alias de la relación. Cada alias equivale a un renombramiento: `E` es lo mismo que `ρE(EMPLEADO)`.
+
+| Alias | Relación | Alias | Relación |
+| :-- | :-- | :-- | :-- |
+| E | EMPLEADO | S | SUCURSAL |
+| T | TRABAJA | CU | CUENTA |
+| EM | EMPRESA | I | IMPOSITOR |
+| J | JEFE | C | CLIENTE |
+| P | PRÉSTAMO | PR | PRESTATARIO |
+
+### Dos formas de combinar condiciones
+
+Cuando una consulta tiene varias condiciones se pueden juntar con `∧` en una sola selección o separarlas en selecciones anidadas:
+
+```text
+σp1∧p2(R)  =  σp1(σp2(R))
+```
+
+Ambas son equivalentes y en los ejercicios se muestran las dos. La equivalencia **solo vale para ∧**. Con `∨` no se puede anidar: dos selecciones seguidas exigen que se cumplan las dos, nunca una u otra.
+
+### Símbolos
+
+| Símbolo | Operador | Tipo |
+| :-- | :-- | :-- |
+| σ | Selección | Unario |
+| Π | Proyección | Unario |
+| ρ | Renombramiento | Unario |
+| ∪ | Unión | Binario |
+| − | Diferencia | Binario |
+| ∩ | Intersección | Binario (derivado) |
+| × | Producto cartesiano | Binario |
+
+## 2. Operadores, restricciones y explicación
+
+Todos los operadores reciben relaciones y devuelven una relación. Esa propiedad se llama **clausura** y es la razón por la que las expresiones se pueden anidar sin límite: la salida de un operador es la entrada del siguiente.
+
+### 2.1 Selección (σ)
+
+```text
+σpredicado(R)
+```
+
+Filtra **filas**. Devuelve las tuplas de R que hacen verdadero el predicado. El esquema no cambia: mismas columnas y, como máximo, las mismas filas.
+
+**Restricciones**
+
+- Actúa sobre una sola relación o sobre el resultado de otra expresión.
+- Comparadores permitidos: `=`, `≠`, `<`, `≤`, `>`, `≥`.
+- Conectivos permitidos: `∧` (y), `∨` (o), `¬` (no).
+- Compara un atributo con una constante o con otro atributo.
+- Los atributos del predicado deben existir en la relación de entrada.
+
+**De la clase:** préstamos de la sucursal de Navacerrada.
+
+```text
+σnombre_sucursal='Navacerrada'(PRÉSTAMO)
+```
+
+Devuelve `(P-15, Navacerrada, 1500)` y `(P-16, Navacerrada, 1300)`. Con dos condiciones, préstamos de Navacerrada de más de 1200:
+
+```text
+σnombre_sucursal='Navacerrada'∧importe>1200(PRÉSTAMO)
+```
+
+### 2.2 Proyección (Π)
+
+```text
+Πatributos(R)
+```
+
+Extrae **columnas**. El resultado es un subconjunto de la relación en vertical: solo los atributos listados.
+
+**Restricciones**
+
+- Los atributos listados deben pertenecer a la relación de entrada.
+- Elimina las filas duplicadas del resultado.
+- El orden de la lista define el orden de las columnas.
+- Tras un producto, los atributos repetidos se escriben con su prefijo.
+
+**De la clase:** número e importe de todos los préstamos.
+
+```text
+Πnumero_préstamo,importe(PRÉSTAMO)
+```
+
+Da siete tuplas, una por préstamo. Una operación compuesta: nombres de los clientes que viven en Peguerinos.
+
+```text
+Πnombre_cliente(σciudad_cliente='Peguerinos'(CLIENTE))
+```
+
+La eliminación de duplicados importa. Si dos filas coinciden en todos los atributos proyectados, el resultado conserva una sola.
+
+### 2.3 Renombramiento (ρ)
+
+```text
+ρx(E)
+ρx(A1,A2,…,An)(E)
+```
+
+Le da un nombre a la relación que produce una expresión y, en la segunda forma, también renombra sus atributos. No toca el contenido.
+
+**Restricciones**
+
+- La lista de atributos nuevos debe tener tantos nombres como atributos tiene E.
+- El nombre nuevo no debe chocar con otra relación de la misma expresión.
+
+En esta guía se usa sobre todo para los alias de la sección 1.
+
+### 2.4 Unión (∪)
+
+```text
+R∪S
+```
+
+Devuelve las tuplas que están en R, en S o en ambas. Cada tupla sale una sola vez.
+
+**Restricciones**
+
+- R y S deben tener la misma aridad: igual número de atributos.
+- Los dominios de los atributos i-ésimos deben coincidir, para todo i.
+- Es conmutativa y asociativa.
+
+Los nombres de atributo del resultado se toman de R, por convención.
+
+**De la clase:** clientes con cuenta, con préstamo o con ambas cosas.
+
+```text
+Πnombre_cliente(PRESTATARIO)∪Πnombre_cliente(IMPOSITOR)
+```
+
+### 2.5 Diferencia (−)
+
+```text
+R−S
+```
+
+Devuelve las tuplas que están en R y **no** están en S.
+
+**Restricciones**
+
+- Exige la misma compatibilidad que la unión.
+- No es conmutativa: R − S y S − R dan resultados distintos.
+
+**De la clase:** clientes con cuenta abierta pero sin ningún préstamo.
+
+```text
+Πnombre_cliente(IMPOSITOR)−Πnombre_cliente(PRESTATARIO)
+```
+
+En la instancia que se mostró en clase el resultado fue González y Rupérez.
+
+### 2.6 Intersección (∩)
+
+```text
+R∩S = R−(R−S)
+```
+
+Devuelve las tuplas que están en R y también en S. Se puede definir con la diferencia, de ahí que se considere derivada y no fundamental. Tiene las mismas restricciones de compatibilidad que la unión y es conmutativa. Un uso típico: clientes que tienen cuenta **y** préstamo.
+
+```text
+Πnombre_cliente(IMPOSITOR)∩Πnombre_cliente(PRESTATARIO)
+```
+
+### 2.7 Producto cartesiano (×)
+
+```text
+R×S
+```
+
+Combina cada tupla de R con cada tupla de S. Si R tiene *m* tuplas y S tiene *n*, el resultado tiene *m·n* tuplas, y su aridad es la suma de las aridades.
+
+**Restricciones**
+
+- No exige compatibilidad: R y S pueden tener esquemas totalmente distintos.
+- Los atributos con el mismo nombre se distinguen con el prefijo de su relación.
+- Por sí solo mezcla datos que no tienen relación entre sí.
+
+Ese último punto es el que condiciona todo lo que sigue. El producto genera todas las parejas posibles, y la mayoría son absurdas. Lo que le da sentido es una selección posterior que deja solo las parejas que describen un hecho real.
+
+### 2.8 Patrón de la clase para consultas con dos relaciones
+
+Cuando los datos pedidos están repartidos en dos relaciones se usa siempre la misma estructura:
+
+```text
+Πatributos pedidos(σcondición de unión(σfiltro(R×S)))
+```
+
+- El producto junta las dos relaciones.
+- El **filtro** aplica la condición del enunciado (una empresa, un importe, una ciudad).
+- La **condición de unión** iguala el atributo común y deja solo las parejas correctas.
+- La proyección se queda con lo que se pidió.
+
+Para llegar a la expresión, la clase propone cuatro preguntas que se responden en orden:
+
+1. ¿Qué atributos se piden en la proyección?
+2. ¿Qué relaciones se necesitan para esos atributos?
+3. ¿Qué condición hay que cumplir?
+4. ¿Qué relaciones se necesitan para esa condición?
+
+Si las respuestas 2 y 4 involucran relaciones distintas, hay producto cartesiano y hace falta una condición de unión sobre el atributo que las enlaza.
+
+## 3. Relaciones de los ejercicios
+
+### 3.1 Base de datos EMPLEADOS
+
+```text
+EMPLEADO(nombre_empleado, calle, ciudad)
+TRABAJA(nombre_empleado, nombre_empresa, sueldo)
+EMPRESA(nombre_empresa, ciudad)
+JEFE(nombre_empleado, nombre_jefe)
+```
+
+**Qué atributo enlaza cada par de relaciones**
+
+| Relaciones | Atributo de enlace |
+| :-- | :-- |
+| EMPLEADO y TRABAJA | `nombre_empleado` |
+| EMPLEADO y JEFE | `nombre_empleado` |
+| TRABAJA y EMPRESA | `nombre_empresa` |
+
+**Instancia de ejemplo**
+
+**EMPLEADO**
+
+| nombre_empleado | calle | ciudad |
+| :-- | :-- | :-- |
+| Ana | Calle Reforma 10 | Xalapa |
+| Beto | Av. Lázaro Cárdenas 45 | Coatepec |
+| Carla | Calle Allende 7 | Xalapa |
+| Diego | Calle Hidalgo 22 | Veracruz |
+| Elena | Calle Juárez 3 | Xalapa |
+| Fabián | Calle Morelos 18 | Coatepec |
+| Gabriela | Calle Zaragoza 31 | Xalapa |
+
+**TRABAJA**
+
+| nombre_empleado | nombre_empresa | sueldo |
+| :-- | :-- | :-- |
+| Ana | BANAMEX | 12000 |
+| Beto | BANAMEX | 9000 |
+| Carla | BANCOMER | 15000 |
+| Diego | BANAMEX | 10000 |
+| Elena | BANAMEX | 18000 |
+| Fabián | BANCOMER | 8000 |
+| Gabriela | BANCOMER | 11000 |
+
+**EMPRESA**
+
+| nombre_empresa | ciudad |
+| :-- | :-- |
+| BANAMEX | Ciudad de México |
+| BANCOMER | Monterrey |
+
+**JEFE**
+
+| nombre_empleado | nombre_jefe |
+| :-- | :-- |
+| Ana | Elena |
+| Beto | Diego |
+| Carla | Elena |
+| Diego | Elena |
+| Fabián | Diego |
+| Gabriela | Diego |
+
+Elena no aparece en la columna `nombre_empleado` de JEFE: es la jefa de más alto nivel y no responde ante nadie. Los datos incluyen casos límite a propósito: Diego gana exactamente 10000, que no es «más de 10000», y Ana y Carla reportan a la misma jefa.
+
+### 3.2 Base de datos Banco
+
+```text
+SUCURSAL(nombre_sucursal, ciudad_sucursal, activos)
+CUENTA(numero_cuenta, nombre_sucursal, saldo)
+IMPOSITOR(nombre_cliente, numero_cuenta)
+CLIENTE(nombre_cliente, calle_cliente, ciudad_cliente)
+PRÉSTAMO(numero_préstamo, nombre_sucursal, importe)
+PRESTATARIO(nombre_cliente, numero_préstamo)
+```
+
+**Qué atributo enlaza cada par de relaciones**
+
+| Relaciones | Atributo de enlace |
+| :-- | :-- |
+| SUCURSAL y CUENTA | `nombre_sucursal` |
+| SUCURSAL y PRÉSTAMO | `nombre_sucursal` |
+| CLIENTE e IMPOSITOR | `nombre_cliente` |
+| CLIENTE y PRESTATARIO | `nombre_cliente` |
+| CUENTA e IMPOSITOR | `numero_cuenta` |
+| PRÉSTAMO y PRESTATARIO | `numero_préstamo` |
+
+**Instancia de ejemplo**
+
+**PRÉSTAMO** (datos de la clase)
+
+| numero_préstamo | nombre_sucursal | importe |
+| :-- | :-- | :-- |
+| P-11 | Collado Mediano | 900 |
+| P-14 | Centro | 1500 |
+| P-15 | Navacerrada | 1500 |
+| P-16 | Navacerrada | 1300 |
+| P-17 | Centro | 1000 |
+| P-23 | Moralzarzal | 2000 |
+| P-93 | Becerril | 500 |
+
+**PRESTATARIO** (datos de la clase)
+
+| nombre_cliente | numero_préstamo |
+| :-- | :-- |
+| Fernández | P-16 |
+| Gómez | P-11 |
+| Gómez | P-23 |
+| López | P-15 |
+| Pérez | P-93 |
+| Santos | P-17 |
+| Sotoca | P-14 |
+| Valdivieso | P-17 |
+
+**SUCURSAL** (inventada)
+
+| nombre_sucursal | ciudad_sucursal | activos |
+| :-- | :-- | :-- |
+| Becerril | Aluche | 400000 |
+| Centro | Arganzuela | 9000000 |
+| Collado Mediano | Sierra | 7100000 |
+| Moralzarzal | Sierra | 2100000 |
+| Navacerrada | Sierra | 1700000 |
+| Peguerinos | Sierra | 3700000 |
+
+**CUENTA** (inventada)
+
+| numero_cuenta | nombre_sucursal | saldo |
+| :-- | :-- | :-- |
+| C-101 | Centro | 60000 |
+| C-102 | Navacerrada | 35000 |
+| C-103 | Centro | 75000 |
+| C-104 | Becerril | 52000 |
+| C-105 | Moralzarzal | 50000 |
+| C-106 | Collado Mediano | 8000 |
+
+**IMPOSITOR** (inventada)
+
+| nombre_cliente | numero_cuenta |
+| :-- | :-- |
+| González | C-101 |
+| Rupérez | C-102 |
+| López | C-103 |
+| Santos | C-104 |
+| Santos | C-105 |
+| Pérez | C-106 |
+
+**CLIENTE** (nombres de la clase; calles y ciudades inventadas)
+
+| nombre_cliente | calle_cliente | ciudad_cliente |
+| :-- | :-- | :-- |
+| Abril | Calle Mayor | Peguerinos |
+| Fernández | Calle Real | Rozas |
+| Gómez | Av. Pinos | Alcorcón |
+| González | Calle Olmo | Alcorcón |
+| López | Calle Sol | Rozas |
+| Pérez | Calle Luna | Peguerinos |
+| Rupérez | Calle Fresno | Rozas |
+| Santos | Calle Arenal | Alcorcón |
+| Sotoca | Calle Álamo | Peguerinos |
+| Valdivieso | Calle Roble | Rozas |
+
+Los casos límite: el préstamo P-17 es de exactamente 1000, la cuenta C-105 tiene exactamente 50000 de saldo, la sucursal Peguerinos no tiene préstamos ni cuentas y Santos tiene dos cuentas.
+
+## 4. Ejemplo guiado de la clase: clientes con préstamo en Navacerrada
+
+Este ejemplo explica **por qué** el producto cartesiano necesita una condición de unión, y por eso va antes de los ejercicios.
+
+**Enunciado.** Determinar el nombre de todos los clientes que tienen concedido un préstamo en la sucursal de Navacerrada.
+
+Los nombres están en `PRESTATARIO` y la sucursal está en `PRÉSTAMO`. Hacen falta las dos relaciones.
+
+### Primer intento (incorrecto)
+
+```text
+Πnombre_cliente(σP.nombre_sucursal='Navacerrada'(PRESTATARIO×PRÉSTAMO))
+```
+
+El producto genera 8 × 7 = 56 tuplas. El filtro deja solo las parejas con un préstamo de Navacerrada (P-15 y P-16), es decir 8 × 2 = 16 tuplas. El problema: cada prestatario quedó emparejado con **los dos** préstamos, aunque el suyo sea otro.
+
+| PR.nombre_cliente | PR.numero_préstamo | P.numero_préstamo | ¿Iguales? |
+| :-- | :-- | :-- | :-- |
+| Fernández | P-16 | P-15 | no |
+| Fernández | P-16 | P-16 | **sí** |
+| Gómez | P-11 | P-15 | no |
+| Gómez | P-11 | P-16 | no |
+| Gómez | P-23 | P-15 | no |
+| Gómez | P-23 | P-16 | no |
+| López | P-15 | P-15 | **sí** |
+| López | P-15 | P-16 | no |
+| Pérez | P-93 | P-15 | no |
+| Pérez | P-93 | P-16 | no |
+| Santos | P-17 | P-15 | no |
+| Santos | P-17 | P-16 | no |
+| Sotoca | P-14 | P-15 | no |
+| Sotoca | P-14 | P-16 | no |
+| Valdivieso | P-17 | P-15 | no |
+| Valdivieso | P-17 | P-16 | no |
+
+Proyectar `nombre_cliente` aquí devolvería los ocho prestatarios, incluidos Gómez, Pérez o Santos, que no tienen nada en Navacerrada.
+
+### Corrección
+
+Un cliente tiene un préstamo en Navacerrada solo si existe una tupla donde `PR.numero_préstamo = P.numero_préstamo`. Esa igualdad es la **condición de unión**.
+
+```text
+Πnombre_cliente(σPR.numero_préstamo=P.numero_préstamo(σP.nombre_sucursal='Navacerrada'(PRESTATARIO×PRÉSTAMO)))
+```
+
+De las 16 tuplas sobreviven solo las marcadas con «sí»: (Fernández, P-16) y (López, P-15). La proyección final da:
+
+| nombre_cliente |
+| :-- |
+| Fernández |
+| López |
+
+## 5. Ejercicios resueltos
+
+Cada ejercicio sigue el mismo recorrido: las cuatro preguntas de la clase, la expresión (con `∧` y con selecciones anidadas), el cálculo paso a paso y el resultado.
+
+### Ejercicio 1 (EMPLEADOS)
+
+**Enunciado.** Determinar el nombre y la ciudad de residencia de todos los empleados que trabajan en el banco BANAMEX.
+
+**Análisis**
+
+| Pregunta | Respuesta |
+| :-- | :-- |
+| ¿Qué atributos se piden? | `nombre_empleado` y `ciudad` |
+| ¿Qué relación los contiene? | EMPLEADO |
+| ¿Qué condición hay que cumplir? | `nombre_empresa = 'BANAMEX'` |
+| ¿Qué relación contiene esa condición? | TRABAJA |
+
+Las respuestas apuntan a dos relaciones distintas. Hay producto cartesiano y hace falta una condición de unión sobre `nombre_empleado`.
+
+**Expresión con ∧**
+
+```text
+ΠE.nombre_empleado,E.ciudad(σE.nombre_empleado=T.nombre_empleado∧T.nombre_empresa='BANAMEX'(EMPLEADO×TRABAJA))
+```
+
+**Expresión con selecciones anidadas**
+
+```text
+ΠE.nombre_empleado,E.ciudad(σE.nombre_empleado=T.nombre_empleado(σT.nombre_empresa='BANAMEX'(EMPLEADO×TRABAJA)))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto cartesiano `EMPLEADO×TRABAJA`.** Cada uno de los 7 empleados se combina con cada una de las 7 filas de TRABAJA: 49 tuplas. El esquema resultante tiene seis atributos: `E.nombre_empleado`, `E.calle`, `E.ciudad`, `T.nombre_empleado`, `T.nombre_empresa`, `T.sueldo`.
+
+**Paso 2. Filtro `σT.nombre_empresa='BANAMEX'`.** TRABAJA tiene 4 filas de BANAMEX (Ana, Beto, Diego, Elena). Cada una queda emparejada con los 7 empleados: 4 × 7 = 28 tuplas. Aún no se sabe cuáles parejas son correctas. Por ejemplo, la fila de Ana en BANAMEX sigue emparejada con Carla.
+
+**Paso 3. Unión `σE.nombre_empleado=T.nombre_empleado`.** Solo se conservan las parejas donde el empleado y la fila de TRABAJA son de la misma persona. Quedan 4 tuplas:
+
+| E.nombre_empleado | E.calle | E.ciudad | T.nombre_empleado | T.nombre_empresa | T.sueldo |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| Ana | Calle Reforma 10 | Xalapa | Ana | BANAMEX | 12000 |
+| Beto | Av. Lázaro Cárdenas 45 | Coatepec | Beto | BANAMEX | 9000 |
+| Diego | Calle Hidalgo 22 | Veracruz | Diego | BANAMEX | 10000 |
+| Elena | Calle Juárez 3 | Xalapa | Elena | BANAMEX | 18000 |
+
+**Paso 4. Proyección `ΠE.nombre_empleado,E.ciudad`.** Se descartan las demás columnas.
+
+**Resultado**
+
+| nombre_empleado | ciudad |
+| :-- | :-- |
+| Ana | Xalapa |
+| Beto | Coatepec |
+| Diego | Veracruz |
+| Elena | Xalapa |
+
+**Observación.** El prefijo `E.` en la proyección no es decorativo: tras el producto existen dos columnas `nombre_empleado`, y sin el prefijo la expresión sería ambigua. `ciudad` solo existe en EMPLEADO, pero conviene calificarla igual.
+
+### Ejercicio 2 (EMPLEADOS)
+
+**Enunciado.** Determinar el nombre, el domicilio y la ciudad de residencia de todos los empleados que ganan más de 10000.
+
+**Análisis**
+
+| Pregunta | Respuesta |
+| :-- | :-- |
+| ¿Qué atributos se piden? | `nombre_empleado`, `calle`, `ciudad` |
+| ¿Qué relación los contiene? | EMPLEADO |
+| ¿Qué condición hay que cumplir? | `sueldo > 10000` |
+| ¿Qué relación contiene esa condición? | TRABAJA |
+
+De nuevo dos relaciones, con unión por `nombre_empleado`. «Domicilio» corresponde al atributo `calle`.
+
+**Expresión con ∧**
+
+```text
+ΠE.nombre_empleado,E.calle,E.ciudad(σE.nombre_empleado=T.nombre_empleado∧T.sueldo>10000(EMPLEADO×TRABAJA))
+```
+
+**Expresión con selecciones anidadas**
+
+```text
+ΠE.nombre_empleado,E.calle,E.ciudad(σE.nombre_empleado=T.nombre_empleado(σT.sueldo>10000(EMPLEADO×TRABAJA)))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto cartesiano.** 7 × 7 = 49 tuplas, con los mismos seis atributos del ejercicio anterior.
+
+**Paso 2. Filtro `σT.sueldo>10000`.** Cumplen cuatro filas de TRABAJA: Ana (12000), Carla (15000), Elena (18000) y Gabriela (11000). Diego gana 10000 justo, y la condición es estrictamente mayor, así que queda fuera. Hay 4 × 7 = 28 tuplas.
+
+**Paso 3. Unión `σE.nombre_empleado=T.nombre_empleado`.** Quedan 4 tuplas:
+
+| E.nombre_empleado | E.calle | E.ciudad | T.nombre_empleado | T.nombre_empresa | T.sueldo |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| Ana | Calle Reforma 10 | Xalapa | Ana | BANAMEX | 12000 |
+| Carla | Calle Allende 7 | Xalapa | Carla | BANCOMER | 15000 |
+| Elena | Calle Juárez 3 | Xalapa | Elena | BANAMEX | 18000 |
+| Gabriela | Calle Zaragoza 31 | Xalapa | Gabriela | BANCOMER | 11000 |
+
+**Paso 4. Proyección `ΠE.nombre_empleado,E.calle,E.ciudad`.**
+
+**Resultado**
+
+| nombre_empleado | calle | ciudad |
+| :-- | :-- | :-- |
+| Ana | Calle Reforma 10 | Xalapa |
+| Carla | Calle Allende 7 | Xalapa |
+| Elena | Calle Juárez 3 | Xalapa |
+| Gabriela | Calle Zaragoza 31 | Xalapa |
+
+**Observación.** La empresa no se pide en este ejercicio. Por eso aparecen empleados de BANAMEX y de BANCOMER: el único filtro es el sueldo.
+
+### Ejercicio 3 (EMPLEADOS)
+
+**Enunciado.** Determinar el nombre, el domicilio y la ciudad de residencia de todos los empleados que trabajan en el banco BANAMEX y ganan más de 10000.
+
+**Análisis**
+
+| Pregunta | Respuesta |
+| :-- | :-- |
+| ¿Qué atributos se piden? | `nombre_empleado`, `calle`, `ciudad` |
+| ¿Qué relación los contiene? | EMPLEADO |
+| ¿Qué condiciones hay que cumplir? | `nombre_empresa = 'BANAMEX'` y `sueldo > 10000` |
+| ¿Qué relación contiene esas condiciones? | TRABAJA |
+
+Es la combinación de los dos ejercicios anteriores. Las dos condiciones se exigen a la vez.
+
+**Expresión con ∧**
+
+```text
+ΠE.nombre_empleado,E.calle,E.ciudad(σE.nombre_empleado=T.nombre_empleado∧T.nombre_empresa='BANAMEX'∧T.sueldo>10000(EMPLEADO×TRABAJA))
+```
+
+**Expresión con selecciones anidadas**
+
+```text
+ΠE.nombre_empleado,E.calle,E.ciudad(σE.nombre_empleado=T.nombre_empleado(σT.nombre_empresa='BANAMEX'(σT.sueldo>10000(EMPLEADO×TRABAJA))))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto cartesiano.** 7 × 7 = 49 tuplas.
+
+**Paso 2. Primer filtro `σT.sueldo>10000`.** Es la selección más interna, así que se aplica primero. Pasan Ana, Carla, Elena y Gabriela. Hay 4 × 7 = 28 tuplas.
+
+**Paso 3. Segundo filtro `σT.nombre_empresa='BANAMEX'`.** De esas cuatro filas de TRABAJA, solo Ana y Elena son de BANAMEX. Carla y Gabriela trabajan en BANCOMER y se descartan. Hay 2 × 7 = 14 tuplas.
+
+**Paso 4. Unión `σE.nombre_empleado=T.nombre_empleado`.** Quedan 2 tuplas:
+
+| E.nombre_empleado | E.calle | E.ciudad | T.nombre_empleado | T.nombre_empresa | T.sueldo |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| Ana | Calle Reforma 10 | Xalapa | Ana | BANAMEX | 12000 |
+| Elena | Calle Juárez 3 | Xalapa | Elena | BANAMEX | 18000 |
+
+**Paso 5. Proyección `ΠE.nombre_empleado,E.calle,E.ciudad`.**
+
+**Resultado**
+
+| nombre_empleado | calle | ciudad |
+| :-- | :-- | :-- |
+| Ana | Calle Reforma 10 | Xalapa |
+| Elena | Calle Juárez 3 | Xalapa |
+
+**Observación.** El orden de las selecciones anidadas no cambia el resultado: las dos condiciones se cumplen sí o sí, y las selecciones conmutan entre sí. Solo cambia el tamaño de los resultados intermedios.
+
+### Ejercicio 4 (EMPLEADOS)
+
+**Enunciado.** Determinar el nombre de los jefes con empleados en la ciudad de Xalapa.
+
+**Análisis**
+
+| Pregunta | Respuesta |
+| :-- | :-- |
+| ¿Qué atributo se pide? | `nombre_jefe` |
+| ¿Qué relación lo contiene? | JEFE |
+| ¿Qué condición hay que cumplir? | `ciudad = 'Xalapa'` |
+| ¿Qué relación contiene esa condición? | EMPLEADO |
+
+La ciudad que se filtra es la del **empleado**, no la del jefe. El enlace entre las dos relaciones es `nombre_empleado`.
+
+**Expresión con selecciones anidadas**
+
+```text
+ΠJ.nombre_jefe(σE.nombre_empleado=J.nombre_empleado(σE.ciudad='Xalapa'(EMPLEADO×JEFE)))
+```
+
+**Expresión con ∧**
+
+```text
+ΠJ.nombre_jefe(σE.nombre_empleado=J.nombre_empleado∧E.ciudad='Xalapa'(EMPLEADO×JEFE))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto cartesiano `EMPLEADO×JEFE`.** 7 empleados por 6 filas de JEFE: 42 tuplas. El esquema tiene cinco atributos: `E.nombre_empleado`, `E.calle`, `E.ciudad`, `J.nombre_empleado`, `J.nombre_jefe`.
+
+**Paso 2. Filtro `σE.ciudad='Xalapa'`.** Viven en Xalapa Ana, Carla, Elena y Gabriela. Cada una se empareja con las 6 filas de JEFE: 4 × 6 = 24 tuplas.
+
+**Paso 3. Unión `σE.nombre_empleado=J.nombre_empleado`.** Se conserva la pareja donde la fila de JEFE corresponde al mismo empleado. Ana, Carla y Gabriela tienen fila en JEFE. Elena no la tiene, porque no tiene jefe, así que no aporta ninguna tupla. Quedan 3 tuplas:
+
+| E.nombre_empleado | E.calle | E.ciudad | J.nombre_empleado | J.nombre_jefe |
+| :-- | :-- | :-- | :-- | :-- |
+| Ana | Calle Reforma 10 | Xalapa | Ana | Elena |
+| Carla | Calle Allende 7 | Xalapa | Carla | Elena |
+| Gabriela | Calle Zaragoza 31 | Xalapa | Gabriela | Diego |
+
+**Paso 4. Proyección `ΠJ.nombre_jefe`.** La columna contiene Elena, Elena y Diego. La proyección elimina duplicados, así que Elena queda una sola vez.
+
+**Resultado**
+
+| nombre_jefe |
+| :-- |
+| Elena |
+| Diego |
+
+**Observación.** Elena aparece como jefa porque Ana y Carla viven en Xalapa. Que ella misma viva en Xalapa es irrelevante para el resultado. Diego aparece aunque viva en Veracruz, porque su subordinada Gabriela vive en Xalapa.
+
+### Ejercicio 5 (Banco)
+
+**Enunciado.** Mostrar `nombre_sucursal` y `ciudad_sucursal` de las sucursales que tengan préstamos con importes mayores a 1000 pesos.
+
+**Análisis**
+
+| Pregunta | Respuesta |
+| :-- | :-- |
+| ¿Qué atributos se piden? | `nombre_sucursal` y `ciudad_sucursal` |
+| ¿Qué relación los contiene? | SUCURSAL |
+| ¿Qué condición hay que cumplir? | `importe > 1000` |
+| ¿Qué relación contiene esa condición? | PRÉSTAMO |
+
+La unión se hace por `nombre_sucursal`, que existe en las dos relaciones.
+
+**Expresión con selecciones anidadas**
+
+```text
+ΠS.nombre_sucursal,S.ciudad_sucursal(σS.nombre_sucursal=P.nombre_sucursal(σP.importe>1000(SUCURSAL×PRÉSTAMO)))
+```
+
+**Expresión con ∧**
+
+```text
+ΠS.nombre_sucursal,S.ciudad_sucursal(σS.nombre_sucursal=P.nombre_sucursal∧P.importe>1000(SUCURSAL×PRÉSTAMO))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto cartesiano `SUCURSAL×PRÉSTAMO`.** 6 sucursales por 7 préstamos: 42 tuplas, con seis atributos (tres de cada relación).
+
+**Paso 2. Filtro `σP.importe>1000`.** Cumplen P-14 (1500), P-15 (1500), P-16 (1300) y P-23 (2000). P-17 vale exactamente 1000 y no entra. Quedan 6 × 4 = 24 tuplas.
+
+**Paso 3. Unión `σS.nombre_sucursal=P.nombre_sucursal`.** Se conserva cada préstamo emparejado con **su** sucursal. Quedan 4 tuplas:
+
+| S.nombre_sucursal | S.ciudad_sucursal | S.activos | P.numero_préstamo | P.nombre_sucursal | P.importe |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| Centro | Arganzuela | 9000000 | P-14 | Centro | 1500 |
+| Navacerrada | Sierra | 1700000 | P-15 | Navacerrada | 1500 |
+| Navacerrada | Sierra | 1700000 | P-16 | Navacerrada | 1300 |
+| Moralzarzal | Sierra | 2100000 | P-23 | Moralzarzal | 2000 |
+
+**Paso 4. Proyección `ΠS.nombre_sucursal,S.ciudad_sucursal`.** Navacerrada aparece dos veces, por sus dos préstamos grandes, y la proyección la reduce a una.
+
+**Resultado**
+
+| nombre_sucursal | ciudad_sucursal |
+| :-- | :-- |
+| Centro | Arganzuela |
+| Navacerrada | Sierra |
+| Moralzarzal | Sierra |
+
+**Observación.** Peguerinos y Becerril no salen: Peguerinos no tiene préstamos y el único de Becerril (P-93) es de 500.
+
+### Ejercicio 6 (Banco)
+
+**Enunciado.** Mostrar el nombre del cliente, la ciudad del cliente y el número de cuenta de todos los clientes con una cuenta abierta en el banco.
+
+**Análisis**
+
+| Pregunta | Respuesta |
+| :-- | :-- |
+| ¿Qué atributos se piden? | `nombre_cliente`, `ciudad_cliente`, `numero_cuenta` |
+| ¿Qué relaciones los contienen? | CLIENTE (nombre y ciudad) e IMPOSITOR (cuenta) |
+| ¿Qué condición hay que cumplir? | Que el cliente aparezca en IMPOSITOR |
+| ¿Qué relaciones intervienen en esa condición? | CLIENTE e IMPOSITOR, enlazadas por `nombre_cliente` |
+
+Aquí no hay un filtro con una constante. La única condición es la propia unión: tener cuenta equivale a tener una tupla en IMPOSITOR con tu nombre.
+
+**Expresión**
+
+```text
+ΠC.nombre_cliente,C.ciudad_cliente,I.numero_cuenta(σC.nombre_cliente=I.nombre_cliente(CLIENTE×IMPOSITOR))
+```
+
+Con una sola condición no hay diferencia entre la forma con `∧` y la anidada.
+
+**Paso a paso**
+
+**Paso 1. Producto cartesiano `CLIENTE×IMPOSITOR`.** 10 clientes por 6 filas de IMPOSITOR: 60 tuplas. Esquema de cinco atributos: `C.nombre_cliente`, `C.calle_cliente`, `C.ciudad_cliente`, `I.nombre_cliente`, `I.numero_cuenta`.
+
+**Paso 2. Unión `σC.nombre_cliente=I.nombre_cliente`.** Se conservan las parejas donde ambos nombres coinciden. Quedan 6 tuplas (una por fila de IMPOSITOR):
+
+| C.nombre_cliente | C.calle_cliente | C.ciudad_cliente | I.nombre_cliente | I.numero_cuenta |
+| :-- | :-- | :-- | :-- | :-- |
+| González | Calle Olmo | Alcorcón | González | C-101 |
+| Rupérez | Calle Fresno | Rozas | Rupérez | C-102 |
+| López | Calle Sol | Rozas | López | C-103 |
+| Santos | Calle Arenal | Alcorcón | Santos | C-104 |
+| Santos | Calle Arenal | Alcorcón | Santos | C-105 |
+| Pérez | Calle Luna | Peguerinos | Pérez | C-106 |
+
+**Paso 3. Proyección `ΠC.nombre_cliente,C.ciudad_cliente,I.numero_cuenta`.**
+
+**Resultado**
+
+| nombre_cliente | ciudad_cliente | numero_cuenta |
+| :-- | :-- | :-- |
+| González | Alcorcón | C-101 |
+| Rupérez | Rozas | C-102 |
+| López | Rozas | C-103 |
+| Santos | Alcorcón | C-104 |
+| Santos | Alcorcón | C-105 |
+| Pérez | Peguerinos | C-106 |
+
+**Observación.** Santos sale dos veces y no es un duplicado: las filas difieren en `numero_cuenta`. La proyección solo elimina filas idénticas en **todos** los atributos proyectados. Los clientes sin cuenta (Abril, Fernández, Gómez, Sotoca, Valdivieso) no aparecen.
+
+### Ejercicio 7 (Banco)
+
+**Enunciado.** Mostrar el nombre de la sucursal y sus activos, de las sucursales que tengan cuentas con saldo mayor a 50000 pesos.
+
+**Análisis**
+
+| Pregunta | Respuesta |
+| :-- | :-- |
+| ¿Qué atributos se piden? | `nombre_sucursal` y `activos` |
+| ¿Qué relación los contiene? | SUCURSAL |
+| ¿Qué condición hay que cumplir? | `saldo > 50000` |
+| ¿Qué relación contiene esa condición? | CUENTA |
+
+La unión se hace por `nombre_sucursal`.
+
+**Expresión con selecciones anidadas**
+
+```text
+ΠS.nombre_sucursal,S.activos(σS.nombre_sucursal=CU.nombre_sucursal(σCU.saldo>50000(SUCURSAL×CUENTA)))
+```
+
+**Expresión con ∧**
+
+```text
+ΠS.nombre_sucursal,S.activos(σS.nombre_sucursal=CU.nombre_sucursal∧CU.saldo>50000(SUCURSAL×CUENTA))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto cartesiano `SUCURSAL×CUENTA`.** 6 sucursales por 6 cuentas: 36 tuplas.
+
+**Paso 2. Filtro `σCU.saldo>50000`.** Cumplen C-101 (60000), C-103 (75000) y C-104 (52000). C-105 tiene exactamente 50000 y no entra; C-102 (35000) y C-106 (8000) tampoco. Quedan 6 × 3 = 18 tuplas.
+
+**Paso 3. Unión `σS.nombre_sucursal=CU.nombre_sucursal`.** Cada cuenta se empareja con su sucursal. Quedan 3 tuplas:
+
+| S.nombre_sucursal | S.ciudad_sucursal | S.activos | CU.numero_cuenta | CU.nombre_sucursal | CU.saldo |
+| :-- | :-- | :-- | :-- | :-- | :-- |
+| Centro | Arganzuela | 9000000 | C-101 | Centro | 60000 |
+| Centro | Arganzuela | 9000000 | C-103 | Centro | 75000 |
+| Becerril | Aluche | 400000 | C-104 | Becerril | 52000 |
+
+**Paso 4. Proyección `ΠS.nombre_sucursal,S.activos`.** Centro aparece dos veces con los mismos valores y se reduce a una.
+
+**Resultado**
+
+| nombre_sucursal | activos |
+| :-- | :-- |
+| Centro | 9000000 |
+| Becerril | 400000 |
+
+## 6. Tabla de resultados
+
+| Ej. | Base | Pide | Resultado |
+| :-- | :-- | :-- | :-- |
+| 1 | EMPLEADOS | Nombre y ciudad, trabajan en BANAMEX | Ana, Beto, Diego, Elena |
+| 2 | EMPLEADOS | Datos de empleados con sueldo > 10000 | Ana, Carla, Elena, Gabriela |
+| 3 | EMPLEADOS | BANAMEX y sueldo > 10000 | Ana, Elena |
+| 4 | EMPLEADOS | Jefes con empleados en Xalapa | Elena, Diego |
+| 5 | Banco | Sucursales con préstamos > 1000 | Centro, Navacerrada, Moralzarzal |
+| 6 | Banco | Clientes con cuenta, con ciudad y número | 6 tuplas, Santos dos veces |
+| 7 | Banco | Sucursales con cuentas de saldo > 50000 | Centro, Becerril |
+
+## 7. Errores frecuentes
+
+Casi todos los errores en este tipo de ejercicios salen de cuatro lugares:
+
+- Olvidar la condición de unión después del producto cartesiano.
+- Usar un atributo ambiguo sin su prefijo de relación.
+- Confundir `>` con `≥` en los valores que caen justo en el límite.
+- Proyectar el atributo equivocado, por ejemplo `nombre_empleado` en lugar de `nombre_jefe`.
+
+El primero es el más grave porque la expresión parece correcta y devuelve filas. Sin condición de unión, el resultado mezcla datos de personas o sucursales que no tienen relación entre sí, como se vio en el ejemplo de Navacerrada.
+
+## 8. Bibliografía de la clase
+
+- Date, C. (2001). *Introducción a los Sistemas de Bases de Datos*. Madrid: Pearson Educación.
+- de Miguel Castaño, A., & Piattini Velthuis, M. G. (1999). *Fundamentos y modelos de bases de datos*. Madrid: Alfaomega.
+- Elmasri, R., & Navathe, S. (2005). *Fundamentos de Sistemas de Bases de Datos*. Madrid: Addison-Wesley.
+- Silberschatz, A., Korth, H., & Sudarshan, S. (2006). *Fundamentos de bases de datos*. España: McGraw-Hill/Interamericana.
+
+## Documento del trabajo
+
+- [Clase 9 — Álgebra relacional: operadores, restricciones y ejercicios resueltos (PDF)](/evidencias/clase9-algebra-relacional/Clase9AlgebraRelacional.pdf)
+
+Este trabajo corresponde a la categoría **Álgebra Relacional** de la asignatura Bases de Datos 1.
