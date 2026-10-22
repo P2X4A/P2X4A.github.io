@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Portada: las dos bases de datos de la Clase 9, EMPLEADOS y Banco, con sus relaciones y el patrón de pregunta y respuesta">
+  <title>Clase 9 — Álgebra relacional</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <text x="16" y="44" fill="#63de86" font-size="12">CLASE 9 · ÁLGEBRA RELACIONAL</text>
+    <text x="16" y="62" fill="#b8b8d8" font-size="8" font-weight="normal">operadores, restricciones y 7 ejercicios</text>
+
+    <!-- panel EMPLEADOS -->
+    <rect x="16" y="80" width="200" height="124" fill="#171740" stroke="#63de86" stroke-width="2" />
+    <text x="26" y="98" fill="#63de86" font-size="10">EMPLEADOS</text>
+    <g font-size="8" fill="#cfe6ff" font-weight="normal">
+      <text x="26" y="118">EMPLEADO</text>
+      <text x="26" y="134">TRABAJA</text>
+      <text x="26" y="150">EMPRESA</text>
+      <text x="26" y="166">JEFE</text>
+    </g>
+    <g font-size="7" fill="#8a8ab8" font-weight="normal">
+      <text x="120" y="118">4 tuplas</text>
+      <text x="120" y="134">4 cond.</text>
+      <text x="120" y="150">2 tuplas</text>
+      <text x="120" y="166">6 tuplas</text>
+    </g>
+
+    <!-- panel BANCO -->
+    <rect x="230" y="80" width="234" height="124" fill="#171740" stroke="#62b4f8" stroke-width="2" />
+    <text x="240" y="98" fill="#62b4f8" font-size="10">BANCO</text>
+    <g font-size="8" fill="#cfe6ff" font-weight="normal">
+      <text x="240" y="118">SUCURSAL</text>
+      <text x="240" y="134">CUENTA</text>
+      <text x="240" y="150">IMPOSITOR</text>
+      <text x="240" y="166">CLIENTE</text>
+      <text x="240" y="182">PRESTAMO</text>
+      <text x="240" y="198">PRESTATARIO</text>
+    </g>
+    <g font-size="7" fill="#8a8ab8" font-weight="normal">
+      <text x="360" y="118">6 tuplas</text>
+      <text x="360" y="134">6 tuplas</text>
+      <text x="360" y="150">6 tuplas</text>
+      <text x="360" y="166">10 tuplas</text>
+      <text x="360" y="182">7 tuplas</text>
+      <text x="360" y="198">8 tuplas</text>
+    </g>
+
+    <text x="16" y="234" fill="#63de86" font-size="9">4 EJERCICIOS EMPLEADOS</text>
+    <text x="190" y="234" fill="#62b4f8" font-size="9">3 EJERCICIOS BANCO</text>
+    <text x="340" y="234" fill="#b8b8d8" font-size="8" font-weight="normal">+ Navacerrada guiado</text>
+  </g>
+</svg>
