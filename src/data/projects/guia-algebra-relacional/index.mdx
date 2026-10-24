@@ -1,19 +1,20 @@
 ---
-title: "ÁLGEBRA RELACIONAL (1) - Resolución Paso A Paso"
-tagline: "Once consultas sobre un esquema comercial, resueltas con los operadores del álgebra relacional"
-description: "Guía 1 de álgebra relacional de Bases de Datos 1: once ejercicios sobre los esquemas CLIENTE, PRODUCTO, FACTURA, DETALLE y LOCALIDAD, resueltos en álgebra relacional extendida."
+title: "Álgebra relacional, Guía 1: operadores, restricciones y ejercicios resueltos"
+tagline: "Once ejercicios sobre un esquema comercial, resueltos con los operadores del álgebra relacional extendida"
+description: "Guía 1 de álgebra relacional de Bases de Datos 1: once ejercicios sobre los esquemas CLIENTE, PRODUCTO, FACTURA, DETALLE y LOCALIDAD, resueltos en álgebra relacional extendida, con operadores, restricciones, notación y casos límite."
 status: "complete"
 category: "algebra-relacional"
 moduleId: "BD1-ALG-002"
 order: 13
 thumbnail: "../../../assets/evidencias/guia-algebra-relacional/thumbnail.png"
-thumbnailAlt: "Los operadores del álgebra relacional: selección, proyección y producto, sobre los cinco esquemas de la guía"
+thumbnailAlt: "Los operadores del álgebra relacional: selección, proyección, producto, diferencia, división y renombrado, sobre los cinco esquemas de la guía"
 
 tech:
   - "Álgebra relacional extendida"
   - "División de relaciones"
   - "Diferencia y producto cartesiano"
   - "Renombrado de atributos (ρ)"
+  - "Autoinforme (self-join)"
   - "Bases de Datos 1"
 
 specs:
@@ -32,7 +33,7 @@ features:
   - lead: "El atributo que se repite"
     text: "CLIENTE y LOCALIDAD comparten el atributo Nombre: hay que renombrar antes de unir."
   - lead: "Diferencia de conjuntos"
-    text: "El «no» de los ejercicios 4 y 11 se resuelve restando, no filtrando."
+    text: "El «no» de los ejercicios 4, 7 y 11 se resuelve restando, no filtrando."
   - lead: "Autoinforme"
     text: "El ejercicio 6 compara cada venta contra la factura 18, producto por producto."
 
@@ -41,250 +42,1008 @@ archCaption: "Los cinco esquemas de la guía y sus relaciones"
 challenge:
   title: "Problema"
   body: "Resolver once consultas en álgebra relacional sobre un esquema comercial de cinco relaciones —CLIENTE, PRODUCTO, FACTURA, DETALLE y LOCALIDAD— con selección, proyección, unión, diferencia, producto, división y renombrado, incluyendo las que piden «todos», las que piden «no ha comprado» y la que compara contra una factura concreta."
+
 solution:
   title: "Solución"
   body: "Cada consulta se resuelve en álgebra relacional extendida, cuidando el renombrado de los atributos homónimos, la formulación de las divisiones mediante diferencia de conjuntos y el autoinforme que exige la comparación del ejercicio 6."
 ---
 
-## Descripción
+'''# Álgebra relacional, Guía 1: operadores, restricciones y ejercicios resueltos
 
-Esta guía reúne los ejercicios de álgebra relacional de **Bases de Datos 1**. El enunciado parte de un esquema comercial de cinco relaciones y pide once consultas que se resuelven con los operadores del álgebra relacional extendida.
+El documento sigue este orden: primero los operadores que intervienen en la guía, con sus restricciones y una explicación breve de cada uno; después las relaciones sobre las que se trabaja; y al final la resolución paso a paso de los once ejercicios, con la notación que se usa en clase.
 
-La ventaja de trabajar en álgebra es que no deja nada implícito: cada filtro es una selección, cada lista de columnas es una proyección, y cada «no» es una diferencia de conjuntos. No hay atajos, y por eso las expresiones se leen como el razonamiento que las produjo.
+Los esquemas son los de la guía. Como la guía no trae datos, las instancias de las tablas están inventadas y sirven para comprobar cada paso con lápiz. Se diseñaron para que cada ejercicio tenga un resultado interesante y para que aparezcan los casos límite (valores exactamente iguales a 100 o a 500, un cliente sin facturas, una localidad sin compras).
 
-## Los esquemas
+---
 
-| Relación | Atributos | Qué guarda |
-| :-- | :-- | :-- |
-| `CLIENTE` | Id_Cliente, Nombre, Dirección, Teléfono, IdLocalidad | Los clientes de la empresa, con su localidad |
-| `PRODUCTO` | IdProducto, Descripción, Precio | El catálogo de productos |
-| `FACTURA` | IdFactura, IdCliente, Fecha, Pagada | La facturación de la empresa |
-| `DETALLE` | IdFactura, IdProducto, Cantidad, PrecioVta | Los productos vendidos en cada factura |
-| `LOCALIDAD` | IdLocalidad, Nombre | Las localidades de la zona |
+## 1. Notación
 
-<img
-  src="/evidencias/algebra-relacional/esquema-guias.png"
-  alt="Esquema relacional de la guía: LOCALIDAD, CLIENTE, FACTURA, PRODUCTO y DETALLE, con las claves primarias, las foráneas y las relaciones uno a muchos entre ellas"
-  loading="lazy"
-  width="1600"
-  height="560"
-/>
+Las expresiones se escriben en una sola línea, con el operador pegado a su parámetro y la relación entre paréntesis:
 
-Dos detalles del esquema se notan antes de empezar: `CLIENTE` y `LOCALIDAD` tienen ambas un atributo `Nombre`, y `DETALLE` es la tabla puente entre `FACTURA` y `PRODUCTO`, con clave (IdFactura, IdProducto).
-
-## La notación
-
-| Operador | Significado |
-| :-- | :-- |
-| `σ` | Selección: filtra filas por una condición |
-| `π` | Proyección: se queda con algunas columnas |
-| `⋈` | Unión (join) de dos relaciones por una condición |
-| `−` | Diferencia de conjuntos |
-| `×` | Producto cartesiano |
-| `ρ` | Renombrado de atributos o de la relación |
-| `÷` | División: los valores que se combinan con todos los de otra relación |
-
-## Los once ejercicios
-
-### 1. Productos cuyo Id sea mayor a 100
-
-```text
-π_{ IdProducto, Descripción } ( σ_{ IdProducto > 100 } ( PRODUCTO ) )
+```
+Πatributos(relación)
+σpredicado(relación)
 ```
 
-El orden de los operadores no es un detalle: la selección va primero porque necesita `IdProducto`, y la proyección viene después precisamente para poder descartar esa columna.
+Un ejemplo de la clase:
 
-### 2. Nombres de los clientes de Luján
-
-```text
-π_{ C.Nombre } (
-  σ_{ L.Nombre = 'Luján' } (
-    ρ_{ C.Nombre → CNombre, L.Nombre → LNombre } (
-      CLIENTE ⋈_{ CLIENTE.IdLocalidad = LOCALIDAD.IdLocalidad } LOCALIDAD
-    )
-  )
-)
+```
+ΠE.nombre_empleado,E.ciudad(σE.nombre_empleado=T.nombre_empleado∧T.nombre_empresa='BANAMEX'(EMPLEADO×TRABAJA))
 ```
 
-El renombrado `ρ` es obligatorio: las dos relaciones traen un atributo `Nombre` y, sin renombrarlos, la proyección no sabe a cuál se refiere.
+Se lee **de adentro hacia afuera**: primero el producto, luego la selección y al final la proyección.
 
-### 3. Cliente, factura, producto y cantidad, con más de 500 unidades
+### Alias y prefijos
 
-```text
-π_{ C.Nombre, IdFactura, IdProducto, Cantidad } (
-  σ_{ Cantidad > 500 } (
-    ρ_{ C.Nombre → CNombre } (
-      CLIENTE ⋈_{ IdCliente } FACTURA ⋈_{ IdFactura } DETALLE
-    )
-  )
-)
+Tras un producto cartesiano, los atributos que se llaman igual en dos relaciones quedan ambiguos. En esta guía pasa bastante: `Nombre` existe en CLIENTE y en LOCALIDAD, e `IdFactura` existe en FACTURA y en DETALLE. Se resuelve anteponiendo el alias de la relación.
+
+| Alias | Relación |
+|---|---|
+| C | CLIENTE |
+| PR | PRODUCTO |
+| F | FACTURA |
+| D | DETALLE |
+| L | LOCALIDAD |
+
+Cuando una subexpresión trabaja con una sola relación no hay ambigüedad posible, y el prefijo se omite.
+
+### Dos formas de combinar condiciones
+
+Varias condiciones se pueden juntar con `∧` en una sola selección o separar en selecciones anidadas:
+
+```
+σp1∧p2(R)  =  σp1(σp2(R))
 ```
 
-La condición se aplica a `DETALLE` porque es la única relación que tiene `Cantidad`, y la proyección final conserva los cuatro atributos pedidos.
+Ambas son equivalentes y en los ejercicios se muestran las dos. La equivalencia **solo vale para ∧**. Con `∨` no se puede anidar, porque dos selecciones seguidas exigen que se cumplan las dos.
 
-### 4. Clientes que no han comprado nada
+### Resultados intermedios con nombre
 
-```text
-π_{ Nombre } ( CLIENTE − π_{ IdCliente } ( FACTURA ) )
+Algunas consultas de esta guía (las de "no han" y "todos") son largas. Para no escribir una expresión ilegible se les pone nombre a los resultados parciales con el renombramiento `ρ`, que la clase ya define:
+
+```
+ρNombre(E)                   da nombre a la relación que produce E
+ρNombre(A1,A2,…)(E)          además da nombre a sus atributos
 ```
 
-La diferencia de conjuntos resuelve el «no» en un solo paso: se resta el conjunto de clientes que aparecen en `FACTURA` al de todos los clientes.
+Después se usa ese nombre como si fuera una relación más. Sustituyendo cada nombre por su definición se obtiene la expresión única equivalente.
 
-### 5. Clientes que han comprado todos los productos de la empresa
+### Símbolos que intervienen en la guía
 
-```text
-D      ≡ π_{ IdCliente, IdProducto } ( FACTURA ⋈_{ IdFactura } DETALLE )
-P      ≡ π_{ IdProducto } ( PRODUCTO )
-Faltan ≡ π_{ IdCliente } ( ( π_{ IdCliente } (D) × P ) − D )
+| Símbolo | Operador | Tipo |
+|---|---|---|
+| σ | Selección | Unario |
+| Π | Proyección | Unario |
+| ρ | Renombramiento | Unario |
+| × | Producto cartesiano | Binario |
+| − | Diferencia | Binario |
+| ∩ | Intersección | Binario (derivado) |
 
-π_{ Nombre } ( CLIENTE )
-  − π_{ Nombre } ( CLIENTE ⋈_{ CLIENTE.Id_Cliente = Faltan.IdCliente } Faltan )
+La unión (∪) no hace falta en ningún ejercicio de esta guía.
+
+---
+
+## 2. Operadores, restricciones y explicación
+
+Todo operador recibe relaciones y devuelve una relación. Esa propiedad, la **clausura**, es lo que permite anidar expresiones: la salida de un operador es la entrada del siguiente.
+
+### 2.1 Selección (σ)
+
+```
+σpredicado(R)
 ```
 
-Este es el operador de división. La formulación con diferencia de conjuntos se lee así: se arma el producto cartesiano entre los clientes que compraron algo y todos los productos, se le quitan las combinaciones que sí ocurrieron, y los clientes que quedan con alguna combinación faltante son los que no compraron todo. Restarlos deja la respuesta.
+Filtra **filas**. Devuelve las tuplas de R que cumplen el predicado. El esquema no cambia: mismas columnas y, como máximo, las mismas filas.
 
-La construcción es la misma que define la división: un cliente está en el resultado si y solo si el conjunto de productos que compró contiene a todos los de `P`.
+**Restricciones**
 
-### 6. IdFactura de las ventas cuya cantidad supera la cantidad vendida en la factura 18
+- Actúa sobre una sola relación o sobre el resultado de otra expresión.
+- Comparadores permitidos: `=`, `≠`, `<`, `≤`, `>`, `≥`.
+- Conectivos permitidos: `∧` (y), `∨` (o), `¬` (no).
+- Compara un atributo con una constante o con otro atributo.
+- Los atributos del predicado deben existir en la entrada.
 
-```text
-π_{ D1.IdFactura } (
-  σ_{ D2.IdFactura = 18 ∧ D1.Cantidad > D2.Cantidad } (
-    ρ_{ D1 } ( DETALLE ) ⋈_{ D1.IdProducto = D2.IdProducto } ρ_{ D2 } ( DETALLE )
-  )
-)
+**Ejemplo de la guía:** `σIdProducto>100(PRODUCTO)` deja solo los productos con identificador mayor a 100.
+
+### 2.2 Proyección (Π)
+
+```
+Πatributos(R)
 ```
 
-La relación se une consigo misma: una copia es la venta que se busca y la otra es la factura 18. La comparación es por producto, porque `DETALLE` tiene clave (IdFactura, IdProducto) y cada venta se mide contra la venta del mismo artículo en la factura 18. Es el único caso de la guía donde el renombrado se aplica a una relación consigo misma.
+Extrae **columnas**. El resultado conserva solo los atributos listados.
 
-### 7. Productos que no se han comprado en Luján
+**Restricciones**
 
-```text
-π_{ IdProducto } ( PRODUCTO )
-  − π_{ IdProducto } (
-      σ_{ L.Nombre = 'Luján' } (
-        ρ_{ L.Nombre → LNombre } (
-          PRODUCTO ⋈_{ IdProducto } DETALLE
-                 ⋈_{ IdFactura } FACTURA
-                 ⋈_{ IdCliente } CLIENTE
-                 ⋈_{ IdLocalidad } LOCALIDAD
-        )
-      )
-    )
+- Los atributos listados deben pertenecer a la relación de entrada.
+- Elimina las filas duplicadas del resultado.
+- El orden de la lista define el orden de las columnas.
+- Tras un producto, los atributos repetidos llevan prefijo.
+
+**Ejemplo de la guía:** `ΠIdProducto,Descripción(PRODUCTO)` devuelve solo esas dos columnas.
+
+La eliminación de duplicados tiene consecuencias reales. Si un cliente tiene tres facturas y se proyecta únicamente su nombre, ese nombre sale una vez.
+
+### 2.3 Renombramiento (ρ)
+
+```
+ρx(E)
+ρx(A1,A2,…,An)(E)
 ```
 
-El camino de las uniones va desde el producto hasta la localidad: producto → detalle → factura → cliente → localidad. Es el precio de llegar a un atributo que está en el otro extremo del esquema.
+Le da nombre a la relación que resulta de una expresión y, en la segunda forma, también a sus atributos. No toca el contenido.
 
-### 8. Productos que se han vendido tanto en Luján como en Cortines
+**Restricciones**
 
-```text
-P_Luján ≡ π_{ IdProducto } (
-  σ_{ L.Nombre = 'Luján' } (
-    ρ_{ L.Nombre → LNombre } (
-      PRODUCTO ⋈_{ IdProducto } DETALLE
-             ⋈_{ IdFactura } FACTURA
-             ⋈_{ IdCliente } CLIENTE
-             ⋈_{ IdLocalidad } LOCALIDAD
-    )
-  )
-)
+- La lista de atributos nuevos debe tener tantos nombres como columnas.
+- El nombre nuevo no debe repetir el de otra relación en uso.
 
-P_Cortines ≡ π_{ IdProducto } (
-  σ_{ L.Nombre = 'Cortines' } (
-    ρ_{ L.Nombre → LNombre } (
-      PRODUCTO ⋈_{ IdProducto } DETALLE
-             ⋈_{ IdFactura } FACTURA
-             ⋈_{ IdCliente } CLIENTE
-             ⋈_{ IdLocalidad } LOCALIDAD
-    )
-  )
-)
+Aquí se usa para dos cosas: dar nombre a resultados intermedios y homogeneizar los nombres de atributos antes de una resta, de modo que la compatibilidad no dependa de nada implícito.
 
-P_Luján ∩ P_Cortines
+### 2.4 Producto cartesiano (×)
+
+```
+R×S
 ```
 
-Los dos conjuntos se intersecan. Aquí sí, porque las dos referencias son conjuntos concretos y cerrados: Luján y Cortines.
+Combina cada tupla de R con cada tupla de S. Si R tiene *m* tuplas y S tiene *n*, el resultado tiene *m·n*, y su aridad es la suma de las aridades.
 
-### 9. Nombre de las localidades a las que se han vendido todos los productos
+**Restricciones**
 
-```text
-D      ≡ π_{ IdLocalidad, IdProducto } (
-         ρ_{ L.Nombre → LNombre } (
-           LOCALIDAD ⋈_{ IdLocalidad } CLIENTE
-                     ⋈_{ IdCliente } FACTURA
-                     ⋈_{ IdFactura } DETALLE
-         ) )
-P      ≡ π_{ IdProducto } ( PRODUCTO )
-Faltan ≡ π_{ IdLocalidad } ( ( π_{ IdLocalidad } (D) × P ) − D )
+- No exige compatibilidad: los esquemas pueden ser totalmente distintos.
+- Los atributos con igual nombre se distinguen con el alias.
+- Es asociativa, así que `A×B×C` no necesita paréntesis.
+- Por sí solo mezcla datos que no tienen relación entre sí.
 
-π_{ L.Nombre } ( LOCALIDAD )
-  − π_{ L.Nombre } (
-      LOCALIDAD ⋈_{ LOCALIDAD.IdLocalidad = Faltan.IdLocalidad } Faltan
-    )
+El último punto condiciona todo lo demás. El producto genera todas las parejas posibles y casi todas son absurdas. Lo que las depura es una selección posterior que deja solo las parejas que describen un hecho real.
+
+### 2.5 Diferencia (−)
+
+```
+R−S
 ```
 
-Es el mismo operador de división del ejercicio 5, con las localidades en lugar de los clientes. La estructura se repite porque el «todos» siempre se resuelve igual.
+Devuelve las tuplas que están en R y **no** están en S. Es la única forma que tiene este lenguaje de expresar negación: cualquier consulta con "los que no" pasa por aquí.
 
-### 10. Clientes que tienen alguna factura sin pagar
+**Restricciones**
 
-```text
-π_{ C.Nombre } (
-  ρ_{ C.Nombre → CNombre } (
-    CLIENTE ⋈_{ IdCliente } σ_{ ¬Pagada } ( FACTURA )
-  )
-)
+- R y S deben tener la misma aridad.
+- Los dominios de los atributos i-ésimos deben coincidir, para todo i.
+- No es conmutativa: R−S y S−R son distintas.
+
+La compatibilidad se exige sobre los **dominios**, no sobre los nombres. En esta guía `Id_Cliente` (de CLIENTE) e `IdCliente` (de FACTURA) tienen nombres distintos pero el mismo dominio, y se pueden restar.
+
+### 2.6 Intersección (∩)
+
+```
+R∩S = R−(R−S)
 ```
 
-El enunciado no declara el tipo de `Pagada`. Se asume booleano; si el atributo es texto, la condición pasa a ser `Pagada = 'No'`.
+Devuelve las tuplas que están en ambas relaciones. Se define con la diferencia, así que no es un operador fundamental. Tiene las mismas restricciones de compatibilidad que la diferencia y sí es conmutativa.
 
-### 11. Clientes que han pagado todas sus facturas
+### 2.7 La división, construida con los operadores de la clase
 
-```text
-π_{ C.Nombre } ( CLIENTE )
-  − π_{ C.Nombre } (
-      ρ_{ C.Nombre → CNombre } (
-        CLIENTE ⋈_{ IdCliente } σ_{ ¬Pagada } ( FACTURA )
-      )
-    )
+Tres ejercicios piden "todos": clientes que compraron **todos** los productos (5), localidades a las que se vendieron **todos** (9) y clientes que pagaron **todas** sus facturas (11, que se resuelve de otra forma). El operador natural para eso es la división `R÷S`, pero no figura entre los operadores de la clase. Se obtiene con los que sí figuran.
+
+Si R tiene atributos (X, Y) y S tiene el atributo Y, los valores de X que se relacionan en R con **todos** los valores de S son:
+
+```
+ΠX(R) − ΠX((ΠX(R)×S) − R)
 ```
 
-Es el ejercicio 4 con una condición distinta: se resta el conjunto de clientes con alguna factura impaga al de todos los clientes. El resultado es el complemento del ejercicio 10.
+Se arma en cuatro pasos y cada uno tiene una lectura clara:
 
-## Tres trampas del enunciado
+1. **Candidatos.** `ΠX(R)` son los valores de X que aparecen alguna vez.
+2. **Posibles.** `ΠX(R)×S` genera todas las parejas que *deberían* existir si cada candidato estuviera con cada valor de S.
+3. **Faltan.** Restar R deja las parejas esperadas que no existen.
+4. **Cumplen.** Los candidatos que no tienen ninguna pareja faltante son los que se relacionan con todo S.
 
-**El atributo `Nombre` está repetido.** Aparece en `CLIENTE` y en `LOCALIDAD`, y los ejercicios 2, 7, 8 y 9 unen las dos relaciones. El renombrado `ρ` es la única forma de que la proyección posterior sepa a cuál de los dos se refiere.
+### 2.8 Patrón para consultas con varias relaciones
 
-**El ejercicio 6 no dice «del mismo producto».** La comparación tiene que hacerse por producto, y no por el total de la factura, porque la clave de `DETALLE` es (IdFactura, IdProducto): una factura puede tener varios productos y cada uno se compara con su homólogo de la factura 18.
+El join no existe como operador propio. Se escribe con producto y selección:
 
-**Dos ejercicios piden «todos» y no son intersecciones.** El 5 y el 9 son divisiones. La intersección solo sirve en el 8, donde las dos referencias son conjuntos cerrados y conocidos.
+```
+Πatributos pedidos(σ condiciones de unión(σ filtros(R×S×…)))
+```
 
-## Qué entrena esta guía
+Una regla que ahorra errores: con *n* relaciones en el producto hacen falta **n−1 condiciones de unión**. Dos relaciones, una condición; tres relaciones, dos; cuatro, tres. Si falta una, el resultado queda inflado con parejas absurdas.
 
-**Nombrar la operación.** En álgebra no hay atajos: cada filtro es una `σ`, cada lista de columnas es una `π` y cada «no» es una diferencia. Nombrar la operación obliga a decidir cómo se encadenan los pasos, y esa decisión es la que después se traduce a cualquier lenguaje de consulta.
+Para llegar a la expresión, la clase propone cuatro preguntas que se contestan en orden:
 
-**La división, dos veces.** Los ejercicios 5 y 9 son divisiones, y es la parte que más cuesta. Su formulación —producto cartesiano menos lo que sí ocurrió— es la que hace evidente por qué funciona, y por eso conviene escribirla entera en lugar de usar el símbolo `÷` y darlo por sabido.
+1. ¿Qué atributos se piden en la proyección?
+2. ¿Qué relaciones se necesitan para esos atributos?
+3. ¿Qué condición hay que cumplir?
+4. ¿Qué relaciones se necesitan para esa condición?
 
-**El renombrado `ρ`.** Es obligatorio en cualquier unión entre relaciones que compartan un nombre de atributo, y es el paso que más se pasa por alto al leer una expresión larga.
+---
 
-**El autoinforme.** El ejercicio 6 obliga a unir una relación consigo misma. Sin renombrar las dos copias, la condición no se puede escribir.
+## 3. Relaciones de la guía
 
-Una advertencia sobre el alcance: las soluciones están bien en su forma, pero el resultado sobre datos reales depende de que `DETALLE` tenga la clave (IdFactura, IdProducto) y de que no queden facturas huérfanas. Si algún producto no aparece nunca en `DETALLE`, el ejercicio 5 devuelve la lista vacía, que es la respuesta correcta para una empresa con catálogo y ventas desalineados.
+```
+CLIENTE(Id_Cliente, Nombre, Dirección, Teléfono, IdLocalidad)
+PRODUCTO(IdProducto, Descripción, Precio)
+FACTURA(IdFactura, IdCliente, Fecha, Pagada)
+DETALLE(IdFactura, IdProducto, Cantidad, PrecioVta)
+LOCALIDAD(IdLocalidad, Nombre)
+```
 
-## Ver el esquema en tamaño completo
+**Qué atributo enlaza cada par de relaciones**
 
-La imagen del esquema tiene **1600 × 560 px**. Dentro de la página se ve entera, pero las claves foráneas y las cardinalidades se leen mejor en una pestaña aparte.
+| Relaciones | Condición de unión |
+|---|---|
+| CLIENTE y LOCALIDAD | `C.IdLocalidad=L.IdLocalidad` |
+| CLIENTE y FACTURA | `C.Id_Cliente=F.IdCliente` |
+| FACTURA y DETALLE | `F.IdFactura=D.IdFactura` |
+| DETALLE y PRODUCTO | `D.IdProducto=PR.IdProducto` |
 
-<a
-  href="/evidencias/algebra-relacional/esquema-guias.png"
-  target="_blank"
-  rel="noopener noreferrer"
-  class="pixel-btn pixel-btn--blue px-5 py-3 text-sm uppercase"
->
-  Abrir el esquema original
-</a>
+Tres observaciones sobre el esquema, porque se arrastran por toda la guía:
 
-## Documento del trabajo
+- El identificador del cliente se llama `Id_Cliente` en CLIENTE e `IdCliente` en FACTURA. Es el mismo dato con dos nombres.
+- DETALLE no tiene cliente. Para saber **quién** compró una línea hay que pasar por FACTURA.
+- La guía no define cómo se codifica `Pagada`. Aquí se asume **1 = pagada y 0 = sin pagar**.
 
-- [Guía 1 · Ejercicios de álgebra relacional (PDF)](/evidencias/algebra-relacional/Ejercicios_algebra_relacional.pdf)
+### Instancia de ejemplo
 
-Este trabajo corresponde a la categoría **Álgebra Relacional** de la asignatura Bases de Datos 1.
+**LOCALIDAD**
+
+| IdLocalidad | Nombre |
+|---|---|
+| 1 | Luján |
+| 2 | Cortines |
+| 3 | Mercedes |
+| 4 | Pilar |
+
+**CLIENTE**
+
+| Id_Cliente | Nombre | Dirección | Teléfono | IdLocalidad |
+|---|---|---|---|---|
+| 1 | Ana | San Martín 120 | 221111 | 1 |
+| 2 | Bruno | Mitre 45 | 222222 | 1 |
+| 3 | Carla | Belgrano 300 | 333333 | 2 |
+| 4 | Diego | Rivadavia 78 | 444444 | 2 |
+| 5 | Elisa | Sarmiento 15 | 555555 | 3 |
+| 6 | Facundo | Moreno 90 | 666666 | 3 |
+
+**PRODUCTO**
+
+| IdProducto | Descripción | Precio |
+|---|---|---|
+| 85 | Cinta | 8.00 |
+| 100 | Tornillo | 2.50 |
+| 101 | Martillo | 45.00 |
+| 150 | Taladro | 320.00 |
+
+**FACTURA**
+
+| IdFactura | IdCliente | Fecha | Pagada |
+|---|---|---|---|
+| 15 | 1 | 2026-03-02 | 1 |
+| 16 | 1 | 2026-03-10 | 0 |
+| 17 | 2 | 2026-03-12 | 1 |
+| 18 | 3 | 2026-03-15 | 1 |
+| 19 | 3 | 2026-03-20 | 1 |
+| 20 | 4 | 2026-03-22 | 0 |
+| 21 | 5 | 2026-03-25 | 1 |
+| 22 | 4 | 2026-03-28 | 1 |
+
+**DETALLE**
+
+| IdFactura | IdProducto | Cantidad | PrecioVta |
+|---|---|---|---|
+| 15 | 85 | 120 | 8.00 |
+| 15 | 101 | 10 | 45.00 |
+| 16 | 85 | 600 | 8.00 |
+| 17 | 101 | 500 | 45.00 |
+| 18 | 101 | 300 | 45.00 |
+| 19 | 85 | 700 | 8.00 |
+| 19 | 150 | 5 | 320.00 |
+| 20 | 100 | 450 | 2.50 |
+| 21 | 85 | 40 | 8.00 |
+| 21 | 100 | 800 | 2.50 |
+| 21 | 101 | 15 | 45.00 |
+| 21 | 150 | 2 | 320.00 |
+| 22 | 85 | 50 | 8.00 |
+
+**Qué se puso a propósito en los datos**
+
+- El producto 100 no es mayor a 100, y la línea de la factura 17 es de exactamente 500.
+- Facundo no tiene facturas, y Pilar no tiene clientes.
+- La factura 18 tiene una sola línea, de 300 unidades.
+- Elisa compró los cuatro productos. Ningún cliente de Cortines los compró todos, pero entre Carla y Diego sí cubren los cuatro.
+- Ana y Diego tienen una factura sin pagar cada uno.
+
+---
+
+## 4. Ejercicios resueltos
+
+Cada ejercicio muestra las cuatro preguntas de la clase, la expresión, el cálculo paso a paso con los tamaños de cada resultado intermedio y el resultado final.
+
+Dos convenciones de lectura:
+
+- Una "venta" es una línea de DETALLE.
+- Los conteos de tuplas se dan para la instancia de la sección 3.
+
+---
+
+### Ejercicio 1
+
+**Enunciado.** Mostrar los Id y las descripciones de los productos cuyo Id sea mayor a 100.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributos se piden? | `IdProducto` y `Descripción` |
+| ¿Qué relación los contiene? | PRODUCTO |
+| ¿Qué condición hay que cumplir? | `IdProducto > 100` |
+| ¿Qué relación contiene la condición? | PRODUCTO |
+
+Todo está en una sola relación: no hay producto cartesiano ni unión.
+
+**Expresión**
+
+```
+ΠIdProducto,Descripción(σIdProducto>100(PRODUCTO))
+```
+
+**Paso a paso**
+
+**Paso 1. Selección `σIdProducto>100`.** Se recorren las cuatro filas de PRODUCTO. El 85 y el 100 no cumplen: la condición es estrictamente mayor y 100 no es mayor que 100. Quedan 2 tuplas.
+
+| IdProducto | Descripción | Precio |
+|---|---|---|
+| 101 | Martillo | 45.00 |
+| 150 | Taladro | 320.00 |
+
+**Paso 2. Proyección `ΠIdProducto,Descripción`.** Se descarta `Precio`.
+
+**Resultado**
+
+| IdProducto | Descripción |
+|---|---|
+| 101 | Martillo |
+| 150 | Taladro |
+
+---
+
+### Ejercicio 2
+
+**Enunciado.** Mostrar los nombres de los clientes de Luján.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributo se pide? | `Nombre` del cliente |
+| ¿Qué relación lo contiene? | CLIENTE |
+| ¿Qué condición hay que cumplir? | El nombre de la localidad es `'Luján'` |
+| ¿Qué relación contiene la condición? | LOCALIDAD, enlazada por `IdLocalidad` |
+
+CLIENTE solo guarda el **identificador** de la localidad. El nombre vive en LOCALIDAD, así que hay producto y una condición de unión.
+
+**Expresión con selecciones anidadas**
+
+```
+ΠC.Nombre(σC.IdLocalidad=L.IdLocalidad(σL.Nombre='Luján'(CLIENTE×LOCALIDAD)))
+```
+
+**Expresión con ∧**
+
+```
+ΠC.Nombre(σC.IdLocalidad=L.IdLocalidad∧L.Nombre='Luján'(CLIENTE×LOCALIDAD))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto `CLIENTE×LOCALIDAD`.** 6 clientes por 4 localidades: 24 tuplas, con siete atributos.
+
+**Paso 2. Filtro `σL.Nombre='Luján'`.** Solo una localidad cumple. Cada una de sus parejas con los 6 clientes sigue viva: 6 tuplas. Todavía hay parejas incorrectas, como Carla emparejada con Luján.
+
+**Paso 3. Unión `σC.IdLocalidad=L.IdLocalidad`.** Se conserva solo la pareja donde el cliente pertenece a esa localidad. Quedan 2 tuplas:
+
+| C.Id_Cliente | C.Nombre | C.IdLocalidad | L.IdLocalidad | L.Nombre |
+|---|---|---|---|---|
+| 1 | Ana | 1 | 1 | Luján |
+| 2 | Bruno | 1 | 1 | Luján |
+
+(Se omiten `Dirección` y `Teléfono` para que la tabla quepa.)
+
+**Paso 4. Proyección `ΠC.Nombre`.** El prefijo es obligatorio: `Nombre` también existe en LOCALIDAD, y sin prefijo no se sabría cuál de las dos columnas se pide.
+
+**Resultado**
+
+| Nombre |
+|---|
+| Ana |
+| Bruno |
+
+---
+
+### Ejercicio 3
+
+**Enunciado.** Obtener el nombre de los clientes, el IdFactura, el IdProducto y su cantidad vendida, de aquellos productos que figuran en detalle con más de 500 unidades.
+
+**Interpretación.** Se entiende que la condición recae sobre cada **línea** de DETALLE: interesan las líneas cuya `Cantidad` supera 500. La otra lectura posible, "productos cuyo total acumulado supera 500", exige sumar por producto, y la suma (agregación) no está entre los operadores de la clase.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributos se piden? | `Nombre`, `IdFactura`, `IdProducto`, `Cantidad` |
+| ¿Qué relaciones los contienen? | CLIENTE (nombre) y DETALLE (el resto) |
+| ¿Qué condición hay que cumplir? | `Cantidad > 500` |
+| ¿Qué relación contiene la condición? | DETALLE |
+
+CLIENTE y DETALLE no se enlazan directamente. Hace falta **FACTURA como puente**: el cliente se une con la factura y la factura con sus líneas. Tres relaciones en el producto, dos condiciones de unión.
+
+**Expresión con selecciones anidadas**
+
+```
+ΠC.Nombre,D.IdFactura,D.IdProducto,D.Cantidad(σC.Id_Cliente=F.IdCliente(σF.IdFactura=D.IdFactura(σD.Cantidad>500(CLIENTE×FACTURA×DETALLE))))
+```
+
+**Expresión con ∧**
+
+```
+ΠC.Nombre,D.IdFactura,D.IdProducto,D.Cantidad(σC.Id_Cliente=F.IdCliente∧F.IdFactura=D.IdFactura∧D.Cantidad>500(CLIENTE×FACTURA×DETALLE))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto `CLIENTE×FACTURA×DETALLE`.** 6 × 8 × 13 = 624 tuplas.
+
+**Paso 2. Filtro `σD.Cantidad>500`.** Tres líneas de DETALLE superan 500: la de la factura 16 (600), la de la 19 (700) y la de la 21 (800). La línea de la factura 17 vale exactamente 500 y queda fuera. Cada línea se combina con las 48 parejas (cliente, factura): 3 × 48 = 144 tuplas.
+
+**Paso 3. Unión `σF.IdFactura=D.IdFactura`.** Cada línea se queda solo con su propia factura. Quedan 3 líneas, cada una combinada con los 6 clientes: 18 tuplas.
+
+**Paso 4. Unión `σC.Id_Cliente=F.IdCliente`.** Cada factura se queda solo con su cliente. Quedan 3 tuplas:
+
+| C.Id_Cliente | C.Nombre | F.IdFactura | F.IdCliente | D.IdFactura | D.IdProducto | D.Cantidad |
+|---|---|---|---|---|---|---|
+| 1 | Ana | 16 | 1 | 16 | 85 | 600 |
+| 3 | Carla | 19 | 3 | 19 | 85 | 700 |
+| 5 | Elisa | 21 | 5 | 21 | 100 | 800 |
+
+**Paso 5. Proyección `ΠC.Nombre,D.IdFactura,D.IdProducto,D.Cantidad`.**
+
+**Resultado**
+
+| Nombre | IdFactura | IdProducto | Cantidad |
+|---|---|---|---|
+| Ana | 16 | 85 | 600 |
+| Carla | 19 | 85 | 700 |
+| Elisa | 21 | 100 | 800 |
+
+**Observación.** Si se olvida cualquiera de las dos condiciones de unión, el resultado se llena de parejas sin sentido: Ana asociada con la compra de Elisa, por ejemplo.
+
+---
+
+### Ejercicio 4
+
+**Enunciado.** Nombre de los clientes de la tabla CLIENTE que no aparecen en la tabla FACTURA (clientes que no han comprado nada).
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributo se pide? | `Nombre` |
+| ¿Qué relación lo contiene? | CLIENTE |
+| ¿Qué condición hay que cumplir? | Que el cliente **no** figure en FACTURA |
+| ¿Qué relaciones intervienen? | CLIENTE y FACTURA |
+
+"Que no figure" es negación, y la negación es **diferencia**. Se restan identificadores, no nombres: si dos clientes se llamaran igual y solo uno hubiera comprado, restar nombres haría desaparecer al que no compró. El identificador es único y no tiene ese problema.
+
+**Expresión, con nombres intermedios**
+
+```
+SinCompras = ρSinCompras(Id_Cliente)(ΠId_Cliente(CLIENTE)−ΠIdCliente(FACTURA))
+
+ΠC.Nombre(σC.Id_Cliente=SinCompras.Id_Cliente(CLIENTE×SinCompras))
+```
+
+**Expresión única**
+
+```
+ΠC.Nombre(σC.Id_Cliente=S.Id_Cliente(CLIENTE×ρS(Id_Cliente)(ΠId_Cliente(CLIENTE)−ΠIdCliente(FACTURA))))
+```
+
+**Paso a paso**
+
+**Paso 1. Todos los clientes: `ΠId_Cliente(CLIENTE)`.** Resultado: `{1, 2, 3, 4, 5, 6}`.
+
+**Paso 2. Clientes con facturas: `ΠIdCliente(FACTURA)`.** Las 8 facturas pertenecen a 5 clientes, y la proyección elimina repetidos. Resultado: `{1, 2, 3, 4, 5}`.
+
+**Paso 3. Diferencia.** `{1, 2, 3, 4, 5, 6}` − `{1, 2, 3, 4, 5}` = `{6}`. Los dos operandos tienen la misma aridad y el mismo dominio, aunque los atributos se llamen distinto. Se nombra el resultado `SinCompras`, con el atributo `Id_Cliente`.
+
+**Paso 4. Recuperar el nombre.** `CLIENTE×SinCompras` tiene 6 × 1 = 6 tuplas. La selección `σC.Id_Cliente=SinCompras.Id_Cliente` deja 1:
+
+| C.Id_Cliente | C.Nombre | SinCompras.Id_Cliente |
+|---|---|---|
+| 6 | Facundo | 6 |
+
+**Paso 5. Proyección `ΠC.Nombre`.**
+
+**Resultado**
+
+| Nombre |
+|---|
+| Facundo |
+
+---
+
+### Ejercicio 5
+
+**Enunciado.** Nombre de los clientes que han comprado todos los productos de la empresa.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributo se pide? | `Nombre` |
+| ¿Qué relación lo contiene? | CLIENTE |
+| ¿Qué condición hay que cumplir? | Haber comprado **cada** producto de PRODUCTO |
+| ¿Qué relaciones intervienen? | FACTURA y DETALLE (quién compró qué), PRODUCTO (el total) |
+
+Aparece "todos", así que se aplica la construcción de la división de la sección 2.7. Falta decidir qué es R y qué es S:
+
+- **R** son las parejas (cliente, producto) que existen en las compras.
+- **S** es la lista completa de productos.
+
+**Expresión, con nombres intermedios**
+
+```
+Pares = ρPares(IdCliente,IdProducto)(ΠF.IdCliente,D.IdProducto(σF.IdFactura=D.IdFactura(FACTURA×DETALLE)))
+Todos = ρTodos(IdProducto)(ΠIdProducto(PRODUCTO))
+ConCompras = ρConCompras(IdCliente)(ΠIdCliente(Pares))
+Faltan = ρFaltan(IdCliente,IdProducto)((ConCompras×Todos)−Pares)
+Cumplen = ρCumplen(IdCliente)(ConCompras−ΠIdCliente(Faltan))
+
+ΠC.Nombre(σC.Id_Cliente=Cumplen.IdCliente(CLIENTE×Cumplen))
+```
+
+**Paso a paso**
+
+**Paso 1. Pares (cliente, producto).** `FACTURA×DETALLE` tiene 8 × 13 = 104 tuplas. La selección `σF.IdFactura=D.IdFactura` deja las 13 líneas, cada una con el cliente de su factura. La proyección `ΠF.IdCliente,D.IdProducto` elimina un repetido: Ana compró el producto 85 en dos facturas distintas, la 15 y la 16. Quedan 12 pares.
+
+| IdCliente | IdProducto |
+|---|---|
+| 1 | 85 |
+| 1 | 101 |
+| 2 | 101 |
+| 3 | 101 |
+| 3 | 85 |
+| 3 | 150 |
+| 4 | 100 |
+| 4 | 85 |
+| 5 | 85 |
+| 5 | 100 |
+| 5 | 101 |
+| 5 | 150 |
+
+**Paso 2. Todos los productos.** `Todos` = `{85, 100, 101, 150}`.
+
+**Paso 3. Candidatos.** `ConCompras` = `{1, 2, 3, 4, 5}`. Facundo no figura porque no tiene ninguna compra.
+
+**Paso 4. Posibles y faltantes.** `ConCompras×Todos` genera las 5 × 4 = 20 parejas que existirían si cada cliente hubiera comprado todo. Al restar `Pares` (12) quedan 8 parejas que faltan:
+
+| IdCliente | IdProducto |
+|---|---|
+| 1 | 100 |
+| 1 | 150 |
+| 2 | 85 |
+| 2 | 100 |
+| 2 | 150 |
+| 3 | 100 |
+| 4 | 101 |
+| 4 | 150 |
+
+**Paso 5. Quién cumple.** Los clientes con alguna pareja faltante son `{1, 2, 3, 4}`. Restándolos de los candidatos queda `Cumplen` = `{5}`. Elisa no tiene ninguna pareja en `Faltan`.
+
+**Paso 6. Recuperar el nombre.** `CLIENTE×Cumplen` tiene 6 tuplas; la selección deja 1. La proyección da el nombre.
+
+**Resultado**
+
+| Nombre |
+|---|
+| Elisa |
+
+**Observación.** Carla compró tres de los cuatro productos (le falta el 100) y por eso queda fuera. La condición es "todos", no "casi todos".
+
+---
+
+### Ejercicio 6
+
+**Enunciado.** IdFactura de las ventas cuya cantidad supera a la cantidad vendida en la factura 18.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributo se pide? | `IdFactura` |
+| ¿Qué relación lo contiene? | DETALLE |
+| ¿Qué condición hay que cumplir? | `Cantidad` mayor que la de la factura 18 |
+| ¿Qué relación contiene la condición? | DETALLE, comparada contra sí misma |
+
+La comparación enfrenta cada línea contra un valor de referencia que sale de la misma tabla. Se aísla ese valor en una relación de una sola fila y se combina con todas las líneas. Se supone que la factura 18 tiene una sola línea, como ocurre en los datos.
+
+**Expresión, con nombres intermedios**
+
+```
+Ref = ρRef(CantRef)(ΠCantidad(σIdFactura=18(DETALLE)))
+
+ΠD.IdFactura(σD.Cantidad>Ref.CantRef(DETALLE×Ref))
+```
+
+**Expresión única**
+
+```
+ΠD.IdFactura(σD.Cantidad>R.CantRef(DETALLE×ρR(CantRef)(ΠCantidad(σIdFactura=18(DETALLE)))))
+```
+
+**Paso a paso**
+
+**Paso 1. Línea de la factura 18: `σIdFactura=18(DETALLE)`.** Una tupla: (18, 101, 300, 45.00).
+
+**Paso 2. Valor de referencia.** Se proyecta `Cantidad` y se renombra el atributo a `CantRef`, para que no choque con `Cantidad` de DETALLE. `Ref` = `{300}`.
+
+**Paso 3. Producto `DETALLE×Ref`.** 13 × 1 = 13 tuplas: cada línea con el 300 pegado al lado.
+
+**Paso 4. Selección `σD.Cantidad>Ref.CantRef`.** Se conservan las líneas con más de 300 unidades. Quedan 5:
+
+| D.IdFactura | D.IdProducto | D.Cantidad | Ref.CantRef |
+|---|---|---|---|
+| 16 | 85 | 600 | 300 |
+| 17 | 101 | 500 | 300 |
+| 19 | 85 | 700 | 300 |
+| 20 | 100 | 450 | 300 |
+| 21 | 100 | 800 | 300 |
+
+**Paso 5. Proyección `ΠD.IdFactura`.**
+
+**Resultado**
+
+| IdFactura |
+|---|
+| 16 |
+| 17 |
+| 19 |
+| 20 |
+| 21 |
+
+**Observación.** La propia factura 18 queda fuera: 300 no es mayor que 300. Si la factura 18 tuviera varias líneas, la expresión devolvería las líneas que superan **a alguna** de ellas. Para superar a todas habría que comparar contra la mayor, y ese máximo se obtiene restando los valores que tienen otro mayor.
+
+---
+
+### Pieza compartida para los ejercicios 7, 8 y 9: qué localidad compró qué producto
+
+Los tres ejercicios siguientes necesitan saber **a qué localidad se vendió cada producto**. Para no repetir la cadena completa de uniones, se calcula una sola vez.
+
+El camino es largo porque DETALLE no sabe nada de localidades: DETALLE → FACTURA (por `IdFactura`) → CLIENTE (por `IdCliente`) → LOCALIDAD (por `IdLocalidad`). Cuatro relaciones, tres condiciones de unión.
+
+**Expresión con selecciones anidadas**
+
+```
+VentasLoc = ρVentasLoc(Localidad,IdProducto)(ΠL.Nombre,D.IdProducto(σD.IdFactura=F.IdFactura(σF.IdCliente=C.Id_Cliente(σC.IdLocalidad=L.IdLocalidad(DETALLE×FACTURA×CLIENTE×LOCALIDAD)))))
+```
+
+**Expresión con ∧**
+
+```
+VentasLoc = ρVentasLoc(Localidad,IdProducto)(ΠL.Nombre,D.IdProducto(σD.IdFactura=F.IdFactura∧F.IdCliente=C.Id_Cliente∧C.IdLocalidad=L.IdLocalidad(DETALLE×FACTURA×CLIENTE×LOCALIDAD)))
+```
+
+**Cómo se reduce el tamaño**
+
+El producto tiene 13 × 8 × 6 × 4 = 2496 tuplas. La primera selección (`C.IdLocalidad=L.IdLocalidad`) las baja a 624, porque cada cliente solo pertenece a una localidad. La segunda (`F.IdCliente=C.Id_Cliente`) las baja a 104, porque cada factura tiene un solo cliente. La tercera (`D.IdFactura=F.IdFactura`) las baja a 13, una por línea de DETALLE:
+
+| D.IdFactura | D.IdProducto | F.IdCliente | C.Nombre | L.Nombre |
+|---|---|---|---|---|
+| 15 | 85 | 1 | Ana | Luján |
+| 15 | 101 | 1 | Ana | Luján |
+| 16 | 85 | 1 | Ana | Luján |
+| 17 | 101 | 2 | Bruno | Luján |
+| 18 | 101 | 3 | Carla | Cortines |
+| 19 | 85 | 3 | Carla | Cortines |
+| 19 | 150 | 3 | Carla | Cortines |
+| 20 | 100 | 4 | Diego | Cortines |
+| 22 | 85 | 4 | Diego | Cortines |
+| 21 | 85 | 5 | Elisa | Mercedes |
+| 21 | 100 | 5 | Elisa | Mercedes |
+| 21 | 101 | 5 | Elisa | Mercedes |
+| 21 | 150 | 5 | Elisa | Mercedes |
+
+La proyección `ΠL.Nombre,D.IdProducto` elimina los repetidos (Luján con el 85 aparece dos veces, por las facturas 15 y 16; Cortines con el 85, también dos veces) y deja 10 pares:
+
+**VentasLoc**
+
+| Localidad | IdProducto |
+|---|---|
+| Luján | 85 |
+| Luján | 101 |
+| Cortines | 85 |
+| Cortines | 100 |
+| Cortines | 101 |
+| Cortines | 150 |
+| Mercedes | 85 |
+| Mercedes | 100 |
+| Mercedes | 101 |
+| Mercedes | 150 |
+
+Pilar no aparece: no tiene clientes, y por tanto tampoco ventas.
+
+---
+
+### Ejercicio 7
+
+**Enunciado.** Productos que no se han comprado en Luján.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributos se piden? | `IdProducto` y `Descripción` |
+| ¿Qué relación los contiene? | PRODUCTO |
+| ¿Qué condición hay que cumplir? | **No** haberse vendido en Luján |
+| ¿Qué relaciones intervienen? | PRODUCTO y `VentasLoc` |
+
+De nuevo negación, de nuevo diferencia: del total de productos se restan los que sí se vendieron en Luján.
+
+**Expresión, con nombres intermedios** (`VentasLoc` es la pieza compartida)
+
+```
+NoLujan = ρNoLujan(IdProducto)(ΠIdProducto(PRODUCTO)−ΠIdProducto(σLocalidad='Luján'(VentasLoc)))
+
+ΠPR.IdProducto,PR.Descripción(σPR.IdProducto=NoLujan.IdProducto(PRODUCTO×NoLujan))
+```
+
+**Paso a paso**
+
+**Paso 1. Productos vendidos en Luján: `ΠIdProducto(σLocalidad='Luján'(VentasLoc))`.** La selección deja (Luján, 85) y (Luján, 101). La proyección da `{85, 101}`.
+
+**Paso 2. Todos los productos: `ΠIdProducto(PRODUCTO)`.** `{85, 100, 101, 150}`.
+
+**Paso 3. Diferencia.** `{85, 100, 101, 150}` − `{85, 101}` = `{100, 150}`. Es `NoLujan`.
+
+**Paso 4. Recuperar la descripción.** `PRODUCTO×NoLujan` tiene 4 × 2 = 8 tuplas. La selección `σPR.IdProducto=NoLujan.IdProducto` deja 2:
+
+| PR.IdProducto | PR.Descripción | PR.Precio | NoLujan.IdProducto |
+|---|---|---|---|
+| 100 | Tornillo | 2.50 | 100 |
+| 150 | Taladro | 320.00 | 150 |
+
+**Paso 5. Proyección `ΠPR.IdProducto,PR.Descripción`.**
+
+**Resultado**
+
+| IdProducto | Descripción |
+|---|---|
+| 100 | Tornillo |
+| 150 | Taladro |
+
+**Observación.** El resultado incluiría también productos que no se hubieran vendido en ninguna parte. La consulta pide "no comprados en Luján", y eso es lo que calcula.
+
+---
+
+### Ejercicio 8
+
+**Enunciado.** Productos que se han vendido tanto en Luján como en Cortines.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributos se piden? | `IdProducto` y `Descripción` |
+| ¿Qué relación los contiene? | PRODUCTO |
+| ¿Qué condición hay que cumplir? | Haberse vendido en Luján **y** en Cortines |
+| ¿Qué relaciones intervienen? | PRODUCTO y `VentasLoc` |
+
+"Tanto… como…" es **intersección**: el conjunto de productos de cada localidad por separado, y lo que tienen en común. No hace falta que sea el mismo cliente ni la misma factura.
+
+**Expresión, con nombres intermedios**
+
+```
+EnLujan = ρEnLujan(IdProducto)(ΠIdProducto(σLocalidad='Luján'(VentasLoc)))
+EnCortines = ρEnCortines(IdProducto)(ΠIdProducto(σLocalidad='Cortines'(VentasLoc)))
+Ambos = ρAmbos(IdProducto)(EnLujan∩EnCortines)
+
+ΠPR.IdProducto,PR.Descripción(σPR.IdProducto=Ambos.IdProducto(PRODUCTO×Ambos))
+```
+
+**Paso a paso**
+
+**Paso 1. Productos de Luján.** `EnLujan` = `{85, 101}`.
+
+**Paso 2. Productos de Cortines.** La selección deja cuatro pares (Cortines, 85), (Cortines, 100), (Cortines, 101) y (Cortines, 150). `EnCortines` = `{85, 100, 101, 150}`.
+
+**Paso 3. Intersección.** `EnLujan∩EnCortines` = `{85, 101}`. Equivale a `EnLujan−(EnLujan−EnCortines)`: la resta interior da vacío, y `{85, 101}` menos vacío es `{85, 101}`.
+
+**Paso 4. Recuperar la descripción.** `PRODUCTO×Ambos` tiene 4 × 2 = 8 tuplas; la selección deja 2. La proyección da id y descripción.
+
+**Resultado**
+
+| IdProducto | Descripción |
+|---|---|
+| 85 | Cinta |
+| 101 | Martillo |
+
+---
+
+### Ejercicio 9
+
+**Enunciado.** Nombre de las localidades a las que se han vendido todos los productos.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributo se pide? | `Nombre` de la localidad |
+| ¿Qué relación lo contiene? | LOCALIDAD (ya incluido en `VentasLoc`) |
+| ¿Qué condición hay que cumplir? | Que se le haya vendido **cada** producto |
+| ¿Qué relaciones intervienen? | `VentasLoc` y PRODUCTO |
+
+Misma estructura que el ejercicio 5, con "localidad" en el lugar de "cliente". **R** es `VentasLoc` (localidad, producto) y **S** es la lista completa de productos.
+
+**Expresión, con nombres intermedios**
+
+```
+Todos = ρTodos(IdProducto)(ΠIdProducto(PRODUCTO))
+Candidatas = ρCandidatas(Localidad)(ΠLocalidad(VentasLoc))
+Faltan = ρFaltan(Localidad,IdProducto)((Candidatas×Todos)−VentasLoc)
+
+Candidatas−ΠLocalidad(Faltan)
+```
+
+**Paso a paso**
+
+**Paso 1. Todos los productos.** `Todos` = `{85, 100, 101, 150}`.
+
+**Paso 2. Candidatas.** `Candidatas` = `{Luján, Cortines, Mercedes}`. Pilar no figura porque no tiene ventas.
+
+**Paso 3. Posibles y faltantes.** `Candidatas×Todos` genera 3 × 4 = 12 parejas. Al restar `VentasLoc` (10 pares) quedan 2 que faltan:
+
+| Localidad | IdProducto |
+|---|---|
+| Luján | 100 |
+| Luján | 150 |
+
+**Paso 4. Quién cumple.** Solo Luján tiene parejas faltantes: `ΠLocalidad(Faltan)` = `{Luján}`. Se resta de las candidatas.
+
+**Resultado**
+
+| Nombre |
+|---|
+| Cortines |
+| Mercedes |
+
+**Observación.** Cortines cumple aunque ninguno de sus clientes haya comprado los cuatro productos por separado: Carla compró tres y Diego compró 100 y 85. Entre los dos cubren los cuatro, y la pregunta es sobre la localidad, no sobre cada cliente.
+
+---
+
+### Ejercicio 10
+
+**Enunciado.** Obtener el nombre de los clientes que tienen alguna factura sin pagar.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributo se pide? | `Nombre` |
+| ¿Qué relación lo contiene? | CLIENTE |
+| ¿Qué condición hay que cumplir? | `Pagada = 0` |
+| ¿Qué relación contiene la condición? | FACTURA, enlazada por `Id_Cliente=IdCliente` |
+
+"Alguna" es la parte fácil: basta con que **exista** una factura con `Pagada=0`. Un filtro y una unión resuelven el ejercicio, sin diferencia ni división.
+
+**Expresión con selecciones anidadas**
+
+```
+ΠC.Nombre(σC.Id_Cliente=F.IdCliente(σF.Pagada=0(CLIENTE×FACTURA)))
+```
+
+**Expresión con ∧**
+
+```
+ΠC.Nombre(σC.Id_Cliente=F.IdCliente∧F.Pagada=0(CLIENTE×FACTURA))
+```
+
+**Paso a paso**
+
+**Paso 1. Producto `CLIENTE×FACTURA`.** 6 × 8 = 48 tuplas.
+
+**Paso 2. Filtro `σF.Pagada=0`.** Dos facturas están sin pagar: la 16 (de Ana) y la 20 (de Diego). Cada una se combina con los 6 clientes: 12 tuplas.
+
+**Paso 3. Unión `σC.Id_Cliente=F.IdCliente`.** Quedan 2 tuplas:
+
+| C.Id_Cliente | C.Nombre | F.IdFactura | F.IdCliente | F.Pagada |
+|---|---|---|---|---|
+| 1 | Ana | 16 | 1 | 0 |
+| 4 | Diego | 20 | 4 | 0 |
+
+**Paso 4. Proyección `ΠC.Nombre`.** Si un cliente tuviera dos facturas sin pagar, su nombre saldría una sola vez.
+
+**Resultado**
+
+| Nombre |
+|---|
+| Ana |
+| Diego |
+
+---
+
+### Ejercicio 11
+
+**Enunciado.** Obtener el nombre de los clientes que han pagado todas sus facturas.
+
+| Pregunta | Respuesta |
+|---|---|
+| ¿Qué atributo se pide? | `Nombre` |
+| ¿Qué relación lo contiene? | CLIENTE |
+| ¿Qué condición hay que cumplir? | **Ninguna** de sus facturas está sin pagar |
+| ¿Qué relaciones intervienen? | CLIENTE y FACTURA |
+
+**Por qué no sirve el atajo.** Lo primero que se le ocurre a cualquiera es filtrar `Pagada=1` y listar los clientes. Con los datos de ejemplo eso devuelve a Ana, que pagó la factura 15 pero debe la 16, y a Diego, que pagó la 22 pero debe la 20. El filtro encuentra clientes con **alguna** factura pagada, que es otra pregunta.
+
+"Todas pagadas" equivale a "ninguna sin pagar". Se parte de los clientes que tienen facturas y se quitan los que tienen alguna sin pagar. Es la misma negación del ejercicio 4, apoyada en el filtro del ejercicio 10.
+
+**Expresión, con nombres intermedios**
+
+```
+ConFacturas = ρConFacturas(IdCliente)(ΠIdCliente(FACTURA))
+Deudores = ρDeudores(IdCliente)(ΠIdCliente(σPagada=0(FACTURA)))
+Pagadores = ρPagadores(IdCliente)(ConFacturas−Deudores)
+
+ΠC.Nombre(σC.Id_Cliente=Pagadores.IdCliente(CLIENTE×Pagadores))
+```
+
+**Paso a paso**
+
+**Paso 1. Clientes con facturas.** `ConFacturas` = `{1, 2, 3, 4, 5}`.
+
+**Paso 2. Deudores.** `σPagada=0(FACTURA)` deja las facturas 16 y 20. Proyectando `IdCliente`: `Deudores` = `{1, 4}`.
+
+**Paso 3. Diferencia.** `{1, 2, 3, 4, 5}` − `{1, 4}` = `{2, 3, 5}`. Es `Pagadores`.
+
+**Paso 4. Recuperar el nombre.** `CLIENTE×Pagadores` tiene 6 × 3 = 18 tuplas; la selección deja 3:
+
+| C.Id_Cliente | C.Nombre | Pagadores.IdCliente |
+|---|---|---|
+| 2 | Bruno | 2 |
+| 3 | Carla | 3 |
+| 5 | Elisa | 5 |
+
+**Paso 5. Proyección `ΠC.Nombre`.**
+
+**Resultado**
+
+| Nombre |
+|---|
+| Bruno |
+| Carla |
+| Elisa |
+
+#### Si Facundo también debe salir
+
+Facundo no tiene facturas, así que no debe ninguna. Según cómo se lea el enunciado, "pagó todas sus facturas" puede incluirlo (se cumple por vacuidad) o excluirlo (no hay nada que haya pagado). La solución de arriba lo excluye. Si se lo quiere dentro, solo cambia el punto de partida: en lugar de los clientes con facturas, se parte de todos los clientes.
+
+```
+Pagadores = ρPagadores(IdCliente)(ΠId_Cliente(CLIENTE)−Deudores)
+```
+
+Con eso, `Pagadores` = `{1, 2, 3, 4, 5, 6}` − `{1, 4}` = `{2, 3, 5, 6}`, y el resultado es Bruno, Carla, Elisa y Facundo.
+
+---
+
+## 5. Tabla de resultados
+
+| Ej. | Pide | Operadores clave | Resultado |
+|---|---|---|---|
+| 1 | Productos con Id > 100 | σ, Π | 101 Martillo, 150 Taladro |
+| 2 | Clientes de Luján | ×, σ, Π | Ana, Bruno |
+| 3 | Líneas de más de 500 unidades | ×, σ (dos uniones), Π | Ana (16), Carla (19), Elisa (21) |
+| 4 | Clientes sin facturas | −, ×, σ, Π | Facundo |
+| 5 | Clientes que compraron todo | división con −, ×, Π | Elisa |
+| 6 | Líneas que superan la de la factura 18 | ρ, ×, σ, Π | Facturas 16, 17, 19, 20, 21 |
+| 7 | Productos no comprados en Luján | −, ×, σ, Π | 100 Tornillo, 150 Taladro |
+| 8 | Productos vendidos en Luján y Cortines | ∩ | 85 Cinta, 101 Martillo |
+| 9 | Localidades con todos los productos | división con −, ×, Π | Cortines, Mercedes |
+| 10 | Clientes con alguna factura sin pagar | ×, σ, Π | Ana, Diego |
+| 11 | Clientes con todas las facturas pagadas | −, ×, σ, Π | Bruno, Carla, Elisa |
+
+Los once ejercicios se reducen a cuatro patrones:
+
+- **Filtrar y proyectar** (1).
+- **Unir con producto y selección** (2, 3, 6, 10).
+- **Negar con diferencia** (4, 7, 11).
+- **Cubrir "todos" con la división** (5, 9). La intersección del 8 es un caso especial de diferencia.
+
+---
+
+## 6. Errores frecuentes
+
+- Olvidar una condición de unión: con *n* relaciones hacen falta *n−1*.
+- Escribir `Nombre` sin prefijo cuando existe en dos relaciones.
+- Restar nombres en lugar de identificadores en los ejercicios de negación.
+- Confundir `>` con `≥` justo en el valor límite (100 y 500 en estos datos).
+- Resolver "todas pagadas" con `Pagada=1`, que responde otra pregunta.
+
+El primero es el más peligroso porque la expresión parece correcta y devuelve filas. Lo que devuelve son parejas inventadas: clientes asociados con facturas ajenas o productos con localidades donde nunca se vendieron. Ante un resultado más grande de lo esperado, conviene contar las relaciones del producto y contar las condiciones de unión.
