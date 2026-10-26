@@ -1,0 +1,161 @@
+---
+title: "Algebra Relacional Aplicada al Caso TecnoCel S.A.S."
+tagline: "Quince casos resueltos con la notacion de clase: producto cartesiano mas seleccion, sin reunion natural, sobre ocho relaciones del modelo TecnoCel"
+description: "Taller de algebra relacional sobre el caso de estudio TecnoCel S.A.S.: 15 casos resueltos paso a paso, operadores sigma, pi, producto cartesiano y diferencia, con ocho relaciones (MARCA, PROVEEDOR, PRODUCTO, SEDE, EMPLEADO, CLIENTE, VENTA, DETALLE_VENTA) y sus igualdades de union."
+status: "complete"
+category: "algebra-relacional"
+moduleId: "BD1-ALG-006"
+order: 18
+thumbnail: "../../../assets/evidencias/algebra-relacional-tecnocel/thumbnail.png"
+thumbnailAlt: "Esquema relacional de ocho tablas del caso TecnoCel: MARCA, PROVEEDOR, PRODUCTO, SEDE, EMPLEADO, CLIENTE, VENTA y DETALLE_VENTA"
+
+tech:
+  - "Algebra relacional (sigma, pi, producto cartesiano, diferencia)"
+  - "Caso de estudio TecnoCel S.A.S."
+  - "Notacion de clase: producto cartesiano mas seleccion"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Caso de estudio TecnoCel S.A.S.: marcas, productos, proveedores, sedes, empleados, clientes, ventas y lineas de venta"
+  - label: "Relaciones"
+    value: "Ocho: MARCA, PROVEEDOR, PRODUCTO, SEDE, EMPLEADO, CLIENTE, VENTA, DETALLE_VENTA"
+  - label: "Casos"
+    value: "Quince: cinco con diferencia, cinco con (p1 y p2) o p3, cinco con (p1 o p2) y p3"
+  - label: "Notacion"
+    value: "Producto cartesiano X mas seleccion sigma; no se usa reunion natural"
+
+features:
+  - lead: "Operadores y restricciones"
+    text: "Sigma, pi, producto cartesiano, diferencia, conectores logicos y comparadores, cada uno con sus restricciones de uso."
+  - lead: "Igualdades de union"
+    text: "Ocho igualdades clave que conectan las ocho relaciones del modelo TecnoCel."
+  - lead: "Quince casos resueltos"
+    text: "Distribuidos en tres tipos: diferencia (casos 1-5), (p1 y p2) o p3 (casos 6-10) y (p1 o p2) y p3 (casos 11-15)."
+  - lead: "Errores comunes"
+    text: "Lista de los fallos mas frecuentes al corregir este tipo de consultas."
+
+archCaption: "Esquema relacional de ocho tablas para el caso TecnoCel S.A.S."
+
+challenge:
+  title: "Problema"
+  body: "Resolver quince casos de algebra relacional aplicados al caso de estudio TecnoCel S.A.S., usando solo producto cartesiano y seleccion (sin reunion natural), con ocho relaciones interconectadas y sus respectivas igualdades de union."
+
+solution:
+  title: "Solucion"
+  body: "Se identifican los operadores sigma, pi, producto cartesiano y diferencia con sus restricciones. Se definen ocho igualdades de union para conectar las ocho relaciones. Los quince casos se resuelven paso a paso en tres grupos segun la forma logica de la condicion, con esquema de resultado para cada uno."
+
+---
+
+## Descripcion
+
+Este documento resuelve el taller de **algebra relacional aplicado al caso TecnoCel S.A.S.** El modelo tiene ocho relaciones conectadas por relaciones 1:N. Se resuelven quince casos paso a paso usando solo producto cartesiano y seleccion (sin reunion natural), tal como se pide en la notacion de la clase.
+
+## Las ocho relaciones del modelo
+
+| Relacion | Atributos principales | PK | FK |
+|---|---|---|---|
+| MARCA | id_marca, nombre_marca, pais_origen, sitio_web | id_marca | — |
+| PROVEEDOR | id_proveedor, nit, razon_social, ciudad_proveedor, telefono_proveedor, email_proveedor | id_proveedor | — |
+| PRODUCTO | id_producto, id_marca, id_proveedor, modelo, tipo_producto, sistema_operativo, almacenamiento_gb, color, precio_venta, stock | id_producto | id_marca, id_proveedor |
+| SEDE | id_sede, nombre_sede, ciudad_sede, direccion_sede, telefono_sede | id_sede | — |
+| EMPLEADO | id_empleado, documento_empleado, nombres_empleado, apellidos_empleado, cargo, salario, fecha_ingreso, id_sede_asignada | id_empleado | id_sede_asignada |
+| CLIENTE | id_cliente, tipo_documento, num_documento, nombres_cliente, apellidos_cliente, ciudad_cliente, telefono_cliente, email_cliente, fecha_registro | id_cliente | — |
+| VENTA | id_venta, fecha_venta, id_cliente, id_empleado, id_sede, medio_pago, estado_venta, total_venta | id_venta | id_cliente, id_empleado, id_sede |
+| DETALLE_VENTA | id_venta, id_producto, cantidad, precio_unitario, descuento_pct | (id_venta, id_producto) | id_venta, id_producto |
+
+## Igualdades de union
+
+Ocho igualdades conectan todo el modelo. Cada vez que un caso cruza tablas, sale de esta lista:
+
+| Se unen | Igualdad dentro del sigma |
+|---|---|
+| MARCA y PRODUCTO | M.id_marca = P.id_marca |
+| PROVEEDOR y PRODUCTO | PR.id_proveedor = P.id_proveedor |
+| SEDE y EMPLEADO | S.id_sede = E.id_sede_asignada |
+| SEDE y VENTA | S.id_sede = V.id_sede |
+| CLIENTE y VENTA | C.id_cliente = V.id_cliente |
+| EMPLEADO y VENTA | E.id_empleado = V.id_empleado |
+| VENTA y DETALLE_VENTA | V.id_venta = D.id_venta |
+| PRODUCTO y DETALLE_VENTA | P.id_producto = D.id_producto |
+
+Dos detalles importantes del modelo:
+- El empleado tiene una sede base (`id_sede_asignada`) y la venta tiene la sede donde ocurrio (`id_sede`). Un empleado puede vender en una sede que no es la suya.
+- `sistema_operativo` y `almacenamiento_gb` solo tienen valor en los celulares. En los accesorios son NULL.
+
+## Operadores y restricciones
+
+### Seleccion: sigma
+Recorre las filas y se queda con las que cumplen la condicion. Las columnas no cambian. Es el filtro del algebra relacional. Restricciones: usa solo atributos que existan, no cambia las columnas, una comparacion con NULL no es verdadera, la condicion se evalua fila por fila.
+
+### Proyeccion: pi
+Elige qué columnas se muestran. Como el resultado es un conjunto, las filas repetidas desaparecen. Restricciones: solo atributos que existan, elimina duplicados, lo que se proyecta fuera no se puede usar despues, no filtra filas (para eso esta sigma).
+
+### Producto cartesiano: cartesiano
+Empareja cada fila de una relacion con todas las filas de la otra. Con n y m filas produce n·m filas. Atributos con igual nombre se califican con alias. Unir k relaciones exige k−1 igualdades de llave en el sigma. Sin esas igualdades el resultado es ruido.
+
+### Diferencia: menos
+Entrega las filas que estan en el primer conjunto y no en el segundo. Los operandos deben ser compatibles (mismo numero de atributos y dominios). No es conmutativa.
+
+## Los tres tipos de casos
+
+Los quince casos se agrupan en tres tipos segun la forma de la condicion:
+
+| Tipo | Casos | Forma | Idea |
+|---|---|---|---|
+| 1 | 1 a 5 | A − B | Universo de candidatos menos los que sí cumplen lo que se excluye |
+| 2 | 6 a 10 | (p1 ∧ p2) ∨ p3 | Dos condiciones juntas, mas una alternativa independiente |
+| 3 | 11 a 15 | (p1 ∨ p2) ∧ p3 | Una alternativa, y a ambas se les exige ademas otra condicion |
+
+### Tipo 1: Diferencia y negacion (casos 1 a 5)
+
+Se arma el universo de candidatos (A) y se resta el grupo que cumple lo que se quiere excluir (B). Casos resueltos:
+
+1. Marcas con celulares que nunca se han vendido en ventas validas.
+2. Clientes fuera de Bogota que nunca han pagado en efectivo.
+3. Empleados no administradores que nunca han vendido en la sede Unicentro.
+4. Celulares que no son iOS y que nunca se han vendido.
+5. Proveedores fuera de Bogota que no suministran marcas coreanas.
+
+### Tipo 2: (p1 ∧ p2) ∨ p3 (casos 6 a 10)
+
+Las igualdades de union van por fuera del parentesis del OR. Si se meten adentro, la alternativa dejaria pasar filas que nunca se unieron. Casos resueltos:
+
+6. Celulares costosos o productos con stock critico.
+7. Ventas en efectivo en Cali o ventas de alto valor.
+8. Clientes bogotanos que compraron Apple, o lineas con descuento alto.
+9. Ventas anuladas por vendedores, o ventas con tarjeta de credito.
+10. Proveedores de Medellin con buen stock, o marcas chinas.
+
+### Tipo 3: (p1 ∨ p2) ∧ p3 (casos 11 a 15)
+
+Todo es AND por fuera. Las igualdades de union y la condicion extra se escriben seguidas. Solo el parentesis del OR importa. Casos resueltos:
+
+11. Samsung o Xiaomi con almacenamiento grande.
+12. Ventas con tarjeta en sedes de Bogota.
+13. Cajeros o vendedores con salario alto y su sede base.
+14. Clientes de Bogota o Cali que compraron accesorios.
+15. Lineas de Apple o Motorola con dos o mas unidades.
+
+Cada caso incluye su esquema de resultado, las igualdades de union usadas y la justificacion paso a paso de cada decision.
+
+## Errores comunes al corregir
+
+- Olvidar una igualdad de union: con k relaciones deben aparecer k−1.
+- Meter las igualdades de union dentro del parentesis del OR.
+- Confundir ¬ (condicion sobre una fila) con − (resta de conjuntos).
+- Restar conjuntos con distinto numero de columnas.
+- Usar `id_sede_asignada` cuando el enunciado habla de la sede de la venta.
+- Proyectar un atributo y luego intentar usarlo en un sigma posterior.
+- Quitar los parentesis en los casos 6 a 15: cambia el resultado sin avisar.
+- Evaluar con ¬ el sistema operativo sin filtrar primero los celulares.
+
+## Documento del trabajo
+
+- [Esquema original (PDF)](/evidencias/algebra-relacional-tecnocel/algebra-relacional-tecnocel.pdf)
+
+---
+
+### Origen del ejercicio
+
+Este es un ejercicio de **otro grupo de Bases De Datos 1**, proporcionado por el profesor **Alexander Dario Agudelo Cubillos**. El documento original corresponde al taller de algebra relacional aplicado al caso de estudio TecnoCel S.A.S. sobre el cual se realizo el analisis y resolucion presentado en este documento.
