@@ -1,0 +1,1049 @@
+---
+title: "Guía de estudio: Consultas SQL — Taller 2 Tienda en Línea"
+tagline: "Consultas SQL sobre el esquema de e-commerce del Taller 2: clientes, pedidos, productos, pagos y envíos, con MySQL como referencia"
+description: "Guía de estudio de consultas SQL sobre el sistema de tienda en línea del Taller 2: anatomía del SELECT, JOINs, subconsultas, CTE, operadores de conjunto, window functions, ejemplos resueltos y errores comunes."
+status: "complete"
+category: "consultas"
+moduleId: "BD1-CON-002"
+order: 20
+thumbnail: "../../../assets/evidencias/consultas-sql-taller2/thumbnail.png"
+thumbnailAlt: "Esquema relacional de siete tablas del Taller 2: CATEGORIA, CLIENTE, PRODUCTO, PEDIDO, DETALLE_PEDIDO, PAGO y ENVIO"
+
+tech:
+  - "SQL (MySQL)"
+  - "JOINs (INNER, LEFT, RIGHT, FULL, CROSS)"
+  - "Subconsultas y EXISTS"
+  - "CTE y Window functions"
+  - "Operadores de conjunto (UNION, INTERSECT, EXCEPT)"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Sistema de gestión de tienda en línea (Taller 2): clientes, pedidos, productos, categorías, detalles, pagos y envíos"
+  - label: "Relaciones"
+    value: "Siete tablas: CATEGORIA, CLIENTE, PRODUCTO, PEDIDO, DETALLE_PEDIDO, PAGO, ENVIO"
+  - label: "Motor de referencia"
+    value: "MySQL (con notas para Oracle, PostgreSQL y SQL Server)"
+  - label: "Contenido"
+    value: "12 secciones: SELECT, JOINs, agregación, subconsultas, CTE, conjuntos, window functions, ejemplos resueltos, errores comunes, chuleta y referencias"
+
+features:
+  - lead: "Anatomía del SELECT"
+    text: "Cláusulas, orden lógico de evaluación, WHERE, GROUP BY, HAVING, DISTINCT, ORDER BY, LIMIT."
+  - lead: "JOINs de todos los tipos"
+    text: "INNER, LEFT, RIGHT, FULL, CROSS, SELF JOIN; cuándo usar cada uno y cómo evitar errores."
+  - lead: "Subconsultas y CTE"
+    text: "En WHERE, FROM, SELECT; EXISTS, NOT EXISTS, IN, NOT IN; CTE simples y recursivos."
+  - lead: "Operadores de conjunto y window functions"
+    text: "UNION, UNION ALL, INTERSECT, EXCEPT/MINUS; ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD."
+  - lead: "Ejemplos resueltos y errores comunes"
+    text: "Cinco consultas completas con decisiones explicadas y catorce errores típicos con sus soluciones."
+
+archCaption: "Esquema relacional de siete tablas para consultas SQL sobre tienda en línea"
+
+challenge:
+  title: "Problema"
+  body: "Crear una guía de estudio de consultas SQL sobre el sistema de tienda en línea del Taller 2, cubriendo desde SELECT básico hasta window functions, con MySQL como motor de referencia, incluyendo ejemplos resueltos, errores comunes y referencias."
+
+solution:
+  title: "Solucion"
+  body: "Guía de 12 secciones que cubre anatomía del SELECT, JOINs, agregación, subconsultas, CTE, operadores de conjunto, window functions, cinco ejemplos resueltos paso a paso, catorce errores comunes con sus soluciones, una chuleta de referencia rápida y referencias bibliográficas."
+
+---
+
+# Guía de estudio: Consultas SQL — Taller 2 Tienda en Línea
+
+Una consulta SQL es una pregunta que le haces a la base de datos. "¿Qué productos se vendieron más?", "¿qué cliente no ha pagado su pedido?", "¿cuánto facturó la tienda en marzo?". Todo eso se contesta con una sentencia `SELECT`.
+
+En este portafolio, la sección **Consultas** demuestra que el modelo diseñado en el MER no es solo un dibujo: se puede interrogar y devuelve respuestas correctas. Esta guía trabaja sobre el esquema del **Taller 2** (Sistema de Gestión de una Tienda en Línea) y usa MySQL como motor de referencia. Cuando otro motor haga las cosas distinto (Oracle, PostgreSQL, SQL Server), lo marco.
+
+**Cómo leerla:** los primeros bloques son base (cláusulas, JOINs, agregación). Luego suben el nivel (subconsultas, CTE, conjuntos, window functions). Al final hay ejemplos resueltos, errores típicos y referencias.
+
+---
+
+## 1. El esquema del Taller 2 (tienda en línea)
+
+Antes de escribir una consulta hay que saber qué tablas existen y cómo se conectan. Esta sección describe el MER del taller tal como aparece en el documento original, ya corregido.
+
+### 1.1 Reglas de negocio
+
+- Un cliente puede realizar muchos pedidos, pero cada pedido pertenece a un solo cliente (1:N).
+- Un pedido puede tener varios productos, y un producto puede aparecer en varios pedidos (N:M, resuelta con la entidad asociativa `DETALLE_PEDIDO`, que registra cantidad, precio unitario y subtotal).
+- Un producto pertenece a una sola categoría, pero una categoría puede tener muchos productos (1:N).
+- Un pedido tiene un único pago asociado, y un pago corresponde a un único pedido (1:1).
+- Un pedido tiene un único envío asociado, y un envío corresponde a un único pedido (1:1).
+
+### 1.2 Descripción del MER corregido
+
+El diagrama del MER corregido muestra siete entidades conectadas por relaciones. Cada entidad se dibuja como una tarjeta con cabecera de color sólido y nombre en mayúsculas. Los atributos clave (PK, FK) van en negrita y con el color de la entidad.
+
+| Entidad | Atributos principales | PK | FK |
+|---|---|---|---|
+| CATEGORIA | id_categoria, nombre, descripcion | id_categoria | — |
+| CLIENTE | id_cliente, nombre, apellido, documento, correo, telefono, direccion, fecha_registro | id_cliente | — |
+| PRODUCTO | id_producto, nombre, descripcion, precio, stock, id_categoria | id_producto | id_categoria |
+| PEDIDO | id_pedido, id_cliente, fecha_pedido, estado, total | id_pedido | id_cliente |
+| DETALLE_PEDIDO | id_detalle, id_pedido, id_producto, cantidad, precio_unitario, subtotal | id_detalle | id_pedido, id_producto |
+| PAGO | id_pago, id_pedido, metodo_pago, fecha_pago, monto, estado | id_pago | id_pedido (UNIQUE) |
+| ENVIO | id_envio, id_pedido, empresa, numero_guia, fecha_envio, fecha_entrega, estado | id_envio | id_pedido (UNIQUE) |
+
+`DETALLE_PEDIDO` es la entidad asociativa que resuelve la N:M entre `PEDIDO` y `PRODUCTO`. Tiene clave primaria propia (`id_detalle`) y dos foráneas.
+
+Las relaciones son:
+
+- `CLIENTE` 1:N `PEDIDO` (un cliente hace muchos pedidos).
+- `PEDIDO` N:M `PRODUCTO` (un pedido tiene varios productos, un producto está en varios pedidos), resuelta por `DETALLE_PEDIDO`.
+- `CATEGORIA` 1:N `PRODUCTO` (una categoría tiene muchos productos).
+- `PEDIDO` 1:1 `PAGO` (un pedido tiene un pago, un pago pertenece a un pedido).
+- `PEDIDO` 1:1 `ENVIO` (un pedido tiene un envío, un envío pertenece a un pedido).
+
+`PEDIDO` es el punto de cruce del modelo. Lleva la FK hacia `CLIENTE` y se conecta con `DETALLE_PEDIDO`, `PAGO` y `ENVIO`. Casi todas las consultas interesantes pasan por ella.
+
+### 1.3 Creación de la base de datos
+
+El script `CREATE` del Taller 2 queda así:
+
+```sql
+CREATE DATABASE tienda_online;
+USE tienda_online;
+
+CREATE TABLE categoria (
+  id_categoria  INT AUTO_INCREMENT PRIMARY KEY,
+  nombre        VARCHAR(50) NOT NULL,
+  descripcion   TEXT
+);
+
+CREATE TABLE cliente (
+  id_cliente      INT AUTO_INCREMENT PRIMARY KEY,
+  nombre          VARCHAR(50) NOT NULL,
+  apellido        VARCHAR(50) NOT NULL,
+  documento       VARCHAR(20) NOT NULL UNIQUE,
+  correo          VARCHAR(100) NOT NULL,
+  telefono        VARCHAR(20),
+  direccion       VARCHAR(150),
+  fecha_registro  DATE
+);
+
+CREATE TABLE producto (
+  id_producto   INT AUTO_INCREMENT PRIMARY KEY,
+  nombre        VARCHAR(100) NOT NULL,
+  descripcion   TEXT,
+  precio        DECIMAL(10,2) NOT NULL,
+  stock         INT NOT NULL DEFAULT 0,
+  id_categoria  INT,
+  FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
+);
+
+CREATE TABLE pedido (
+  id_pedido      INT AUTO_INCREMENT PRIMARY KEY,
+  id_cliente     INT NOT NULL,
+  fecha_pedido   DATETIME NOT NULL,
+  estado         ENUM('Pendiente','Enviado','Entregado','Cancelado') DEFAULT 'Pendiente',
+  total          DECIMAL(10,2),
+  FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+);
+
+CREATE TABLE detalle_pedido (
+  id_detalle        INT AUTO_INCREMENT PRIMARY KEY,
+  id_pedido         INT NOT NULL,
+  id_producto       INT NOT NULL,
+  cantidad          INT NOT NULL,
+  precio_unitario   DECIMAL(10,2) NOT NULL,
+  subtotal          DECIMAL(10,2),
+  FOREIGN KEY (id_pedido)   REFERENCES pedido(id_pedido),
+  FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
+);
+
+CREATE TABLE pago (
+  id_pago       INT AUTO_INCREMENT PRIMARY KEY,
+  id_pedido     INT NOT NULL UNIQUE,
+  metodo_pago   VARCHAR(50) NOT NULL,
+  fecha_pago    DATETIME,
+  monto         DECIMAL(10,2) NOT NULL,
+  estado        ENUM('Aprobado','Rechazado','Pendiente') DEFAULT 'Pendiente',
+  FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido)
+);
+
+CREATE TABLE envio (
+  id_envio        INT AUTO_INCREMENT PRIMARY KEY,
+  id_pedido       INT NOT NULL UNIQUE,
+  empresa         VARCHAR(50),
+  numero_guia     VARCHAR(30),
+  fecha_envio     DATE,
+  fecha_entrega   DATE,
+  estado          ENUM('En camino','Entregado','En espera') DEFAULT 'En espera',
+  FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido)
+);
+```
+
+### 1.4 Datos de prueba
+
+El Taller 2 incluye al menos 5 registros por tabla. Los datos de ejemplo son:
+
+**Categoría:** Electrónica, Ropa, Hogar, Deportes, Libros.
+
+**Cliente:** Juan Pérez, María López, Andrés Castro, Sofía Rojas, Diego Morales (con documento, correo, teléfono, dirección y fecha de registro).
+
+**Producto:** Audífonos Bluetooth ($150.000, stock 50), Camiseta deportiva ($45.000, stock 100), Juego de sábanas ($90.000, stock 30), Balón de fútbol ($70.000, stock 40), Novela Cien años de soledad ($55.000, stock 25).
+
+**Pedido:** 5 pedidos con fechas entre marzo de 2024, estados variados (Entregado, Enviado, Pendiente, Cancelado) y totales.
+
+**Detalle de pedido:** cada pedido tiene una o más líneas con cantidad, precio unitario y subtotal.
+
+**Pago:** método de pago (Tarjeta de crédito, PSE, Tarjeta de débito), fecha, monto y estado (Aprobado, Rechazado, Pendiente).
+
+**Envío:** empresa (Servientrega, Coordinadora, Interrapidísimo), número de guía, fechas y estado.
+
+---
+
+## 2. Anatomía de un SELECT
+
+Una consulta básica tiene esta forma:
+
+```sql
+SELECT   columnas o expresiones
+FROM     tabla
+WHERE    condición sobre filas
+GROUP BY columnas de agrupación
+HAVING   condición sobre grupos
+ORDER BY columnas de orden
+LIMIT    n;
+```
+
+Lo que escribes y lo que el motor ejecuta no van en el mismo orden. Esta diferencia explica la mitad de los errores de principiante.
+
+**Orden lógico de evaluación:**
+
+1. `FROM` (y los `JOIN`): arma el conjunto de filas de partida.
+2. `WHERE`: descarta filas.
+3. `GROUP BY`: agrupa lo que quedó.
+4. `HAVING`: descarta grupos.
+5. `SELECT`: calcula las columnas y los alias.
+6. `DISTINCT`: elimina duplicados.
+7. `ORDER BY`: ordena el resultado.
+8. `LIMIT`: recorta.
+
+De ahí salen reglas que parecen caprichos, pero no lo son. Un alias definido en el `SELECT` no existe todavía cuando corre el `WHERE`. Y `ORDER BY` sí puede usarlo, porque se evalúa después.
+
+### 2.1 SELECT y FROM
+
+`SELECT` dice **qué** columnas quieres. `FROM` dice **de dónde**.
+
+```sql
+SELECT nombre, precio
+FROM producto;
+```
+
+Puedes calcular expresiones y ponerles alias con `AS`:
+
+```sql
+SELECT nombre,
+       precio * 1.19 AS precio_con_iva
+FROM producto;
+```
+
+`SELECT *` sirve para explorar. En código que va a durar, nómbrate las columnas: si alguien agrega una columna a la tabla, tu consulta no cambia de forma sin avisar.
+
+**Restricciones:**
+
+- Si mezclas columnas normales con agregaciones, las normales deben ir en `GROUP BY`.
+- Los alias no se pueden usar en `WHERE` ni en `HAVING` (en MySQL, `HAVING` sí los acepta).
+- Un alias con espacios necesita comillas invertidas: `` `total pagado` ``.
+
+### 2.2 WHERE
+
+Filtra **filas individuales**, antes de agrupar.
+
+```sql
+SELECT nombre, precio
+FROM producto
+WHERE precio > 50000
+  AND stock > 0;
+```
+
+Operadores que vas a usar todo el tiempo:
+
+| Operador | Uso | Ejemplo |
+|---|---|---|
+| `=`, `<>`, `<`, `>`, `<=`, `>=` | Comparar | `precio > 50000` |
+| `AND`, `OR`, `NOT` | Combinar | `estado = 'Entregado' AND total > 100000` |
+| `BETWEEN` | Rango inclusivo | `fecha_pedido BETWEEN '2024-03-01' AND '2024-03-31'` |
+| `IN` | Lista de valores | `estado IN ('Enviado','Entregado')` |
+| `LIKE` | Patrón (`%` y `_`) | `nombre LIKE 'Audífonos%'` |
+| `IS NULL` / `IS NOT NULL` | Nulos | `fecha_entrega IS NULL` |
+
+**La trampa del NULL.** `NULL` no es igual a nada, ni siquiera a otro `NULL`. Escribir `fecha_entrega = NULL` nunca devuelve filas. Se escribe `IS NULL`. Es el error número uno de quien empieza.
+
+Precedencia: `AND` pesa más que `OR`. Cuando mezcles ambos, usa paréntesis aunque no hagan falta.
+
+```sql
+-- Pedidos entregados o enviados con total mayor a 50 mil
+SELECT id_pedido, estado, total
+FROM pedido
+WHERE total > 50000
+   OR (estado <> 'Cancelado' AND fecha_pedido >= '2024-03-01');
+```
+
+**Restricciones:** no admite funciones de agregación (`WHERE COUNT(*) > 1` es un error). Eso va en `HAVING`.
+
+### 2.3 DISTINCT
+
+Quita filas duplicadas **del resultado completo**, no de una columna suelta.
+
+```sql
+SELECT DISTINCT estado
+FROM pedido;
+```
+
+Con varias columnas, `DISTINCT` compara la combinación entera:
+
+```sql
+SELECT DISTINCT estado, id_cliente
+FROM pedido;
+```
+
+Úsalo con cuidado. Si te salen duplicados que no esperabas, casi siempre el problema es un `JOIN` mal planteado, y `DISTINCT` solo lo esconde. Arregla la causa.
+
+### 2.4 ORDER BY
+
+Ordena el resultado. Sin `ORDER BY`, el motor no garantiza ningún orden.
+
+```sql
+SELECT nombre, precio
+FROM producto
+ORDER BY precio DESC, nombre ASC;
+```
+
+- `ASC` es el valor por defecto; `DESC` invierte.
+- Puedes ordenar por alias, por expresión o por posición (`ORDER BY 2`), aunque la posición es frágil.
+- En MySQL, los `NULL` salen primero en `ASC` y al final en `DESC`.
+
+### 2.5 LIMIT, OFFSET y FETCH FIRST
+
+Recortan el número de filas. Casi siempre van con `ORDER BY`.
+
+```sql
+-- Los 3 productos más caros
+SELECT nombre, precio
+FROM producto
+ORDER BY precio DESC
+LIMIT 3;
+
+-- Saltar 3 y traer los siguientes 3 (paginación)
+SELECT nombre FROM producto ORDER BY id_producto LIMIT 3 OFFSET 3;
+```
+
+Cada motor lo escribe a su manera:
+
+| Motor | Sintaxis |
+|---|---|
+| MySQL, PostgreSQL, SQLite | `LIMIT n [OFFSET m]` |
+| Oracle 12c+, PostgreSQL, SQL estándar | `OFFSET m ROWS FETCH FIRST n ROWS ONLY` |
+| SQL Server | `SELECT TOP n ...` o `OFFSET ... FETCH NEXT ...` |
+
+---
+
+## 3. Funciones de agregación
+
+Toman muchas filas y devuelven un valor. Sin `GROUP BY`, el resultado es una sola fila para toda la tabla.
+
+| Función | Qué hace | Detalle que se olvida |
+|---|---|---|
+| `COUNT(*)` | Cuenta filas | Incluye filas con `NULL` |
+| `COUNT(col)` | Cuenta valores no nulos de `col` | Ignora los `NULL` |
+| `COUNT(DISTINCT col)` | Cuenta valores distintos | Ignora los `NULL` |
+| `SUM(col)` | Suma | Devuelve `NULL` si no hay filas |
+| `AVG(col)` | Promedio | Ignora los `NULL`, no los cuenta como 0 |
+| `MAX(col)` / `MIN(col)` | Mayor / menor | Sirven también para texto y fechas |
+
+Con los datos del Taller 2:
+
+```sql
+SELECT COUNT(*)               AS pedidos,
+       SUM(total)             AS facturado_total,
+       AVG(total)             AS ticket_promedio,
+       MAX(total)             AS pedido_mayor,
+       MIN(total)             AS pedido_menor
+FROM pedido;
+```
+
+Resultado esperado:
+
+| pedidos | facturado_total | ticket_promedio | pedido_mayor | pedido_menor |
+|---|---|---|---|---|
+| 5 | 455000.00 | 91000.000000 | 195000.00 | 45000.00 |
+
+### 3.1 Agregación con GROUP BY y HAVING
+
+Ventas por estado de pedido:
+
+```sql
+SELECT estado,
+       COUNT(*)      AS cantidad,
+       SUM(total)    AS total_vendido
+FROM pedido
+GROUP BY estado
+HAVING SUM(total) > 50000
+ORDER BY total_vendido DESC;
+```
+
+| estado | cantidad | total_vendido |
+|---|---|---|
+| Entregado | 2 | 250000.00 |
+| Enviado | 1 | 45000.00 |
+| Pendiente | 1 | 70000.00 |
+
+Los pedidos cancelados desaparecen porque su suma no supera el umbral (o se filtran con `WHERE` antes, según el caso).
+
+**Restricciones:**
+
+- Todo lo que aparezca en `SELECT` sin agregar debe estar en `GROUP BY`.
+- MySQL con `ONLY_FULL_GROUP_BY` (activo por defecto) rechaza lo contrario.
+- `HAVING` suele llevar agregaciones; sin ellas casi siempre debería ser un `WHERE`.
+- No se pueden anidar agregaciones directamente: `SUM(COUNT(*))` es error.
+
+---
+
+## 4. JOINs
+
+Los datos están repartidos en tablas por diseño. El `JOIN` los reúne usando la condición de la cláusula `ON`, que casi siempre empareja una llave foránea con su llave primaria.
+
+Imagina dos conjuntos: `A` es la tabla de la izquierda y `B` la de la derecha. Cada tipo de `JOIN` decide qué hace con las filas que **no** encuentran pareja.
+
+### 4.1 INNER JOIN
+
+Devuelve solo las filas con pareja en ambas tablas. Es el `JOIN` por defecto.
+
+```sql
+SELECT c.nombre, c.apellido, p.id_pedido, p.fecha_pedido, p.total
+FROM pedido p
+INNER JOIN cliente c ON c.id_cliente = p.id_cliente;
+```
+
+**Cuándo usarlo:** cuando solo te interesan los datos que están relacionados.
+
+### 4.2 LEFT JOIN
+
+Conserva **todas** las filas de la tabla izquierda. Si no hay pareja en la derecha, las columnas de la derecha salen en `NULL`.
+
+```sql
+SELECT c.nombre, c.apellido, COUNT(p.id_pedido) AS pedidos
+FROM cliente c
+LEFT JOIN pedido p ON p.id_cliente = c.id_cliente
+GROUP BY c.id_cliente, c.nombre, c.apellido
+ORDER BY pedidos DESC;
+```
+
+Aquí `INNER JOIN` habría dejado solo clientes con pedidos y habrías perdido a los que no compraron nada. Nota que se cuenta `p.id_pedido`, no `*`: así los clientes sin pedidos dan 0 y no 1.
+
+**Truco clásico, el anti-join.** Para encontrar lo que **no** tiene pareja:
+
+```sql
+SELECT c.nombre, c.apellido
+FROM cliente c
+LEFT JOIN pedido p ON p.id_cliente = c.id_cliente
+WHERE p.id_pedido IS NULL;
+```
+
+**Dónde poner el filtro importa.** Una condición sobre la tabla derecha en el `WHERE` convierte el `LEFT JOIN` en un `INNER JOIN` disfrazado. Si quieres filtrar la derecha sin perder filas de la izquierda, la condición va en el `ON`.
+
+### 4.3 RIGHT JOIN
+
+Es el espejo del anterior: conserva todas las filas de la tabla **derecha**.
+
+```sql
+SELECT c.nombre, p.id_pedido
+FROM pedido p
+RIGHT JOIN cliente c ON c.id_cliente = p.id_cliente;
+```
+
+Da el mismo resultado que el `LEFT JOIN` con las tablas intercambiadas. En la práctica casi todo el mundo escribe `LEFT JOIN` y reordena las tablas.
+
+### 4.4 FULL JOIN (FULL OUTER JOIN)
+
+Conserva todas las filas de ambas tablas. Lo que no tiene pareja se rellena con `NULL`.
+
+```sql
+-- PostgreSQL, Oracle, SQL Server
+SELECT c.nombre, p.id_pedido
+FROM cliente c
+FULL OUTER JOIN pedido p ON p.id_cliente = c.id_cliente;
+```
+
+**MySQL no tiene `FULL JOIN`.** Se simula con `LEFT JOIN` y `RIGHT JOIN` unidos por `UNION`.
+
+**Cuándo usarlo:** conciliaciones. "Qué hay en A que no está en B, qué hay en B que no está en A, y qué coincide."
+
+### 4.5 CROSS JOIN
+
+Producto cartesiano: cada fila de una tabla con cada fila de la otra. Sin `ON`.
+
+```sql
+SELECT c.nombre, cat.nombre
+FROM cliente c
+CROSS JOIN categoria cat;
+```
+
+Cinco clientes por cinco categorías: 25 filas. Si cruzas dos tablas grandes sin querer, obtienes millones de filas. Tiene usos legítimos: generar combinaciones, calendarios, matrices de reporte.
+
+### 4.6 SELF JOIN y JOIN con varias tablas
+
+Una tabla puede unirse consigo misma usando alias distintos. Y los `JOIN` se encadenan. Este recorre cliente → pedido → detalle → producto:
+
+```sql
+SELECT p.id_pedido,
+       c.nombre AS cliente,
+       pr.nombre AS producto,
+       dp.cantidad,
+       dp.subtotal
+FROM pedido p
+JOIN cliente c      ON c.id_cliente = p.id_cliente
+JOIN detalle_pedido dp ON dp.id_pedido = p.id_pedido
+JOIN producto pr    ON pr.id_producto = dp.id_producto;
+```
+
+Para ir de `pedido` a `producto` **hay que pasar por `detalle_pedido`**. Es el precio de resolver una N:M.
+
+### 4.7 Comparativa de los cinco JOIN
+
+| JOIN | Filas sin pareja de la izquierda | Filas sin pareja de la derecha | Úsalo cuando |
+|---|---|---|---|
+| `INNER` | Se pierden | Se pierden | Solo importan los datos relacionados |
+| `LEFT` | Se conservan | Se pierden | Quieres todo de A, con o sin datos de B |
+| `RIGHT` | Se pierden | Se conservan | Igual que `LEFT`, tablas invertidas |
+| `FULL` | Se conservan | Se conservan | Comparar dos conjuntos completos |
+| `CROSS` | No aplica | No aplica | Necesitas todas las combinaciones |
+
+---
+
+## 5. Subconsultas
+
+Una subconsulta es un `SELECT` dentro de otro. Va entre paréntesis y puede aparecer en varios lugares.
+
+### 5.1 En el WHERE
+
+La más común. La subconsulta produce un valor o una lista que el `WHERE` externo usa para filtrar.
+
+```sql
+-- Productos con precio mayor al promedio
+SELECT nombre, precio
+FROM producto
+WHERE precio > (SELECT AVG(precio) FROM producto);
+```
+
+El promedio es 82.000, así que salen Audífonos Bluetooth y Juego de sábanas.
+
+Cuando la subconsulta devuelve **un solo valor**, puedes usar `=`, `>`, `<`. Si puede devolver varios, usa `IN`, `ANY` o `ALL`.
+
+### 5.2 En el FROM (tabla derivada)
+
+El resultado de una subconsulta se trata como si fuera una tabla. **Obligatorio ponerle alias.**
+
+```sql
+SELECT t.estado, t.pedidos, t.total_vendido
+FROM (
+  SELECT estado, COUNT(*) AS pedidos, SUM(total) AS total_vendido
+  FROM pedido
+  GROUP BY estado
+) AS t
+WHERE t.total_vendido > 50000;
+```
+
+Sirve para filtrar o calcular sobre algo que ya fue agregado. Hoy esto suele escribirse mejor con un CTE (sección 7).
+
+### 5.3 En el SELECT (subconsulta escalar)
+
+Devuelve exactamente un valor por fila externa. Si devuelve más de uno, error.
+
+```sql
+SELECT c.nombre,
+       c.apellido,
+       (SELECT COUNT(*)
+        FROM pedido p
+        WHERE p.id_cliente = c.id_cliente) AS pedidos
+FROM cliente c;
+```
+
+Esta es además una subconsulta **correlacionada**. Funciona, pero un `LEFT JOIN` con `GROUP BY` suele rendir mejor en tablas grandes.
+
+### 5.4 IN y NOT IN
+
+`IN` pregunta si un valor está dentro de una lista que genera la subconsulta.
+
+```sql
+-- Clientes que tienen al menos un pedido con total mayor a 50 mil
+SELECT nombre, apellido
+FROM cliente
+WHERE id_cliente IN (SELECT id_cliente FROM pedido WHERE total > 50000);
+```
+
+**La trampa de `NOT IN`.** Si la lista contiene un solo `NULL`, `NOT IN` no devuelve ninguna fila. Cuando la columna pueda ser nula, usa `NOT EXISTS` o filtra los nulos dentro de la subconsulta.
+
+### 5.5 Subconsultas correlacionadas
+
+Hacen referencia a una columna de la consulta externa, así que se **reevalúan por cada fila externa**.
+
+```sql
+-- El pedido más reciente de cada cliente
+SELECT p.id_pedido, p.id_cliente, p.fecha_pedido
+FROM pedido p
+WHERE p.fecha_pedido = (
+  SELECT MAX(p2.fecha_pedido)
+  FROM pedido p2
+  WHERE p2.id_cliente = p.id_cliente
+);
+```
+
+Lee la subconsulta como una pregunta que se repite: "para *este* cliente, ¿cuál es su fecha máxima?".
+
+### 5.6 EXISTS y NOT EXISTS
+
+No importa **qué** devuelve la subconsulta, solo **si devuelve algo**. En cuanto encuentra una fila, el motor se detiene.
+
+```sql
+-- Clientes con algún pedido entregado
+SELECT c.nombre, c.apellido
+FROM cliente c
+WHERE EXISTS (
+  SELECT 1
+  FROM pedido p
+  WHERE p.id_cliente = c.id_cliente
+    AND p.estado = 'Entregado'
+);
+```
+
+Sale Juan Pérez y Sofía Rojas. Con `NOT EXISTS` obtienes lo contrario: quienes no tienen ninguno.
+
+**`EXISTS` o `IN`.** Para listas pequeñas, da lo mismo. Con subconsultas grandes `EXISTS` suele rendir igual o mejor, y para negaciones es **siempre** más seguro que `NOT IN` por el asunto de los `NULL`.
+
+---
+
+## 6. CTE: expresiones de tabla comunes
+
+Un CTE es una consulta con nombre que defines al principio con `WITH` y luego usas como si fuera una tabla. Vive solo durante esa sentencia.
+
+```sql
+WITH ventas_por_cliente AS (
+  SELECT id_cliente, SUM(total) AS total_gastado
+  FROM pedido
+  GROUP BY id_cliente
+)
+SELECT c.nombre, c.apellido, v.total_gastado
+FROM ventas_por_cliente v
+JOIN cliente c ON c.id_cliente = v.id_cliente
+WHERE v.total_gastado > 100000;
+```
+
+**Para qué sirve:**
+
+- Leer la consulta de arriba hacia abajo, en pasos.
+- Reutilizar el mismo resultado intermedio varias veces.
+- Reemplazar subconsultas en el `FROM` que se anidan varios niveles.
+
+Puedes encadenar varios CTE separados por coma; los últimos pueden usar los anteriores:
+
+```sql
+WITH
+pedidos_activos AS (
+  SELECT id_cliente, COUNT(*) AS n
+  FROM pedido
+  WHERE estado <> 'Cancelado'
+  GROUP BY id_cliente
+),
+top_clientes AS (
+  SELECT id_cliente, SUM(total) AS total_gastado
+  FROM pedido
+  GROUP BY id_cliente
+)
+SELECT c.nombre, p.n AS pedidos, t.total_gastado
+FROM cliente c
+LEFT JOIN pedidos_activos p ON p.id_cliente = c.id_cliente
+LEFT JOIN top_clientes t ON t.id_cliente = c.id_cliente;
+```
+
+**Restricciones:**
+
+- Disponible desde MySQL 8.0, PostgreSQL, Oracle y SQL Server.
+- Un CTE no es una tabla temporal: se reevalúa en cada referencia en algunos motores.
+
+---
+
+## 7. Operadores de conjunto
+
+Combinan los resultados de dos consultas **verticalmente** (filas sobre filas), a diferencia de los `JOIN`, que combinan horizontalmente.
+
+### 7.1 Requisitos de compatibilidad
+
+Para que funcionen, las dos consultas deben cumplir:
+
+- Mismo número de columnas.
+- Tipos de datos compatibles, posición por posición.
+- Los nombres de columna del resultado vienen de la primera consulta.
+- `ORDER BY` va una sola vez, al final de todo.
+
+### 7.2 UNION y UNION ALL
+
+`UNION` une y **elimina duplicados**. `UNION ALL` une y los **conserva**, y por eso es más rápido.
+
+```sql
+-- Clientes con pedido entregado o enviado, sin repetir
+SELECT id_cliente FROM pedido WHERE estado = 'Entregado'
+UNION
+SELECT id_cliente FROM pedido WHERE estado = 'Enviado';
+```
+
+### 7.3 INTERSECT
+
+Devuelve solo las filas presentes en **ambas** consultas.
+
+```sql
+-- Clientes con pedido entregado Y con pago aprobado
+SELECT p.id_cliente
+FROM pedido p JOIN pago pa ON pa.id_pedido = p.id_pedido
+WHERE p.estado = 'Entregado' AND pa.estado = 'Aprobado'
+INTERSECT
+SELECT id_cliente FROM pedido WHERE total > 50000;
+```
+
+MySQL soporta `INTERSECT` desde la 8.0.31; antes hay que simularlo con `IN` o `EXISTS`.
+
+### 7.4 MINUS / EXCEPT
+
+Devuelve las filas de la primera consulta que **no** están en la segunda. Importa el orden: `A MINUS B` no es igual a `B MINUS A`.
+
+| Motor | Palabra |
+|---|---|
+| Oracle | `MINUS` |
+| PostgreSQL, SQL Server, MySQL 8.0.31+, SQL estándar | `EXCEPT` |
+
+```sql
+-- Pedidos entregados que no superan los 50 mil
+SELECT id_pedido FROM pedido WHERE estado = 'Entregado'
+EXCEPT
+SELECT id_pedido FROM pedido WHERE total > 50000;
+```
+
+---
+
+## 8. Window functions
+
+Calculan algo sobre un grupo de filas **sin colapsarlas**. Con `GROUP BY` perdías el detalle; con una window function cada fila se queda y recibe además el valor calculado sobre su "ventana".
+
+La forma general:
+
+```sql
+función() OVER (
+  PARTITION BY columnas   -- opcional: reinicia el cálculo por grupo
+  ORDER BY columnas       -- define el orden dentro de la ventana
+)
+```
+
+Disponibles en MySQL desde 8.0, y en PostgreSQL, Oracle y SQL Server desde hace años.
+
+### 8.1 ROW_NUMBER, RANK y DENSE_RANK
+
+Numeran filas. La diferencia está en cómo tratan los empates.
+
+```sql
+SELECT nombre,
+       precio,
+       ROW_NUMBER() OVER (ORDER BY precio DESC) AS fila,
+       RANK()       OVER (ORDER BY precio DESC) AS rango,
+       DENSE_RANK() OVER (ORDER BY precio DESC) AS rango_denso
+FROM producto;
+```
+
+| nombre | precio | fila | rango | rango_denso |
+|---|---|---|---|---|
+| Audífonos Bluetooth | 150000.00 | 1 | 1 | 1 |
+| Juego de sábanas | 90000.00 | 2 | 2 | 2 |
+| Novela: Cien años de soledad | 55000.00 | 3 | 3 | 3 |
+| Balón de fútbol | 70000.00 | 4 | 4 | 4 |
+| Camiseta deportiva | 45000.00 | 5 | 5 | 5 |
+
+- **`ROW_NUMBER`**: numera sin repetir; entre empates el orden es arbitrario.
+- **`RANK`**: los empatados comparten número y se salta el siguiente (1, 2, 2, 4).
+- **`DENSE_RANK`**: los empatados comparten número y no se salta nada (1, 2, 2, 3).
+
+Uso típico: "el top N por grupo", con `PARTITION BY` y filtrando en una consulta exterior o en un CTE.
+
+### 8.2 NTILE
+
+Reparte las filas en *n* cubetas del mismo tamaño.
+
+```sql
+SELECT nombre,
+       precio,
+       NTILE(2) OVER (ORDER BY precio DESC) AS mitad
+FROM producto;
+```
+
+Con 5 filas en 2 grupos, la primera cubeta recibe 3 filas y la segunda 2.
+
+### 8.3 LAG y LEAD
+
+Acceden a la fila **anterior** (`LAG`) o **siguiente** (`LEAD`) dentro de la ventana.
+
+```sql
+SELECT id_pedido,
+       fecha_pedido,
+       LAG(fecha_pedido) OVER (ORDER BY fecha_pedido) AS pedido_anterior
+FROM pedido;
+```
+
+Acepta un desplazamiento y un valor por defecto: `LAG(col, 2, 0)` mira dos filas atrás y devuelve 0 si no existe.
+
+### 8.4 Agregaciones como window functions
+
+`SUM`, `AVG`, `COUNT` también aceptan `OVER`. Con `ORDER BY` dentro, dan acumulados:
+
+```sql
+SELECT id_pedido, fecha_pedido, total,
+       SUM(total) OVER (ORDER BY fecha_pedido) AS facturado_acumulado
+FROM pedido;
+```
+
+---
+
+## 9. Ejemplos resueltos
+
+Cinco consultas completas sobre el esquema del Taller 2. Cada una parte de una pregunta en lenguaje natural y explica las decisiones que hay detrás.
+
+### Ejemplo 1: Clientes con pedidos entregados y su total gastado
+
+**Pregunta:** ¿Qué clientes tienen pedidos entregados y cuánto gastaron en total?
+
+**Decisiones:**
+
+1. Los datos están en `pedido`, pero el nombre está en `cliente`. Hace falta un `JOIN`.
+2. `INNER JOIN` basta: solo importan clientes con pedidos entregados.
+3. Se agrupa por cliente para sumar los totales.
+4. El filtro por estado va en `WHERE`, antes de agrupar.
+
+```sql
+SELECT c.id_cliente,
+       CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+       SUM(p.total) AS total_gastado
+FROM cliente c
+JOIN pedido p ON p.id_cliente = c.id_cliente
+WHERE p.estado = 'Entregado'
+GROUP BY c.id_cliente, c.nombre, c.apellido
+ORDER BY total_gastado DESC;
+```
+
+| id_cliente | cliente | total_gastado |
+|---|---|---|
+| 1 | Juan Pérez | 195000.00 |
+| 5 | Diego Morales | 55000.00 |
+
+### Ejemplo 2: Productos sin vender nunca
+
+**Pregunta:** ¿Qué productos nunca aparecieron en un detalle de pedido?
+
+**Decisiones:**
+
+1. La palabra "nunca" avisa: anti-join.
+2. `LEFT JOIN` desde `producto` hacia `detalle_pedido`.
+3. Filtrar los que no tienen detalle: `dp.id_producto IS NULL`.
+
+```sql
+SELECT pr.id_producto, pr.nombre, pr.precio, pr.stock
+FROM producto pr
+LEFT JOIN detalle_pedido dp ON dp.id_producto = pr.id_producto
+WHERE dp.id_producto IS NULL;
+```
+
+Con los datos de prueba, todos los productos tienen al menos una venta, así que el resultado está vacío. Si el taller incluyera productos sin vender, aquí aparecerían.
+
+### Ejemplo 3: Categorías con cantidad de productos, incluyendo las vacías
+
+**Pregunta:** ¿Cuántos productos tiene cada categoría?
+
+**Decisiones:**
+
+1. "Cada categoría" avisa: deben aparecer todas, también las sin productos.
+2. Eso descarta el `INNER JOIN` y pide `LEFT JOIN` desde `categoria`.
+3. Se cuenta `p.id_producto`, no `*`.
+
+```sql
+SELECT cat.nombre,
+       COUNT(p.id_producto) AS productos
+FROM categoria cat
+LEFT JOIN producto p ON p.id_categoria = cat.id_categoria
+GROUP BY cat.id_categoria, cat.nombre
+ORDER BY productos DESC;
+```
+
+| nombre | productos |
+|---|---|
+| Electrónica | 1 |
+| Ropa | 1 |
+| Hogar | 1 |
+| Deportes | 1 |
+| Libros | 1 |
+
+Con los datos de prueba cada categoría tiene exactamente un producto. Si el taller tuviera categorías sin productos, aquí darían 0.
+
+### Ejemplo 4: Pedidos con pago rechazado y su envío
+
+**Pregunta:** Lista los pedidos cuyo pago fue rechazado, con datos del envío.
+
+**Decisiones:**
+
+1. Los datos están en `pago`, `pedido` y `envio`.
+2. Son tres tablas, así que encadeno dos `JOIN` siguiendo las llaves foráneas.
+3. El filtro por estado de pago va en `WHERE`.
+
+```sql
+SELECT p.id_pedido,
+       pa.estado AS estado_pago,
+       pa.monto,
+       e.empresa,
+       e.numero_guia,
+       e.estado AS estado_envio
+FROM pago pa
+JOIN pedido p ON p.id_pedido = pa.id_pedido
+JOIN envio e ON e.id_pedido = p.id_pedido
+WHERE pa.estado = 'Rechazado';
+```
+
+| id_pedido | estado_pago | monto | empresa | numero_guia | estado_envio |
+|---|---|---|---|---|---|
+| 4 | Rechazado | 90000.00 | Servientrega | SE000000000 | En espera |
+
+### Ejemplo 5: Ranking de clientes por monto gastado con window function
+
+**Pregunta:** Ordena a los clientes por lo que gastaron y muestra su puesto.
+
+**Decisiones:**
+
+1. Primero agrego montos por cliente en un CTE.
+2. Después uso `RANK()` para el puesto.
+3. Solo incluyo clientes con al menos un pedido.
+
+```sql
+WITH gastado_por_cliente AS (
+  SELECT id_cliente, SUM(total) AS total_gastado
+  FROM pedido
+  GROUP BY id_cliente
+)
+SELECT CONCAT(c.nombre, ' ', c.apellido) AS cliente,
+       g.total_gastado,
+       RANK() OVER (ORDER BY g.total_gastado DESC) AS puesto
+FROM gastado_por_cliente g
+JOIN cliente c ON c.id_cliente = g.id_cliente
+ORDER BY puesto;
+```
+
+| cliente | total_gastado | puesto |
+|---|---|---|
+| Juan Pérez | 195000.00 | 1 |
+| Diego Morales | 55000.00 | 2 |
+| Sofía Rojas | 55000.00 | 2 |
+| María López | 45000.00 | 4 |
+| Andrés Castro | 70000.00 | 3 |
+
+Nota: Diego y Sofía comparten el puesto 2 porque tienen el mismo total. El siguiente puesto es 4, no 3.
+
+---
+
+## 10. Errores comunes y cómo evitarlos
+
+**1. Comparar con NULL usando `=`.**
+`WHERE col = NULL` nunca devuelve nada. Usa `IS NULL` o `IS NOT NULL`.
+
+**2. Poner agregaciones en el WHERE.**
+`WHERE COUNT(*) > 1` falla. Esa condición es sobre grupos y va en `HAVING`.
+
+**3. Columnas sin agrupar en el SELECT.**
+Si pides `nombre` y `SUM(total)` sin poner `nombre` en el `GROUP BY`, MySQL con `ONLY_FULL_GROUP_BY` lo rechaza.
+
+**4. Usar un alias del SELECT en el WHERE.**
+El alias no existe todavía en ese punto del orden lógico. Repite la expresión, o envuélvela en un CTE.
+
+**5. `NOT IN` con una subconsulta que puede tener nulos.**
+Devuelve cero filas sin avisar. Cámbialo por `NOT EXISTS`.
+
+**6. Condición del `ON` olvidada o incompleta.**
+Genera un producto cartesiano. Si un conteo se infla de pronto, revisa esto primero.
+
+**7. `LEFT JOIN` convertido en `INNER` por el WHERE.**
+Una condición sobre la tabla derecha en el `WHERE` elimina las filas con `NULL`. Muévela al `ON`.
+
+**8. Contar con `COUNT(*)` tras un `LEFT JOIN`.**
+La fila vacía cuenta como 1. Cuenta una columna de la tabla derecha.
+
+**9. Arreglar duplicados con `DISTINCT` sin entender el origen.**
+El duplicado suele nacer de un `JOIN` uno-a-muchos. Corrige la relación o agrupa.
+
+**10. `LIMIT` sin `ORDER BY`.**
+"Los primeros 3" sin criterio de orden es un resultado que puede cambiar entre ejecuciones.
+
+**11. Mezclar `UNION` y `UNION ALL` sin pensar.**
+`UNION` ordena y compara para quitar duplicados; en volúmenes grandes cuesta. Si sabes que no hay repetidos, `UNION ALL`.
+
+**12. Operar con tipos incompatibles.**
+Comparar una fecha con un texto mal formateado da resultados raros o errores. Usa formato `'AAAA-MM-DD'`.
+
+**13. `SELECT *` en consultas que van a quedarse.**
+Se rompe cuando cambia la tabla y trae columnas que no necesitas.
+
+**14. Aplicar funciones a la columna filtrada.**
+`WHERE YEAR(fecha_pedido) = 2024` impide usar un índice sobre `fecha_pedido`. Es mejor `WHERE fecha_pedido >= '2024-01-01' AND fecha_pedido < '2025-01-01'`.
+
+**Hábito que evita casi todo lo anterior:** escribe la consulta por partes. Primero el `FROM` y los `JOIN`, mira cuántas filas salen. Luego el `WHERE`. Luego agrupa. Verificar en cada paso es más rápido que depurar una consulta larga de golpe.
+
+---
+
+## 11. Chuleta de consulta rápida
+
+| Quiero... | Uso |
+|---|---|
+| Filtrar filas | `WHERE` |
+| Filtrar grupos | `HAVING` |
+| Quitar repetidos | `DISTINCT` |
+| Ordenar | `ORDER BY` |
+| Traer solo N filas | `LIMIT` / `FETCH FIRST` |
+| Datos relacionados | `INNER JOIN` |
+| Todo de una tabla, con o sin pareja | `LEFT JOIN` |
+| Lo que no tiene pareja | `LEFT JOIN ... WHERE x IS NULL` o `NOT EXISTS` |
+| Resultado intermedio con nombre | `WITH` (CTE) |
+| Unir resultados | `UNION` / `UNION ALL` |
+| Solo lo común | `INTERSECT` |
+| Lo que está en A y no en B | `EXCEPT` / `MINUS` |
+| Ranking sin perder filas | `RANK()`, `ROW_NUMBER()`, `DENSE_RANK()` |
+| Comparar con la fila anterior | `LAG()` |
+
+---
+
+## 12. Referencias
+
+**Documentación oficial**
+
+- MySQL 8.0 Reference Manual, capítulo "SQL Statements" (SELECT, JOIN, WITH, Window Functions): https://dev.mysql.com/doc/refman/8.0/en/
+- PostgreSQL Documentation, capítulo "Queries": https://www.postgresql.org/docs/current/queries.html
+- Oracle Database SQL Language Reference: https://docs.oracle.com/en/database/oracle/oracle-database/
+- Microsoft Learn, Transact-SQL reference: https://learn.microsoft.com/en-us/sql/t-sql/
+
+**Libros**
+
+- Silberschatz, A., Korth, H. y Sudarshan, S. *Fundamentos de bases de datos* (*Database System Concepts*). McGraw-Hill.
+- Elmasri, R. y Navathe, S. *Fundamentos de sistemas de bases de datos* (*Fundamentals of Database Systems*). Pearson.
+- Date, C. J. *An Introduction to Database Systems*. Pearson.
+- Ben-Gan, I. *T-SQL Fundamentals*. Microsoft Press.
+
+**Recursos en línea**
+
+- Modern SQL, características del estándar y soporte por motor: https://modern-sql.com
+- Use The Index, Luke, rendimiento y uso de índices: https://use-the-index-luke.com
+- SQLBolt, ejercicios interactivos para practicar: https://sqlbolt.com
+
+**Material del curso**
+
+- Taller 2, *Bases de Datos I — MER: Evaluación y Corrección*. Sistema de Gestión de una Tienda en Línea (E-commerce).
+
+---
+
+### Origen del ejercicio
+
+Este es un ejercicio de **otro grupo de Bases De Datos 1**, proporcionado por el profesor **Alexander Dario Agudelo Cubillos**. El esquema y las consultas corresponden al Taller 2 de consultas SQL sobre el sistema de gestión de una tienda en línea.
