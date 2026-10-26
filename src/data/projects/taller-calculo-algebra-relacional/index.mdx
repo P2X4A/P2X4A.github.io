@@ -1,7 +1,7 @@
 ---
-title: "Taller de Cálculo y Álgebra Relacional — Estudiantes destacados de Ingeniería de Sistemas"
-tagline: "De la consulta en Cálculo Relacional de Tuplas a su resolución en álgebra relacional: selecciones, proyecciones, productos cartesianos, intersecciones y diferencias aplicadas a siete condiciones"
-description: "Taller de álgebra relacional sobre estudiantes de Ingeniería de Sistemas: solución en Cálculo Relacional de Tuplas (TRC) y en álgebra relacional (Π, σ, ×, ∪, −, ∩, ρ) con sete condiciones de filtrado, intersectado final y proyección de nombre, apellido y correo."
+title: "Taller de Calculo y Algebra Relacional - Estudiantes destacados de Ingenieria de Sistemas"
+tagline: "De la consulta en Calculo Relacional de Tuplas a su resolucion en algebra relacional: selecciones, proyecciones, productos cartesianos, intersecciones y diferencias aplicadas a siete condiciones"
+description: "Taller de algebra relacional sobre estudiantes de Ingenieria de Sistemas: solucion en Calculo Relacional de Tuplas (TRC) y en algebra relacional (Pi, sigma, cartesiano, union, diferencia, interseccion, renombrado) con siete condiciones de filtrado, intersectado final y proyeccion de nombre, apellido y correo."
 status: "complete"
 category: "algebra-relacional"
 moduleId: "BD1-ALG-005"
@@ -10,48 +10,48 @@ thumbnail: "../../../assets/evidencias/taller-calculo-algebra-relacional/thumbna
 thumbnailAlt: "Esquema relacional de cinco tablas: CARRERA, ESTUDIANTE, MATRICULA, CURSO y PROFESOR con sus relaciones y claves"
 
 tech:
-  - "Cálculo Relacional de Tuplas"
-  - "Álgebra relacional (Π, σ, ×, ∩, −, ρ)"
+  - "Calculo Relacional de Tuplas"
+  - "Algebra relacional (Pi, sigma, cartesiano, union, diferencia, interseccion, renombrado)"
   - "Dependencias y claves primarias"
   - "Bases de Datos 1"
 
 specs:
   - label: "Dominio"
-    value: "Estudiantes de Ingeniería de Sistemas, período 2026-1, con matrículas, cursos y profesores"
+    value: "Estudiantes de Ingenieria de Sistemas, periodo 2026-1, con matriculas, cursos y profesores"
   - label: "Relaciones"
     value: "Cinco: CARRERA, ESTUDIANTE, MATRICULA, CURSO, PROFESOR"
   - label: "Condiciones"
-    value: "Siete: carrera, al menos tres cursos, nota > 4.0, sin cursos perdidos, aprobados de 3 créditos, curso de BD con nota ≥ 3.5, curso de 4+ créditos"
+    value: "Siete: carrera, al menos tres cursos, nota mayor a 4.0, sin cursos perdidos, aprobados de 3 creditos, curso de BD con nota mayor o igual a 3.5, curso de 4 o mas creditos"
   - label: "Resultado"
     value: "Nombre, apellido y correo de los estudiantes que cumplen todas las condiciones"
 
 features:
-  - lead: "Cálculo relacional de tuplas"
-    text: "Siete condiciones unidas con cuantificadores existenciales, universales y negación."
-  - lead: "Álgebra relacional"
-    text: "Siete conjuntos intermedios de id_estudiante combinados con intersección y proyección final."
+  - lead: "Calculo relacional de tuplas"
+    text: "Siete condiciones unidas con cuantificadores existenciales, universales y negacion."
+  - lead: "Algebra relacional"
+    text: "Siete conjuntos intermedios de id_estudiante combinados con interseccion y proyeccion final."
   - lead: "Observaciones"
-    text: "Condición 5 redundante, llave de MATRICULA, notas nulas y estado no usado."
+    text: "Condicion 5 redundante, llave de MATRICULA, notas nulas y estado no usado."
 
-archCaption: "Esquema relacional de cinco tablas para el taller de álgebra relacional"
+archCaption: "Esquema relacional de cinco tablas para el taller de algebra relacional"
 
 challenge:
   title: "Problema"
-  body: "Identificar estudiantes de Ingeniería de Sistemas con desempeño destacado en 2026-1 que cumplan siete condiciones simultáneas, resolviendo primero en Cálculo Relacional de Tuplas y después en álgebra relacional con la notación del curso (Π, σ, ×, ∪, −, ∩, ρ)."
+  body: "Identificar estudiantes de Ingenieria de Sistemas con desempeño destacado en 2026-1 que cumplan siete condiciones simultaneas, resolviendo primero en Calculo Relacional de Tuplas y despues en algebra relacional con la notacion del curso (Pi, sigma, cartesiano, union, diferencia, interseccion, renombrado)."
 
 solution:
-  title: "Solución"
-  body: "Se resuelve en TRC con cuantificadores ∃, ∀ y ¬ sobre ESTUDIANTE, CARRERA, MATRICULA, CURSO y PROFESOR. Luego se traduce a álgebra relacional calculando siete conjuntos de id_estudiante y intersectándolos, terminando con la proyección de nombre, apellido y correo."
+  title: "Solucion"
+  body: "Se resuelve en TRC con cuantificadores existen, universal y negacion sobre ESTUDIANTE, CARRERA, MATRICULA, CURSO y PROFESOR. Luego se traduce a algebra relacional calculando siete conjuntos de id_estudiante y intersectandolos, terminando con la proyeccion de nombre, apellido y correo."
 
 ---
 
-## Descripción
+## Descripcion
 
-Este documento resuelve el **Taller de Cálculo y Álgebra Relacional** sobre estudiantes de Ingeniería de Sistemas del período 2026-1. El ejercicio pide identificar estudiantes que cumplan siete condiciones a la vez, entregando primero la consulta en Cálculo Relacional de Tuplas (TRC) y luego su equivalente en álgebra relacional con la notación de clase.
+Este documento resuelve el **Taller de Calculo y Algebra Relacional** sobre estudiantes de Ingenieria de Sistemas del periodo 2026-1. El ejercicio pide identificar estudiantes que cumplan siete condiciones a la vez, entregando primero la consulta en Calculo Relacional de Tuplas (TRC) y luego su equivalente en algebra relacional con la notacion de clase.
 
 ## Las cinco relaciones del modelo
 
-| Relación | Atributos |
+| Relacion | Atributos |
 |---|---|
 | CARRERA | id_carrera (PK), nombre, facultad |
 | ESTUDIANTE | id_estudiante (PK), nombre, apellido, edad, correo, id_carrera (FK) |
@@ -65,69 +65,69 @@ MATRICULA es el puente entre estudiante y curso. Cada curso pertenece a una carr
 
 Un estudiante califica solo si cumple todo esto:
 
-- Pertenece a Ingeniería de Sistemas.
-- Está matriculado en al menos tres cursos en 2026-1.
+- Pertenece a Ingenieria de Sistemas.
+- Esta matriculado en al menos tres cursos en 2026-1.
 - Tiene una nota mayor a 4.0 en al menos uno de esos cursos.
-- No perdió ningún curso (nota menor a 3.0).
-- Aprobó todos los cursos de 3 créditos de su carrera que matricularon en 2026-1.
-- Si un curso de 3 créditos lo dicta un profesor de Bases de Datos, la nota debe ser ≥ 3.5.
-- Tiene al menos un curso de 4 o más créditos aprobado en 2026-1.
+- No perdio ningun curso (nota menor a 3.0).
+- Aprobo todos los cursos de 3 creditos de su carrera que matriculo en 2026-1.
+- Si un curso de 3 creditos lo dicta un profesor de Bases de Datos, la nota debe ser mayor o igual a 3.5.
+- Tiene al menos un curso de 4 o mas creditos aprobado en 2026-1.
 
 El resultado esperado es nombre, apellido y correo de esos estudiantes.
 
-## Solución en Cálculo Relacional de Tuplas
+## Solucion en Calculo Relacional de Tuplas
 
-La idea es partir de cada estudiante `e` y filtrarlo con siete condiciones unidas por `∧`. El camino entre tablas es: ESTUDIANTE → CARRERA, ESTUDIANTE → MATRICULA → CURSO → PROFESOR.
+La idea es partir de cada estudiante `e` y filtrarlo con siete condiciones unidas por Y. El camino entre tablas es: ESTUDIANTE -> CARRERA, ESTUDIANTE -> MATRICULA -> CURSO -> PROFESOR.
 
-**Paso 1 — Pertenece a Ingeniería de Sistemas.** Se busca la carrera del estudiante y se verifica el nombre.
+**Paso 1 — Pertenece a Ingenieria de Sistemas.** Se busca la carrera del estudiante y se verifica el nombre.
 
-**Paso 2 — Al menos tres cursos.** Como el álgebra no tiene conteo, se piden tres matrículas distintas del mismo estudiante en el mismo semestre, comparando los `id_curso` entre sí. Las tres desigualdades son necesarias; si falta una, dos variables podrían apuntar a la misma matrícula.
+**Paso 2 — Al menos tres cursos.** Como el algebra no tiene conteo, se piden tres matriculas distintas del mismo estudiante en el mismo semestre, comparando los id_curso entre si. Las tres desigualdades son necesarias; si falta una, dos variables podrian apuntar a la misma matricula.
 
-**Paso 3 — Alguna nota mayor a 4.0.** Se busca una matrícula del estudiante en 2026-1 con `nota_final > 4.0`.
+**Paso 3 — Alguna nota mayor a 4.0.** Se busca una matricula del estudiante en 2026-1 con nota_final mayor a 4.0.
 
-**Paso 4 — Ningún curso perdido.** Se dice con "no existe" una matrícula con nota menor a 3.0.
+**Paso 4 — Ningun curso perdido.** Se dice con "no existe" una matricula con nota menor a 3.0.
 
-**Paso 5 — Aprobó todos sus cursos de 3 créditos.** Es una regla universal con implicación: si es un curso de 3 créditos de su carrera y lo matriculó, entonces lo aprobó. Los cursos que no cumplen el antecedente no molestan.
+**Paso 5 — Aprobo todos sus cursos de 3 creditos.** Es una regla universal con implicacion: si es un curso de 3 creditos de su carrera y lo matriculo, entonces lo aprobo. Los cursos que no cumplen el antecedente no molestan.
 
-**Paso 6 — Cursos de 3 créditos con profesor de Bases de Datos.** Misma estructura, con un filtro más en el antecedente y una nota más exigente (≥ 3.5) en el consecuente.
+**Paso 6 — Cursos de 3 creditos con profesor de Bases de Datos.** Misma estructura, con un filtro mas en el antecedente y una nota mas exigente (mayor o igual a 3.5) en el consecuente.
 
-**Paso 7 — Al menos un curso de 4 o más créditos aprobado.** Se cruza MATRICULA con CURSO para saber los créditos y se exige nota ≥ 3.0.
+**Paso 7 — Al menos un curso de 4 o mas creditos aprobado.** Se cruza MATRICULA con CURSO para saber los creditos y se exige nota aprobatoria.
 
-La consulta completa combina las siete condiciones en un solo conjunto con proyección de nombre, apellido y correo.
+La consulta completa combina las siete condiciones en un solo conjunto con proyeccion de nombre, apellido y correo.
 
-## Solución en Álgebra Relacional (notación de clase)
+## Solucion en Algebra Relacional (notacion de clase)
 
-En álgebra no hay cuantificadores, así que la estrategia cambia. Se calcula, para cada condición, **el conjunto de `id_estudiante` que la cumple** y al final se intersectan todos. Las condiciones negativas se resuelven con diferencia: se toma a todos los estudiantes y se restan los que fallan.
+En algebra no hay cuantificadores, asi que la estrategia cambia. Se calcula, para cada condicion, **el conjunto de id_estudiante que la cumple** y al final se intersectan todos. Las condiciones negativas se resuelven con diferencia: se toman a todos los estudiantes y se restan los que fallan.
 
-Todos los conjuntos intermedios tienen un solo atributo, `id_estudiante`, por eso son compatibles para intersección y diferencia.
+Todos los conjuntos intermedios tienen un solo atributo, id_estudiante, por eso son compatibles para interseccion y diferencia.
 
-**Paso 0 — Insumos base.** Se filtra la matrícula del período una sola vez y se reutiliza en todos los pasos siguientes.
+**Paso 0 — Insumos base.** Se filtra la matricula del periodo una sola vez y se reutiliza en todos los pasos siguientes.
 
-**Paso 1 — Estudiantes de Ingeniería de Sistemas.** Se filtra el nombre de la carrera, después se amarra la clave foránea. El orden se puede invertir, pero se manejarían más tuplas intermedias.
+**Paso 1 — Estudiantes de Ingenieria de Sistemas.** Se filtra el nombre de la carrera, despues se amarra la clave foranea. El orden se puede invertir, pero se manejarian mas tuplas intermedias.
 
-**Paso 2 — Al menos tres cursos.** Se toman tres copias de la matrícula filtrada con renombre (ρ). Se exige que sean del mismo estudiante y de cursos distintos entre sí. Quien tenga cuatro o más cursos también aparece, porque basta con encontrar una terna de cursos distintos.
+**Paso 2 — Al menos tres cursos.** Se toman tres copias de la matricula filtrada con renombre. Se exige que sean del mismo estudiante y de cursos distintos entre si. Quien tenga cuatro o mas cursos tambien aparece, porque basta con encontrar una terna de cursos distintos.
 
-**Paso 3 — Alguna nota superior a 4.0.** Proyección directa sobre las matrículas filtradas.
+**Paso 3 — Alguna nota superior a 4.0.** Proyeccion directa sobre las matriculas filtradas.
 
-**Paso 4 — Ningún curso perdido.** Se calculan los que sí perdieron alguno y se restan del total de estudiantes.
+**Paso 4 — Ningun curso perdido.** Se calculan los que si perdieron alguno y se restan del total de estudiantes.
 
-**Paso 5 — Aprobó todos sus cursos de 3 créditos.** Se buscan los que reprobaron un curso de 3 créditos de su propia carrera y se les resta del total. Este conjunto es subcadena del anterior.
+**Paso 5 — Aprobo todos sus cursos de 3 creditos.** Se buscan los que reprobaron un curso de 3 creditos de su propia carrera y se les resta del total. Este conjunto es subcadena del anterior.
 
-**Paso 6 — Cursos de 3 créditos con profesor de Bases de Datos.** Misma idea, con PROFESOR en el producto y el umbral de 3.5.
+**Paso 6 — Cursos de 3 creditos con profesor de Bases de Datos.** Misma idea, con PROFESOR en el producto y el umbral de 3.5.
 
-**Paso 7 — Un curso de 4 o más créditos aprobado.** Se cruza matrícula con curso para obtener los créditos y se filtra por nota aprobatoria.
+**Paso 7 — Un curso de 4 o mas creditos aprobado.** Se cruza matricula con curso para obtener los creditos y se filtra por nota aprobatoria.
 
-**Paso 8 — Intersección y proyección final.** Se intersectan los siete conjuntos y se recuperan los datos personales del estudiante. Los pasos anteriores trabajan solo con identificadores porque así las operaciones de conjuntos son válidas.
+**Paso 8 — Interseccion y proyeccion final.** Se intersectan los siete conjuntos y se recuperan los datos personales del estudiante. Los pasos anteriores trabajan solo con identificadores porque asi las operaciones de conjuntos son validas.
 
-## Observaciones para la revisión
+## Observaciones para la revision
 
-1. **La condición 5 es redundante.** Si nadie del resultado tiene una nota menor a 3.0 (condición 4), tampoco puede haber reprobado un curso de 3 créditos. La condición 6 sí aporta, porque sube el umbral a 3.5 en un caso particular. El enunciado las pide por separado, así que se dejaron las dos.
+1. **La condicion 5 es redundante.** Si nadie del resultado tiene una nota menor a 3.0 (condicion 4), tampoco puede haber reprobado un curso de 3 creditos. La condicion 6 si aporta, porque sube el umbral a 3.5 en un caso particular. El enunciado las pide por separado, asi que se dejan las dos.
 
-2. **Llave de MATRICULA.** Con la llave (id_estudiante, id_curso) un estudiante no podría repetir el mismo curso en otro semestre. Si el modelo real permite repetirlo, `semestre` debería entrar en la llave. Las consultas funcionan igual en ambos casos.
+2. **Llave de MATRICULA.** Con la llave (id_estudiante, id_curso) un estudiante no podria repetir el mismo curso en otro semestre. Si el modelo real permite repetirlo, semestre deberia entrar en la llave. Las consultas funcionan igual en ambos casos.
 
-3. **Notas nulas.** Un curso matriculado sin nota final no cumple `< 3.0` ni `≥ 3.0`. El ejercicio no lo trata, así que se asume que todas las matrículas del período ya tienen nota.
+3. **Notas nulas.** Un curso matriculado sin nota final no cumple menor a 3.0 ni mayor o igual a 3.0. El ejercicio no lo trata, asi que se asume que todas las matriculas del periodo ya tienen nota.
 
-4. **Estado de la matrícula.** El atributo `estado` no se usa. La aprobación se define solo por la nota, como indica el enunciado.
+4. **Estado de la matricula.** El atributo estado no se usa. La aprobacion se define solo por la nota, como indica el enunciado.
 
 ## Documento del trabajo
 
@@ -137,4 +137,4 @@ Todos los conjuntos intermedios tienen un solo atributo, `id_estudiante`, por es
 
 ### Origen del ejercicio
 
-Este es un ejercicio de **otro grupo de Bases De Datos 1**, proporcionado por el profesor **Alexander Dario Agudelo Cubillos**. El esquema original corresponde al taller de cálculo y álgebra relacional sobre el cual se realizó el análisis y resolución presentado en este documento.
+Este es un ejercicio de **otro grupo de Bases De Datos 1**, proporcionado por el profesor **Alexander Dario Agudelo Cubillos**. El esquema original corresponde al taller de calculo y algebra relacional sobre el cual se realizo el analisis y resolucion presentado en este documento.
