@@ -1,0 +1,1271 @@
+---
+title: "Guía de estudio: Consultas SQL"
+tagline: "Todo lo que hay que saber de consultas SQL para Bases de Datos I, de SELECT a window functions, con el esquema del Taller 1 (biblioteca universitaria)."
+description: "Guía de estudio de consultas SQL sobre el esquema de biblioteca universitaria del Taller 1: anatomía del SELECT, JOINs, subconsultas, CTE, operadores de conjunto, window functions, 6 ejemplos resueltos y 14 errores comunes."
+status: "complete"
+category: "consultas"
+moduleId: "BD1-CON-001"
+order: 19
+thumbnail: "../../../assets/evidencias/consultas-sql/thumbnail.png"
+thumbnailAlt: "Esquema relacional de seis tablas del Taller 1: USUARIO, PRESTAMO, LIBRO, CATEGORIA, AUTOR y LIBRO_AUTOR"
+
+tech:
+  - "SQL (MySQL 8)"
+  - "JOINs (INNER, LEFT, RIGHT, FULL, CROSS)"
+  - "Subconsultas y EXISTS"
+  - "CTE y Window functions"
+  - "Operadores de conjunto (UNION, INTERSECT, EXCEPT)"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Sistema de gestión de biblioteca universitaria (Taller 1): usuarios, libros, autores, categorías, préstamos y libro_autor"
+  - label: "Relaciones"
+    value: "Seis tablas: USUARIO, PRESTAMO, LIBRO, CATEGORIA, AUTOR, LIBRO_AUTOR"
+  - label: "Motor de referencia"
+    value: "MySQL 8 (con notas para Oracle, PostgreSQL y SQL Server)"
+  - label: "Contenido"
+    value: "12 secciones: SELECT, JOINs, agregación, subconsultas, CTE, conjuntos, window functions, 6 ejemplos resueltos, 14 errores comunes, chuleta y referencias"
+
+features:
+  - lead: "Anatomía del SELECT"
+    text: "Cláusulas, orden lógico de evaluación, WHERE, GROUP BY, HAVING, DISTINCT, ORDER BY, LIMIT."
+  - lead: "JOINs de todos los tipos"
+    text: "INNER, LEFT, RIGHT, FULL, CROSS, SELF JOIN; cuándo usar cada uno y cómo evitar convertir LEFT JOIN en INNER."
+  - lead: "Subconsultas y CTE"
+    text: "En WHERE, FROM, SELECT; EXISTS, NOT EXISTS, IN, NOT IN; CTE simples y recursivos."
+  - lead: "Operadores de conjunto y window functions"
+    text: "UNION, UNION ALL, INTERSECT, EXCEPT/MINUS; ROW_NUMBER, RANK, DENSE_RANK, NTILE, LAG, LEAD."
+  - lead: "Ejemplos resueltos y errores comunes"
+    text: "Seis consultas completas con decisiones explicadas y catorce errores típicos con cómo evitarlos."
+
+archCaption: "Esquema relacional de seis tablas para consultas SQL sobre biblioteca universitaria"
+
+challenge:
+  title: "Problema"
+  body: "Crear una guía de estudio de consultas SQL sobre el esquema de biblioteca universitaria del Taller 1, cubriendo desde SELECT básico hasta window functions, con MySQL 8 como motor de referencia, incluyendo ejemplos resueltos, errores comunes y referencias."
+
+solution:
+  title: "Solucion"
+  body: "Guía de 12 secciones que cubre anatomía del SELECT, JOINs, agregación, subconsultas, CTE, operadores de conjunto, window functions, seis ejemplos resueltos paso a paso, catorce errores comunes con sus soluciones, una chuleta de referencia rápida y referencias bibliográficas."
+
+---
+
+# Guía de estudio: Consultas SQL
+
+Una consulta es una pregunta que le haces a la base de datos, escrita en un lenguaje que el motor entiende. "¿Qué libros están prestados?", "¿quién debe una multa?", "¿cuántos ejemplares quedan por categoría?". Todo eso se contesta con una sentencia `SELECT`.
+
+En este portafolio, la sección **Consultas** demuestra que el modelo que diseñé en el MER no es un dibujo bonito: se puede interrogar y devuelve respuestas correctas. Por eso esta guía trabaja sobre el esquema real del **Taller 1** (Sistema de Gestión de una Biblioteca Universitaria) y usa MySQL 8 como motor de referencia. Cuando otro motor haga las cosas distinto (Oracle, PostgreSQL, SQL Server), lo marco.
+
+**Cómo leerla:** los primeros bloques son base (cláusulas, JOINs, agregación). Luego suben el nivel (subconsultas, CTE, conjuntos, window functions). Al final hay ejemplos resueltos, errores típicos y referencias.
+
+---
+
+## 1. El esquema con el que vamos a trabajar (Taller 1)
+
+Antes de escribir una sola consulta hay que saber qué tablas existen y cómo se conectan. Esta sección describe el MER del taller tal como aparece en el documento original, ya corregido.
+
+### 1.1 Reglas de negocio
+
+- Un usuario hace muchos préstamos; cada préstamo es de un solo usuario (1:N).
+- Un libro tiene muchos préstamos con el tiempo; cada préstamo es de un solo libro (1:N).
+- Un libro pertenece a una categoría; una categoría agrupa muchos libros (1:N).
+- Un libro puede tener varios autores y un autor varios libros (N:M, resuelta con `LIBRO_AUTOR`).
+- Un préstamo tiene estado (Activo, Devuelto, Retrasado) y puede generar multa.
+
+La multa aparece cuando la devolución real ocurre después de la fecha de devolución esperada.
+
+### 1.2 Descripción detallada del MER
+
+**Cómo está dibujada cada entidad.** Todas son tarjetas con una cabecera de color sólido y el nombre en mayúsculas, blanco y centrado. Debajo, el cuerpo tiene un tono pastel del mismo color y lista los atributos en tipografía monoespaciada. Los atributos que son clave (`PK`, `FK`) van coloreados con el color de la entidad y llevan el prefijo en negrita; los demás van en negro y con sangría.
+
+| Entidad | Color | Posición en el lienzo | Atributos (en orden de aparición) |
+|---|---|---|---|
+| `USUARIO` | Azul (cabecera azul acero, cuerpo celeste claro) | Esquina superior izquierda | **PK** `id_usuario`, `nombre`, `apellido`, `tipo_usuario`, `documento`, `correo`, `telefono`, `fecha_registro` |
+| `PRESTAMO` | Violeta (cabecera morada, cuerpo lila claro) | Esquina superior derecha | **PK** `id_prestamo`, **FK** `id_usuario`, **FK** `id_libro`, `fecha_prestamo`, `fecha_devolucion`, `fecha_real_devolucion`, `estado`, `multa` |
+| `LIBRO` | Naranja (cabecera ámbar, cuerpo crema/durazno) | Centro del diagrama | **PK** `id_libro`, `titulo`, `isbn`, `anio_publicacion`, `editorial`, **FK** `id_categoria`, `cantidad_total`, `cantidad_disponible` |
+| `AUTOR` | Verde azulado/teal (cabecera teal oscuro, cuerpo menta muy claro) | Lado derecho, a media altura | **PK** `id_autor`, `nombre`, `apellido`, `nacionalidad` |
+| `LIBRO_AUTOR` | Verde (cabecera verde medio, cuerpo verde claro) | Lado derecho, debajo de `AUTOR` | **PK/FK** `id_libro`, **PK/FK** `id_autor` |
+| `CATEGORIA` | Rojo ladrillo (cabecera roja, cuerpo rosado claro) | Parte inferior central | **PK** `id_categoria`, `nombre_categoria`, `descripcion` |
+
+`LIBRO_AUTOR` es la única entidad con **doble borde**: un marco exterior grueso y, dentro del cuerpo, un segundo rectángulo fino. Ese doble contorno es la notación de entidad asociativa, que aquí nace de resolver una relación N:M.
+
+**Los rombos de relación.** Son rombos de contorno oscuro y relleno blanco, con el verbo en mayúsculas y letra pequeña dentro. Hay cinco:
+
+1. **`REALIZA`**: rombo grande en la parte superior central, entre `USUARIO` y `PRESTAMO`. Una línea recta horizontal sale del borde derecho de `USUARIO`, atraviesa el rombo y llega al borde izquierdo de `PRESTAMO`. Cardinalidad **1** (azul) junto a `USUARIO` y **N** (morado) junto a `PRESTAMO`.
+2. **`CORRESPONDE A`**: rombo con texto en dos líneas, a la derecha de `LIBRO` y por debajo de `REALIZA`. Una línea diagonal baja desde el borde inferior izquierdo de `PRESTAMO` hasta la punta superior del rombo (etiqueta **N**, morada). Otra línea corta une la punta izquierda del rombo con el borde derecho de `LIBRO` (etiqueta **1**, naranja).
+3. **`PERTENECE A`**: rombo con texto en dos líneas, justo debajo de `LIBRO`. Una línea vertical lo une hacia arriba con `LIBRO` (etiqueta **N**, naranja) y hacia abajo con `CATEGORIA` (etiqueta **1**, roja).
+4. **`ESCRIBE` (gris)**: rombo de contorno oscuro, ubicado a la derecha de `PERTENECE A` y a la izquierda de `LIBRO_AUTOR`. Una diagonal va del borde derecho inferior de `LIBRO` a este rombo (etiqueta **1**, naranja); otra línea lo une con el borde izquierdo de `LIBRO_AUTOR` (etiqueta **N**, verde).
+5. **`ESCRIBE` (teal)**: rombo más pequeño con contorno y texto en teal, entre `AUTOR` y `LIBRO_AUTOR`. Una línea baja del borde inferior de `AUTOR` hacia la punta superior del rombo (etiqueta **1**, teal) y otra sale de su punta inferior derecha hacia el borde superior de `LIBRO_AUTOR` (etiqueta **N**, verde).
+
+Las cardinalidades se pintan con el color de la entidad que las origina, no en negro.
+
+**Recuadro de notas.** Abajo a la izquierda hay un rectángulo de bordes grises y relleno casi blanco, titulado **"Correcciones aplicadas:"** en negrita, con dos puntos:
+
+1. *PRESTAMO ahora se relaciona con LIBRO (antes conectaba, por error, con USUARIO).*
+2. *LIBRO_AUTOR es entidad asociativa con clave compuesta (PK/FK), resolviendo N:M.*
+
+**Esquema de referencia en texto** (simplificado, sin respetar las posiciones exactas):
+
+```text
+USUARIO (1) ──── REALIZA ──── (N) PRESTAMO (N) ──── CORRESPONDE A ──── (1) LIBRO
+                                                                            │ (N)
+                                                                       PERTENECE A
+                                                                            │ (1)
+                                                                        CATEGORIA
+
+LIBRO (1) ──── ESCRIBE ──── (N) LIBRO_AUTOR (N) ──── ESCRIBE ──── (1) AUTOR
+```
+
+Dicho de otra forma: `PRESTAMO` es el punto de cruce del modelo. Lleva dos llaves foráneas, una hacia `USUARIO` y otra hacia `LIBRO`, y por eso casi todas las consultas interesantes pasan por ella.
+
+### 1.3 Creación de la base de datos
+
+> **Imagen/captura: script `CREATE` del Taller 1.** El código va en un cuadro de texto:
+
+```sql
+CREATE DATABASE biblioteca_universitaria;
+USE biblioteca_universitaria;
+
+CREATE TABLE categoria (
+  id_categoria     INT AUTO_INCREMENT PRIMARY KEY,
+  nombre_categoria VARCHAR(50) NOT NULL,
+  descripcion      TEXT
+);
+
+CREATE TABLE autor (
+  id_autor      INT AUTO_INCREMENT PRIMARY KEY,
+  nombre        VARCHAR(50) NOT NULL,
+  apellido      VARCHAR(50) NOT NULL,
+  nacionalidad  VARCHAR(50)
+);
+
+CREATE TABLE usuario (
+  id_usuario      INT AUTO_INCREMENT PRIMARY KEY,
+  nombre          VARCHAR(50) NOT NULL,
+  apellido        VARCHAR(50) NOT NULL,
+  tipo_usuario    ENUM('Estudiante','Docente','Administrativo') NOT NULL,
+  documento       VARCHAR(20) NOT NULL UNIQUE,
+  correo          VARCHAR(100) NOT NULL,
+  telefono        VARCHAR(20),
+  fecha_registro  DATE
+);
+
+CREATE TABLE libro (
+  id_libro             INT AUTO_INCREMENT PRIMARY KEY,
+  titulo               VARCHAR(150) NOT NULL,
+  isbn                 VARCHAR(20) UNIQUE,
+  anio_publicacion     YEAR,
+  editorial            VARCHAR(80),
+  id_categoria         INT,
+  cantidad_total       INT NOT NULL DEFAULT 1,
+  cantidad_disponible  INT NOT NULL DEFAULT 1,
+  FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
+);
+
+-- Entidad asociativa: resuelve la relación N:M entre LIBRO y AUTOR
+CREATE TABLE libro_autor (
+  id_libro  INT,
+  id_autor  INT,
+  PRIMARY KEY (id_libro, id_autor),
+  FOREIGN KEY (id_libro) REFERENCES libro(id_libro),
+  FOREIGN KEY (id_autor) REFERENCES autor(id_autor)
+);
+
+CREATE TABLE prestamo (
+  id_prestamo            INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario             INT NOT NULL,
+  id_libro               INT NOT NULL,
+  fecha_prestamo         DATE NOT NULL,
+  fecha_devolucion       DATE,
+  fecha_real_devolucion  DATE,
+  estado                 ENUM('Activo','Devuelto','Retrasado') DEFAULT 'Activo',
+  multa                  DECIMAL(10,2) DEFAULT 0,
+  FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+  FOREIGN KEY (id_libro)   REFERENCES libro(id_libro)
+);
+```
+
+### 1.4 Datos de prueba
+
+> **Imagen/captura: script `INSERT` del Taller 1** (mínimo 5 registros por tabla), en cuadro de texto:
+
+```sql
+INSERT INTO categoria (nombre_categoria, descripcion) VALUES
+('Ficción','Libros de entretenimiento'),
+('Ciencias','Libros de ciencias en general'),
+('Tecnología','Libros de tecnología'),
+('Historia','Libros de historia'),
+('Arte','Libros de arte y diseño');
+
+INSERT INTO autor (nombre, apellido, nacionalidad) VALUES
+('Gabriel','García Márquez','Colombiana'),
+('Isabel','Allende','Chilena'),
+('George','Orwell','Británica'),
+('Jane','Austen','Británica'),
+('Julio','Verne','Francesa');
+
+INSERT INTO usuario (nombre, apellido, tipo_usuario, documento, correo, telefono, fecha_registro) VALUES
+('Ana','Torres','Estudiante','1001234567','ana.torres@uni.edu.co','3001112233','2023-01-15'),
+('Carlos','Ramírez','Docente','1002345678','carlos.ramirez@uni.edu.co','3002223344','2021-08-10'),
+('Laura','Gómez','Estudiante','1003456789','laura.gomez@uni.edu.co','3003334455','2022-02-20'),
+('Pedro','Salas','Administrativo','1004567890','pedro.salas@uni.edu.co','3004445566','2020-11-05'),
+('Marta','Díaz','Estudiante','1005678901','marta.diaz@uni.edu.co','3005556677','2023-06-01');
+
+INSERT INTO libro (titulo, isbn, anio_publicacion, editorial, id_categoria, cantidad_total, cantidad_disponible) VALUES
+('Cien años de soledad','978-0307474728',1967,'Sudamericana',1,3,2),
+('La casa de los espíritus','978-8401242104',1982,'Plaza & Janés',1,2,1),
+('1984','978-0451524935',1949,'Secker & Warburg',1,4,3),
+('Orgullo y prejuicio','978-0141439518',1813,'T. Egerton',1,2,2),
+('Veinte mil leguas de viaje submarino','978-8420674977',1870,'Hetzel',1,3,3);
+
+-- Cada fila conecta un libro con su autor correspondiente
+INSERT INTO libro_autor (id_libro, id_autor) VALUES
+(1,1),  -- Cien años de soledad — García Márquez
+(2,2),  -- La casa de los espíritus — Allende
+(3,3),  -- 1984 — Orwell
+(4,4),  -- Orgullo y prejuicio — Austen
+(5,5);  -- Veinte mil leguas... — Verne
+
+INSERT INTO prestamo (id_usuario, id_libro, fecha_prestamo, fecha_devolucion, fecha_real_devolucion, estado, multa) VALUES
+(1,1,'2024-03-01','2024-03-15',NULL,'Activo',0.00),
+(2,3,'2024-02-10','2024-02-24','2024-02-20','Devuelto',0.00),
+(3,2,'2024-01-05','2024-01-19','2024-01-25','Devuelto',5000.00),
+(4,4,'2024-03-10','2024-03-24',NULL,'Retrasado',3000.00),
+(5,5,'2024-03-20','2024-04-03',NULL,'Activo',0.00);
+```
+
+Tres cosas de estos datos que conviene tener presentes porque cambian los resultados de las consultas:
+
+- **Los cinco libros son de la categoría 1 (Ficción).** Las categorías 2 a 5 no tienen libros.
+- **Cada usuario y cada libro tiene exactamente un préstamo.** Los conteos por grupo darán 1 casi siempre.
+- **`fecha_real_devolucion` es `NULL` en tres préstamos.** Ahí viven los trucos con `NULL` que verás más abajo.
+
+---
+
+## 2. Anatomía de un SELECT
+
+Una consulta básica tiene esta forma:
+
+```sql
+SELECT   columnas o expresiones
+FROM     tabla
+WHERE    condición sobre filas
+GROUP BY columnas de agrupación
+HAVING   condición sobre grupos
+ORDER BY columnas de orden
+LIMIT    n;
+```
+
+Lo que escribes y lo que el motor ejecuta no van en el mismo orden. Esta diferencia explica la mitad de los errores de principiante.
+
+**Orden lógico de evaluación:**
+
+1. `FROM` (y los `JOIN`): arma el conjunto de filas de partida.
+2. `WHERE`: descarta filas.
+3. `GROUP BY`: agrupa lo que quedó.
+4. `HAVING`: descarta grupos.
+5. `SELECT`: calcula las columnas y los alias.
+6. `DISTINCT`: elimina duplicados.
+7. `ORDER BY`: ordena el resultado.
+8. `LIMIT`: recorta.
+
+De ahí salen reglas que parecen caprichos, pero no lo son. Un alias definido en el `SELECT` no existe todavía cuando corre el `WHERE`. Y `ORDER BY` sí puede usarlo, porque se evalúa después.
+
+### 2.1 SELECT y FROM
+
+`SELECT` dice **qué** columnas quieres. `FROM` dice **de dónde**.
+
+```sql
+SELECT titulo, anio_publicacion
+FROM libro;
+```
+
+Puedes calcular expresiones y ponerles alias con `AS`:
+
+```sql
+SELECT titulo,
+       cantidad_total - cantidad_disponible AS ejemplares_fuera
+FROM libro;
+```
+
+`SELECT *` sirve para explorar. En código que va a durar, nómbrate las columnas: si alguien agrega una columna a la tabla, tu consulta no cambia de forma sin avisar.
+
+**Restricciones:**
+
+- Si mezclas columnas normales con agregaciones, las normales deben ir en `GROUP BY`.
+- Los alias no se pueden usar en `WHERE` ni en `HAVING` (en MySQL, `HAVING` sí los acepta).
+- Un alias con espacios necesita comillas invertidas: `` `total multas` ``.
+
+### 2.2 WHERE
+
+Filtra **filas individuales**, antes de agrupar.
+
+```sql
+SELECT titulo, editorial
+FROM libro
+WHERE anio_publicacion > 1900
+  AND cantidad_disponible > 0;
+```
+
+Operadores que vas a usar todo el tiempo:
+
+| Operador | Uso | Ejemplo |
+|---|---|---|
+| `=`, `<>`, `<`, `>`, `<=`, `>=` | Comparar | `multa > 0` |
+| `AND`, `OR`, `NOT` | Combinar | `estado = 'Activo' AND multa = 0` |
+| `BETWEEN` | Rango inclusivo | `fecha_prestamo BETWEEN '2024-03-01' AND '2024-03-31'` |
+| `IN` | Lista de valores | `tipo_usuario IN ('Docente','Administrativo')` |
+| `LIKE` | Patrón (`%` y `_`) | `titulo LIKE 'La %'` |
+| `IS NULL` / `IS NOT NULL` | Nulos | `fecha_real_devolucion IS NULL` |
+
+**La trampa del NULL.** `NULL` no es igual a nada, ni siquiera a otro `NULL`. Escribir `fecha_real_devolucion = NULL` nunca devuelve filas. Se escribe `IS NULL`. Es el error número uno de quien empieza.
+
+Precedencia: `AND` pesa más que `OR`. Cuando mezcles ambos, usa paréntesis aunque no hagan falta, porque el que lee tu consulta no debería tener que adivinar.
+
+```sql
+-- Préstamos con multa, o que siguen abiertos y ya vencieron
+SELECT id_prestamo, estado, multa
+FROM prestamo
+WHERE multa > 0
+   OR (estado <> 'Devuelto' AND fecha_devolucion < '2024-03-20');
+```
+
+**Restricciones:** no admite funciones de agregación (`WHERE COUNT(*) > 1` es un error). Eso va en `HAVING`.
+
+### 2.3 DISTINCT
+
+Quita filas duplicadas **del resultado completo**, no de una columna suelta.
+
+```sql
+SELECT DISTINCT estado
+FROM prestamo;
+```
+
+Con varias columnas, `DISTINCT` compara la combinación entera:
+
+```sql
+SELECT DISTINCT tipo_usuario, estado
+FROM usuario u
+JOIN prestamo p ON p.id_usuario = u.id_usuario;
+```
+
+Úsalo con cuidado. Si te salen duplicados que no esperabas, casi siempre el problema es un `JOIN` mal planteado, y `DISTINCT` solo lo esconde. Arregla la causa.
+
+### 2.4 ORDER BY
+
+Ordena el resultado. Sin `ORDER BY`, el motor no garantiza ningún orden, aunque en tus pruebas "siempre salga igual".
+
+```sql
+SELECT titulo, anio_publicacion
+FROM libro
+ORDER BY anio_publicacion DESC, titulo ASC;
+```
+
+- `ASC` es el valor por defecto; `DESC` invierte.
+- Puedes ordenar por alias, por expresión o por posición (`ORDER BY 2`), aunque la posición es frágil.
+- En MySQL, los `NULL` salen primero en `ASC` y al final en `DESC`.
+
+### 2.5 LIMIT, OFFSET y FETCH FIRST
+
+Recortan el número de filas. Casi siempre van con `ORDER BY`, si no "los 3 primeros" no significa nada.
+
+```sql
+-- MySQL y PostgreSQL: los 3 libros más antiguos
+SELECT titulo, anio_publicacion
+FROM libro
+ORDER BY anio_publicacion ASC
+LIMIT 3;
+
+-- Saltar 3 y traer los siguientes 3 (paginación)
+SELECT titulo FROM libro ORDER BY id_libro LIMIT 3 OFFSET 3;
+```
+
+Cada motor lo escribe a su manera:
+
+| Motor | Sintaxis |
+|---|---|
+| MySQL, PostgreSQL, SQLite | `LIMIT n [OFFSET m]` |
+| Oracle 12c+, PostgreSQL, SQL estándar | `OFFSET m ROWS FETCH FIRST n ROWS ONLY` |
+| SQL Server | `SELECT TOP n ...` o `OFFSET ... FETCH NEXT ...` |
+
+### 2.6 GROUP BY y HAVING
+
+`GROUP BY` junta las filas que comparten valor en las columnas indicadas y deja **una fila por grupo**. `HAVING` filtra esos grupos ya formados.
+
+```sql
+SELECT estado, COUNT(*) AS total_prestamos
+FROM prestamo
+GROUP BY estado
+HAVING COUNT(*) >= 2;
+```
+
+La diferencia con `WHERE`, en una línea: `WHERE` filtra antes de agrupar, `HAVING` filtra después. Si puedes poner la condición en `WHERE`, ponla ahí: el motor trabaja menos.
+
+```sql
+-- Mal pensado: filtra tarde
+SELECT estado, COUNT(*) FROM prestamo
+GROUP BY estado
+HAVING estado <> 'Devuelto';
+
+-- Mejor: filtra antes de agrupar
+SELECT estado, COUNT(*) FROM prestamo
+WHERE estado <> 'Devuelto'
+GROUP BY estado;
+```
+
+**Restricciones:**
+
+- Todo lo que aparezca en `SELECT` sin agregar debe estar en `GROUP BY`.
+- MySQL con `ONLY_FULL_GROUP_BY` (activo por defecto) rechaza lo contrario.
+- `HAVING` suele llevar agregaciones; sin ellas casi siempre debería ser un `WHERE`.
+
+---
+
+## 3. Funciones de agregación
+
+Toman muchas filas y devuelven un valor. Sin `GROUP BY`, el resultado es una sola fila para toda la tabla.
+
+| Función | Qué hace | Detalle que se olvida |
+|---|---|---|
+| `COUNT(*)` | Cuenta filas | Incluye filas con `NULL` |
+| `COUNT(col)` | Cuenta valores no nulos de `col` | Ignora los `NULL` |
+| `COUNT(DISTINCT col)` | Cuenta valores distintos | Ignora los `NULL` |
+| `SUM(col)` | Suma | Devuelve `NULL` si no hay filas |
+| `AVG(col)` | Promedio | Ignora los `NULL`, no los cuenta como 0 |
+| `MAX(col)` / `MIN(col)` | Mayor / menor | Sirven también para texto y fechas |
+
+Con los datos del Taller 1:
+
+```sql
+SELECT COUNT(*)               AS prestamos,
+       COUNT(fecha_real_devolucion) AS con_devolucion_real,
+       SUM(multa)             AS multas_total,
+       AVG(multa)             AS multa_promedio,
+       MAX(multa)             AS multa_mayor,
+       MIN(multa)             AS multa_menor
+FROM prestamo;
+```
+
+Resultado esperado:
+
+| prestamos | con_devolucion_real | multas_total | multa_promedio | multa_mayor | multa_menor |
+|---|---|---|---|---|---|
+| 5 | 2 | 8000.00 | 1600.000000 | 5000.00 | 0.00 |
+
+Fíjate en que `COUNT(*)` da 5 y `COUNT(fecha_real_devolucion)` da 2: tres filas tienen `NULL` y esa función las salta.
+
+### 3.1 Agregación con GROUP BY y HAVING
+
+Multas por tipo de usuario, mostrando solo quien tiene algo que pagar:
+
+```sql
+SELECT u.tipo_usuario,
+       COUNT(*)      AS prestamos,
+       SUM(p.multa)  AS multas
+FROM prestamo p
+JOIN usuario u ON u.id_usuario = p.id_usuario
+GROUP BY u.tipo_usuario
+HAVING SUM(p.multa) > 0
+ORDER BY multas DESC;
+```
+
+| tipo_usuario | prestamos | multas |
+|---|---|---|
+| Estudiante | 3 | 5000.00 |
+| Administrativo | 1 | 3000.00 |
+
+Los docentes desaparecen porque su suma es 0 y `HAVING` los descarta.
+
+**Restricciones:**
+
+- No se pueden anidar agregaciones directamente: `SUM(COUNT(*))` es error en la mayoría de motores.
+- Las agregaciones no entran en `WHERE`.
+- `AVG` sobre una columna entera puede darte decimales o truncar, según el motor.
+
+---
+
+## 4. JOINs
+
+Los datos están repartidos en tablas por diseño. El `JOIN` los reúne usando la condición de la cláusula `ON`, que casi siempre empareja una llave foránea con su llave primaria.
+
+Para fijar la idea, imagina dos conjuntos: `A` es la tabla de la izquierda (la que escribes antes del `JOIN`) y `B` la de la derecha. Cada tipo de `JOIN` decide qué hace con las filas que **no** encuentran pareja.
+
+### 4.1 INNER JOIN
+
+Devuelve solo las filas con pareja en ambas tablas. Es el `JOIN` por defecto: escribir solo `JOIN` equivale a `INNER JOIN`.
+
+```sql
+SELECT u.nombre, u.apellido, l.titulo, p.fecha_prestamo
+FROM prestamo p
+INNER JOIN usuario u ON u.id_usuario = p.id_usuario
+INNER JOIN libro   l ON l.id_libro   = p.id_libro;
+```
+
+**Cuándo usarlo:** cuando solo te interesan los datos que están relacionados. "Dame los préstamos con el nombre del usuario y el título."
+
+### 4.2 LEFT JOIN
+
+Conserva **todas** las filas de la tabla izquierda. Si no hay pareja en la derecha, las columnas de la derecha salen en `NULL`.
+
+```sql
+SELECT c.nombre_categoria, COUNT(l.id_libro) AS libros
+FROM categoria c
+LEFT JOIN libro l ON l.id_categoria = c.id_categoria
+GROUP BY c.id_categoria, c.nombre_categoria
+ORDER BY libros DESC;
+```
+
+| nombre_categoria | libros |
+|---|---|
+| Ficción | 5 |
+| Ciencias | 0 |
+| Tecnología | 0 |
+| Historia | 0 |
+| Arte | 0 |
+
+Aquí `INNER JOIN` habría dejado solo Ficción y habrías pensado que las otras categorías no existen. Nota también que se cuenta `l.id_libro` y no `*`: así las categorías vacías dan 0 y no 1.
+
+**Truco clásico, el anti-join.** Para encontrar lo que **no** tiene pareja, haz `LEFT JOIN` y filtra los nulos de la derecha:
+
+```sql
+SELECT c.nombre_categoria
+FROM categoria c
+LEFT JOIN libro l ON l.id_categoria = c.id_categoria
+WHERE l.id_libro IS NULL;
+```
+
+Devuelve Ciencias, Tecnología, Historia y Arte.
+
+**Dónde poner el filtro importa.** Una condición sobre la tabla derecha en el `WHERE` convierte el `LEFT JOIN` en un `INNER JOIN` disfrazado, porque los `NULL` no pasan el filtro. Si quieres filtrar la derecha sin perder filas de la izquierda, la condición va en el `ON`.
+
+### 4.3 RIGHT JOIN
+
+Es el espejo del anterior: conserva todas las filas de la tabla **derecha**.
+
+```sql
+SELECT c.nombre_categoria, l.titulo
+FROM libro l
+RIGHT JOIN categoria c ON c.id_categoria = l.id_categoria;
+```
+
+Da el mismo resultado que el `LEFT JOIN` con las tablas intercambiadas. En la práctica casi todo el mundo escribe `LEFT JOIN` y reordena las tablas; así las consultas se leen siempre en la misma dirección.
+
+### 4.4 FULL JOIN (FULL OUTER JOIN)
+
+Conserva todas las filas de ambas tablas. Lo que no tiene pareja se rellena con `NULL` en el lado que falte.
+
+```sql
+-- PostgreSQL, Oracle, SQL Server
+SELECT c.nombre_categoria, l.titulo
+FROM categoria c
+FULL OUTER JOIN libro l ON l.id_categoria = c.id_categoria;
+```
+
+**MySQL no tiene `FULL JOIN`.** Se simula uniendo un `LEFT` con un `RIGHT`:
+
+```sql
+SELECT c.nombre_categoria, l.titulo
+FROM categoria c LEFT JOIN libro l ON l.id_categoria = c.id_categoria
+UNION
+SELECT c.nombre_categoria, l.titulo
+FROM categoria c RIGHT JOIN libro l ON l.id_categoria = c.id_categoria;
+```
+
+**Cuándo usarlo:** conciliaciones. "Qué hay en A que no está en B, qué hay en B que no está en A, y qué coincide."
+
+### 4.5 CROSS JOIN
+
+Producto cartesiano: cada fila de una tabla con cada fila de la otra. Sin `ON`.
+
+```sql
+SELECT u.tipo_usuario, c.nombre_categoria
+FROM (SELECT DISTINCT tipo_usuario FROM usuario) u
+CROSS JOIN categoria c;
+```
+
+Tres tipos de usuario por cinco categorías: 15 filas. Si cruzas dos tablas grandes sin querer (por ejemplo, olvidando la condición del `ON`), obtienes millones de filas. Tiene usos legítimos: generar combinaciones, calendarios, matrices de reporte.
+
+### 4.6 SELF JOIN y JOIN con varias tablas
+
+Una tabla puede unirse consigo misma usando alias distintos (útil para jerarquías, como empleado y jefe). Y los `JOIN` se encadenan. Este recorre las cuatro tablas del camino préstamo → libro → autor → categoría:
+
+```sql
+SELECT p.id_prestamo,
+       u.nombre AS usuario,
+       l.titulo,
+       CONCAT(a.nombre, ' ', a.apellido) AS autor,
+       c.nombre_categoria AS categoria
+FROM prestamo p
+JOIN usuario u     ON u.id_usuario   = p.id_usuario
+JOIN libro l       ON l.id_libro     = p.id_libro
+JOIN libro_autor la ON la.id_libro   = l.id_libro
+JOIN autor a       ON a.id_autor     = la.id_autor
+JOIN categoria c   ON c.id_categoria = l.id_categoria;
+```
+
+Para ir de `libro` a `autor` **hay que pasar por `libro_autor`**. No existe una llave directa: es el precio de resolver una N:M.
+
+### 4.7 Comparativa de los cinco JOIN
+
+| JOIN | Filas sin pareja de la izquierda | Filas sin pareja de la derecha | Úsalo cuando |
+|---|---|---|---|
+| `INNER` | Se pierden | Se pierden | Solo importan los datos relacionados |
+| `LEFT` | Se conservan | Se pierden | Quieres todo de A, con o sin datos de B |
+| `RIGHT` | Se pierden | Se conservan | Igual que `LEFT`, tablas invertidas |
+| `FULL` | Se conservan | Se conservan | Comparar dos conjuntos completos |
+| `CROSS` | No aplica | No aplica | Necesitas todas las combinaciones |
+
+---
+
+## 5. Subconsultas
+
+Una subconsulta es un `SELECT` dentro de otro. Va entre paréntesis y puede aparecer en cuatro lugares.
+
+### 5.1 En el WHERE
+
+La más común. La subconsulta produce un valor o una lista que el `WHERE` externo usa para filtrar.
+
+```sql
+-- Libros con más ejemplares que el promedio
+SELECT titulo, cantidad_total
+FROM libro
+WHERE cantidad_total > (SELECT AVG(cantidad_total) FROM libro);
+```
+
+El promedio es 2.8, así que salen *Cien años de soledad* (3), *1984* (4) y *Veinte mil leguas de viaje submarino* (3).
+
+Cuando la subconsulta devuelve **un solo valor**, puedes usar `=`, `>`, `<`. Si puede devolver varios, usa `IN`, `ANY` o `ALL`.
+
+### 5.2 En el FROM (tabla derivada)
+
+El resultado de una subconsulta se trata como si fuera una tabla. **Obligatorio ponerle alias.**
+
+```sql
+SELECT t.tipo_usuario, t.multas
+FROM (
+  SELECT u.tipo_usuario, SUM(p.multa) AS multas
+  FROM prestamo p
+  JOIN usuario u ON u.id_usuario = p.id_usuario
+  GROUP BY u.tipo_usuario
+) AS t
+WHERE t.multas > 0;
+```
+
+Sirve para filtrar o calcular sobre algo que ya fue agregado. Hoy esto suele escribirse mejor con un CTE (sección 6).
+
+### 5.3 En el SELECT (subconsulta escalar)
+
+Devuelve exactamente un valor por fila externa. Si devuelve más de uno, error.
+
+```sql
+SELECT u.nombre,
+       u.apellido,
+       (SELECT COUNT(*)
+        FROM prestamo p
+        WHERE p.id_usuario = u.id_usuario) AS prestamos
+FROM usuario u;
+```
+
+Esta es además una subconsulta **correlacionada** (sección 5.5). Funciona, pero un `LEFT JOIN` con `GROUP BY` suele rendir mejor en tablas grandes.
+
+### 5.4 IN y NOT IN
+
+`IN` pregunta si un valor está dentro de una lista que genera la subconsulta.
+
+```sql
+-- Usuarios que tienen al menos un préstamo con multa
+SELECT nombre, apellido
+FROM usuario
+WHERE id_usuario IN (SELECT id_usuario FROM prestamo WHERE multa > 0);
+```
+
+Salen Laura Gómez y Pedro Salas.
+
+**La trampa de `NOT IN`.** Si la lista contiene un solo `NULL`, `NOT IN` no devuelve ninguna fila. La comparación con `NULL` da "desconocido", y "desconocido" no pasa el filtro.
+
+```sql
+-- Peligroso: fecha_real_devolucion tiene NULLs en este esquema
+SELECT id_prestamo
+FROM prestamo
+WHERE fecha_devolucion NOT IN (SELECT fecha_real_devolucion FROM prestamo);
+-- Devuelve 0 filas aunque debería devolver varias
+```
+
+Cuando la columna pueda ser nula, usa `NOT EXISTS` o filtra los nulos dentro de la subconsulta (`WHERE col IS NOT NULL`).
+
+### 5.5 Subconsultas correlacionadas
+
+Hacen referencia a una columna de la consulta externa, así que se **reevalúan por cada fila externa**. No se pueden ejecutar solas.
+
+```sql
+-- El préstamo más reciente de cada usuario
+SELECT p.id_prestamo, p.id_usuario, p.fecha_prestamo
+FROM prestamo p
+WHERE p.fecha_prestamo = (
+  SELECT MAX(p2.fecha_prestamo)
+  FROM prestamo p2
+  WHERE p2.id_usuario = p.id_usuario
+);
+```
+
+Lee la subconsulta como una pregunta que se repite: "para *este* usuario, ¿cuál es su fecha máxima?". Los optimizadores modernos transforman muchas en joins por dentro, pero en datos grandes conviene medir con `EXPLAIN`.
+
+### 5.6 EXISTS y NOT EXISTS
+
+No importa **qué** devuelve la subconsulta, solo **si devuelve algo**. En cuanto encuentra una fila, el motor se detiene.
+
+```sql
+-- Usuarios con algún préstamo retrasado
+SELECT u.nombre, u.apellido
+FROM usuario u
+WHERE EXISTS (
+  SELECT 1
+  FROM prestamo p
+  WHERE p.id_usuario = u.id_usuario
+    AND p.estado = 'Retrasado'
+);
+```
+
+Sale Pedro Salas. Con `NOT EXISTS` obtienes lo contrario: quienes no tienen ninguno.
+
+**`EXISTS` o `IN`.** Para listas pequeñas, da lo mismo. Con subconsultas grandes `EXISTS` suele rendir igual o mejor, y para negaciones es **siempre** más seguro que `NOT IN` por el asunto de los `NULL`. El `SELECT 1` dentro del `EXISTS` es convención: la columna es irrelevante.
+
+### 5.7 ANY, SOME y ALL
+
+Comparan un valor contra todo un conjunto.
+
+```sql
+-- Multas mayores que todas las multas de los Docentes (ALL)
+SELECT id_prestamo, multa
+FROM prestamo
+WHERE multa > ALL (
+  SELECT p.multa
+  FROM prestamo p JOIN usuario u ON u.id_usuario = p.id_usuario
+  WHERE u.tipo_usuario = 'Docente'
+);
+```
+
+`> ANY` significa "mayor que al menos uno"; `> ALL`, "mayor que todos". `= ANY` es equivalente a `IN`.
+
+---
+
+## 6. CTE: expresiones de tabla comunes
+
+Un CTE es una consulta con nombre que defines al principio con `WITH` y luego usas como si fuera una tabla. Vive solo durante esa sentencia.
+
+```sql
+WITH multas_por_usuario AS (
+  SELECT id_usuario, SUM(multa) AS total_multa
+  FROM prestamo
+  GROUP BY id_usuario
+)
+SELECT u.nombre, u.apellido, m.total_multa
+FROM multas_por_usuario m
+JOIN usuario u ON u.id_usuario = m.id_usuario
+WHERE m.total_multa > 0;
+```
+
+**Para qué sirve:**
+
+- Leer la consulta de arriba hacia abajo, en pasos.
+- Reutilizar el mismo resultado intermedio varias veces.
+- Reemplazar subconsultas en el `FROM` que se anidan tres niveles.
+- Recorrer jerarquías con recursión.
+
+Puedes encadenar varios CTE separados por coma; los últimos pueden usar los anteriores:
+
+```sql
+WITH
+abiertos AS (
+  SELECT id_libro, COUNT(*) AS n
+  FROM prestamo
+  WHERE estado <> 'Devuelto'
+  GROUP BY id_libro
+),
+stock AS (
+  SELECT id_libro, titulo, cantidad_total - cantidad_disponible AS fuera
+  FROM libro
+)
+SELECT s.titulo, s.fuera, COALESCE(a.n, 0) AS prestamos_abiertos
+FROM stock s
+LEFT JOIN abiertos a ON a.id_libro = s.id_libro;
+```
+
+### 6.1 CTE recursivo
+
+Tiene una parte ancla, una parte recursiva y se detiene cuando esta última no produce filas nuevas. En MySQL se escribe `WITH RECURSIVE`.
+
+```sql
+-- Numeración del 1 al 5 (ejemplo mínimo para ver la mecánica)
+WITH RECURSIVE n AS (
+  SELECT 1 AS i            -- ancla
+  UNION ALL
+  SELECT i + 1 FROM n      -- parte recursiva
+  WHERE i < 5              -- condición de parada
+)
+SELECT i FROM n;
+```
+
+Su uso real: organigramas, categorías con subcategorías, rutas, calendarios. Si te falta la condición de parada, el motor corta por límite de recursión (en MySQL, `cte_max_recursion_depth`).
+
+**Restricciones:**
+
+- Disponible desde MySQL 8.0, PostgreSQL 8.4, Oracle 11gR2 y SQL Server 2005.
+- Un CTE no es una tabla temporal: se reevalúa en cada referencia en algunos motores.
+- En Oracle el recursivo no lleva la palabra `RECURSIVE`.
+
+---
+
+## 7. Operadores de conjunto
+
+Combinan los resultados de dos consultas **verticalmente** (filas sobre filas), a diferencia de los `JOIN`, que combinan horizontalmente (columnas al lado de columnas).
+
+### 7.1 Requisitos de compatibilidad
+
+Para que funcionen, las dos consultas deben cumplir:
+
+- Mismo número de columnas.
+- Tipos de datos compatibles, posición por posición.
+- Los nombres de columna del resultado vienen de la primera consulta.
+- `ORDER BY` va una sola vez, al final de todo.
+
+### 7.2 UNION y UNION ALL
+
+`UNION` une y **elimina duplicados**. `UNION ALL` une y los **conserva**, y por eso es más rápido (no tiene que comparar).
+
+```sql
+-- Libros con préstamo abierto (Activo o Retrasado), sin repetir
+SELECT id_libro FROM prestamo WHERE estado = 'Activo'
+UNION
+SELECT id_libro FROM prestamo WHERE estado = 'Retrasado';
+```
+
+Resultado: libros 1, 4 y 5. Si ya sabes que no habrá repetidos (o los quieres), usa `UNION ALL`.
+
+### 7.3 INTERSECT
+
+Devuelve solo las filas presentes en **ambas** consultas.
+
+```sql
+-- Libros prestados a estudiantes Y con multa
+SELECT p.id_libro
+FROM prestamo p JOIN usuario u ON u.id_usuario = p.id_usuario
+WHERE u.tipo_usuario = 'Estudiante'
+INTERSECT
+SELECT id_libro FROM prestamo WHERE multa > 0;
+```
+
+Resultado: libro 2. MySQL soporta `INTERSECT` desde la **8.0.31**; antes hay que simularlo con `IN` o `EXISTS`.
+
+### 7.4 MINUS / EXCEPT
+
+Devuelve las filas de la primera consulta que **no** están en la segunda. Importa el orden: `A MINUS B` no es igual a `B MINUS A`.
+
+| Motor | Palabra |
+|---|---|
+| Oracle | `MINUS` |
+| PostgreSQL, SQL Server, MySQL 8.0.31+, SQL estándar | `EXCEPT` |
+
+```sql
+-- Libros devueltos que no generaron multa
+SELECT id_libro FROM prestamo WHERE estado = 'Devuelto'
+EXCEPT
+SELECT id_libro FROM prestamo WHERE multa > 0;
+```
+
+Resultado: libro 3. Si tu MySQL es anterior, la versión equivalente es:
+
+```sql
+SELECT DISTINCT p.id_libro
+FROM prestamo p
+WHERE p.estado = 'Devuelto'
+  AND NOT EXISTS (
+    SELECT 1 FROM prestamo q
+    WHERE q.id_libro = p.id_libro AND q.multa > 0
+  );
+```
+
+Un detalle que desconcierta: `UNION`, `INTERSECT` y `EXCEPT` (sin `ALL`) quitan duplicados; las variantes `ALL` los conservan. Y en el estándar, `INTERSECT` tiene mayor precedencia que `UNION` y `EXCEPT`. Si mezclas varios, pon paréntesis.
+
+---
+
+## 8. Window functions
+
+Calculan algo sobre un grupo de filas **sin colapsarlas**. Con `GROUP BY` perdías el detalle; con una window function cada fila se queda y recibe además el valor calculado sobre su "ventana".
+
+La forma general:
+
+```sql
+función() OVER (
+  PARTITION BY columnas   -- opcional: reinicia el cálculo por grupo
+  ORDER BY columnas       -- define el orden dentro de la ventana
+)
+```
+
+Disponibles en MySQL desde 8.0, y en PostgreSQL, Oracle y SQL Server desde hace años.
+
+### 8.1 ROW_NUMBER, RANK y DENSE_RANK
+
+Numeran filas. La diferencia está en cómo tratan los empates.
+
+```sql
+SELECT titulo,
+       cantidad_total,
+       ROW_NUMBER() OVER (ORDER BY cantidad_total DESC) AS fila,
+       RANK()       OVER (ORDER BY cantidad_total DESC) AS rango,
+       DENSE_RANK() OVER (ORDER BY cantidad_total DESC) AS rango_denso
+FROM libro;
+```
+
+| titulo | cantidad_total | fila | rango | rango_denso |
+|---|---|---|---|---|
+| 1984 | 4 | 1 | 1 | 1 |
+| Cien años de soledad | 3 | 2 | 2 | 2 |
+| Veinte mil leguas de viaje submarino | 3 | 3 | 2 | 2 |
+| La casa de los espíritus | 2 | 4 | 4 | 3 |
+| Orgullo y prejuicio | 2 | 5 | 4 | 3 |
+
+- **`ROW_NUMBER`**: numera sin repetir; entre empates el orden es arbitrario.
+- **`RANK`**: los empatados comparten número y se salta el siguiente (1, 2, 2, 4).
+- **`DENSE_RANK`**: los empatados comparten número y no se salta nada (1, 2, 2, 3).
+
+Uso típico: "el top N por grupo", con `PARTITION BY` y filtrando el resultado en una consulta exterior o en un CTE, porque no se puede poner una window function directamente en el `WHERE`.
+
+### 8.2 NTILE
+
+Reparte las filas en *n* cubetas del mismo tamaño (o lo más parecido posible).
+
+```sql
+SELECT titulo,
+       cantidad_total,
+       NTILE(2) OVER (ORDER BY cantidad_total DESC) AS mitad
+FROM libro;
+```
+
+Con 5 filas en 2 grupos, la primera cubeta recibe 3 filas y la segunda 2. Se usa para cuartiles, deciles y segmentaciones tipo "el 25 % superior".
+
+### 8.3 LAG y LEAD
+
+Acceden a la fila **anterior** (`LAG`) o **siguiente** (`LEAD`) dentro de la ventana, sin autojoin.
+
+```sql
+SELECT id_prestamo,
+       fecha_prestamo,
+       LAG(fecha_prestamo) OVER (ORDER BY fecha_prestamo) AS prestamo_anterior,
+       DATEDIFF(fecha_prestamo,
+                LAG(fecha_prestamo) OVER (ORDER BY fecha_prestamo)) AS dias_desde_anterior
+FROM prestamo;
+```
+
+| id_prestamo | fecha_prestamo | prestamo_anterior | dias_desde_anterior |
+|---|---|---|---|
+| 3 | 2024-01-05 | NULL | NULL |
+| 2 | 2024-02-10 | 2024-01-05 | 36 |
+| 1 | 2024-03-01 | 2024-02-10 | 20 |
+| 4 | 2024-03-10 | 2024-03-01 | 9 |
+| 5 | 2024-03-20 | 2024-03-10 | 10 |
+
+Acepta un desplazamiento y un valor por defecto: `LAG(col, 2, 0)` mira dos filas atrás y devuelve 0 si no existe. `LEAD` hace lo mismo hacia adelante.
+
+### 8.4 Agregaciones como window functions
+
+`SUM`, `AVG`, `COUNT` también aceptan `OVER`. Con `ORDER BY` dentro, dan acumulados:
+
+```sql
+SELECT id_prestamo, fecha_prestamo, multa,
+       SUM(multa) OVER (ORDER BY fecha_prestamo) AS multa_acumulada
+FROM prestamo;
+```
+
+---
+
+## 9. Ejemplos resueltos
+
+Cinco consultas completas sobre el esquema del Taller 1. Cada una parte de una pregunta en lenguaje natural y explica las decisiones que hay detrás.
+
+### Ejemplo 1: Multas totales por usuario, solo quienes deben algo
+
+**Pregunta:** ¿Quién tiene multas y cuánto suman?
+
+**Decisiones:**
+
+1. Los datos están en `prestamo`, pero el nombre está en `usuario`. Hace falta un `JOIN`.
+2. `INNER JOIN` basta: solo importan usuarios con préstamos.
+3. Se agrupa por usuario para sumar. Agrupo por `id_usuario` y también por nombre y apellido, porque `ONLY_FULL_GROUP_BY` lo exige.
+4. "Solo quienes deben" es una condición sobre la suma, o sea sobre grupos: va en `HAVING`.
+
+```sql
+SELECT u.id_usuario,
+       CONCAT(u.nombre, ' ', u.apellido) AS usuario,
+       SUM(p.multa) AS total_multas
+FROM usuario u
+JOIN prestamo p ON p.id_usuario = u.id_usuario
+GROUP BY u.id_usuario, u.nombre, u.apellido
+HAVING SUM(p.multa) > 0
+ORDER BY total_multas DESC;
+```
+
+| id_usuario | usuario | total_multas |
+|---|---|---|
+| 3 | Laura Gómez | 5000.00 |
+| 4 | Pedro Salas | 3000.00 |
+
+### Ejemplo 2: Categorías con su cantidad de libros, incluyendo las vacías
+
+**Pregunta:** ¿Cuántos libros tiene cada categoría?
+
+**Decisiones:**
+
+1. La palabra "cada" avisa: deben aparecer todas las categorías, también las sin libros.
+2. Eso descarta el `INNER JOIN` y pide `LEFT JOIN` desde `categoria`.
+3. Se cuenta `l.id_libro`, no `*`. Con `COUNT(*)` una categoría vacía mostraría 1 por la fila de relleno con `NULL`.
+
+```sql
+SELECT c.nombre_categoria,
+       COUNT(l.id_libro) AS libros
+FROM categoria c
+LEFT JOIN libro l ON l.id_categoria = c.id_categoria
+GROUP BY c.id_categoria, c.nombre_categoria
+ORDER BY libros DESC, c.nombre_categoria;
+```
+
+Resultado: Ficción 5; Arte, Ciencias, Historia y Tecnología con 0.
+
+### Ejemplo 3: Catálogo completo con autor y categoría
+
+**Pregunta:** Lista cada libro con su autor y su categoría.
+
+**Decisiones:**
+
+1. `libro` y `autor` no se conectan directo: la N:M obliga a pasar por `libro_autor`.
+2. Son cuatro tablas, así que encadeno tres `JOIN` siguiendo las llaves foráneas.
+3. Un libro con dos autores saldría en dos filas. Es lo correcto para este resultado; si quisiera una fila por libro usaría `GROUP_CONCAT`.
+4. `CONCAT` junta nombre y apellido para que el resultado sea legible.
+
+```sql
+SELECT l.titulo,
+       GROUP_CONCAT(CONCAT(a.nombre, ' ', a.apellido) SEPARATOR ', ') AS autores,
+       c.nombre_categoria AS categoria
+FROM libro l
+JOIN libro_autor la ON la.id_libro = l.id_libro
+JOIN autor a        ON a.id_autor  = la.id_autor
+JOIN categoria c    ON c.id_categoria = l.id_categoria
+GROUP BY l.id_libro, l.titulo, c.nombre_categoria
+ORDER BY l.titulo;
+```
+
+| titulo | autores | categoria |
+|---|---|---|
+| 1984 | George Orwell | Ficción |
+| Cien años de soledad | Gabriel García Márquez | Ficción |
+| La casa de los espíritus | Isabel Allende | Ficción |
+| Orgullo y prejuicio | Jane Austen | Ficción |
+| Veinte mil leguas de viaje submarino | Julio Verne | Ficción |
+
+### Ejemplo 4: Detectar inventario inconsistente
+
+**Pregunta:** ¿En qué libros no coincide el stock con los préstamos abiertos?
+
+**Decisiones:**
+
+1. Por stock, los ejemplares fuera son `cantidad_total - cantidad_disponible`.
+2. Por préstamos, son los que no están en estado `Devuelto`. Los cuento en un CTE para tener el paso aislado y legible.
+3. `LEFT JOIN` hacia el CTE, porque hay libros sin ningún préstamo abierto y no deben desaparecer.
+4. `COALESCE` convierte el `NULL` de esos libros en 0 para poder comparar.
+5. Dejo solo las filas donde ambos números difieren.
+
+```sql
+WITH abiertos AS (
+  SELECT id_libro, COUNT(*) AS prestamos_abiertos
+  FROM prestamo
+  WHERE estado <> 'Devuelto'
+  GROUP BY id_libro
+)
+SELECT l.id_libro,
+       l.titulo,
+       l.cantidad_total - l.cantidad_disponible AS fuera_segun_stock,
+       COALESCE(a.prestamos_abiertos, 0)        AS fuera_segun_prestamos
+FROM libro l
+LEFT JOIN abiertos a ON a.id_libro = l.id_libro
+WHERE l.cantidad_total - l.cantidad_disponible <> COALESCE(a.prestamos_abiertos, 0);
+```
+
+| id_libro | titulo | fuera_segun_stock | fuera_segun_prestamos |
+|---|---|---|---|
+| 2 | La casa de los espíritus | 1 | 0 |
+| 3 | 1984 | 1 | 0 |
+| 4 | Orgullo y prejuicio | 0 | 1 |
+| 5 | Veinte mil leguas de viaje submarino | 0 | 1 |
+
+Esta consulta destapa algo útil sobre el modelo: `cantidad_disponible` es un dato **derivado** que se puede desfasar de los préstamos reales. Es un buen punto de discusión para el taller (calcularlo con una consulta, o mantenerlo con un trigger).
+
+### Ejemplo 5: Préstamos devueltos tarde y días de retraso
+
+**Pregunta:** ¿Qué préstamos se devolvieron después de la fecha pactada y con cuántos días de retraso?
+
+**Decisiones:**
+
+1. Solo tienen sentido los que tienen `fecha_real_devolucion`: filtro con `IS NOT NULL` (nunca `<> NULL`).
+2. El retraso es la diferencia entre la fecha real y la esperada, con `DATEDIFF(real, esperada)`.
+3. Solo quedan los de diferencia positiva.
+4. Hago `JOIN` con `usuario` y `libro` para que el resultado se entienda sin consultar ids.
+5. Agrego `CASE` para etiquetar la situación; es un ejemplo corto de lógica condicional dentro del `SELECT`.
+
+```sql
+SELECT p.id_prestamo,
+       CONCAT(u.nombre, ' ', u.apellido) AS usuario,
+       l.titulo,
+       p.fecha_devolucion      AS esperada,
+       p.fecha_real_devolucion AS real_,
+       DATEDIFF(p.fecha_real_devolucion, p.fecha_devolucion) AS dias_retraso,
+       CASE
+         WHEN p.multa > 0 THEN 'Con multa'
+         ELSE 'Sin multa'
+       END AS situacion
+FROM prestamo p
+JOIN usuario u ON u.id_usuario = p.id_usuario
+JOIN libro l   ON l.id_libro   = p.id_libro
+WHERE p.fecha_real_devolucion IS NOT NULL
+  AND p.fecha_real_devolucion > p.fecha_devolucion;
+```
+
+| id_prestamo | usuario | titulo | esperada | real_ | dias_retraso | situacion |
+|---|---|---|---|---|---|---|
+| 3 | Laura Gómez | La casa de los espíritus | 2024-01-19 | 2024-01-25 | 6 | Con multa |
+
+### Ejemplo 6 (extra): Ranking de usuarios por multas con window function
+
+**Pregunta:** Ordena a los usuarios por lo que deben y muestra qué porcentaje del total representa cada uno.
+
+**Decisiones:**
+
+1. Primero agrego multas por usuario en un CTE.
+2. Después uso `RANK()` para el puesto y `SUM() OVER ()` sin partición para obtener el total general en cada fila.
+3. El porcentaje es la multa del usuario dividida entre ese total, redondeada.
+
+```sql
+WITH por_usuario AS (
+  SELECT id_usuario, SUM(multa) AS total_multa
+  FROM prestamo
+  GROUP BY id_usuario
+)
+SELECT CONCAT(u.nombre, ' ', u.apellido) AS usuario,
+       pu.total_multa,
+       RANK() OVER (ORDER BY pu.total_multa DESC) AS puesto,
+       ROUND(100 * pu.total_multa / SUM(pu.total_multa) OVER (), 1) AS porcentaje
+FROM por_usuario pu
+JOIN usuario u ON u.id_usuario = pu.id_usuario
+ORDER BY puesto;
+```
+
+| usuario | total_multa | puesto | porcentaje |
+|---|---|---|---|
+| Laura Gómez | 5000.00 | 1 | 62.5 |
+| Pedro Salas | 3000.00 | 2 | 37.5 |
+| Ana Torres | 0.00 | 3 | 0.0 |
+| Carlos Ramírez | 0.00 | 3 | 0.0 |
+| Marta Díaz | 0.00 | 3 | 0.0 |
+
+---
+
+## 10. Errores comunes y cómo evitarlos
+
+**1. Comparar con NULL usando `=`.**
+`WHERE col = NULL` nunca devuelve nada. Usa `IS NULL` o `IS NOT NULL`.
+
+**2. Poner agregaciones en el WHERE.**
+`WHERE COUNT(*) > 1` falla. Esa condición es sobre grupos y va en `HAVING`.
+
+**3. Columnas sin agrupar en el SELECT.**
+Si pides `nombre` y `SUM(multa)` sin poner `nombre` en el `GROUP BY`, MySQL con `ONLY_FULL_GROUP_BY` lo rechaza. Y los motores que lo aceptan devuelven un valor arbitrario, que es peor.
+
+**4. Usar un alias del SELECT en el WHERE.**
+El alias no existe todavía en ese punto del orden lógico. Repite la expresión, o envuélvela en un CTE.
+
+**5. `NOT IN` con una subconsulta que puede tener nulos.**
+Devuelve cero filas sin avisar. Cámbialo por `NOT EXISTS`.
+
+**6. Condición del `ON` olvidada o incompleta.**
+Genera un producto cartesiano. Si un conteo se infla de pronto, revisa esto primero.
+
+**7. `LEFT JOIN` convertido en `INNER` por el WHERE.**
+Una condición sobre la tabla derecha en el `WHERE` elimina las filas con `NULL`. Muévela al `ON`.
+
+**8. Contar con `COUNT(*)` tras un `LEFT JOIN`.**
+La fila vacía cuenta como 1. Cuenta una columna de la tabla derecha.
+
+**9. Arreglar duplicados con `DISTINCT` sin entender el origen.**
+El duplicado suele nacer de un `JOIN` uno-a-muchos. Corrige la relación o agrupa.
+
+**10. `LIMIT` sin `ORDER BY`.**
+"Los primeros 3" sin criterio de orden es un resultado que puede cambiar entre ejecuciones.
+
+**11. Mezclar `UNION` y `UNION ALL` sin pensar.**
+`UNION` ordena y compara para quitar duplicados; en volúmenes grandes cuesta. Si sabes que no hay repetidos, `UNION ALL`.
+
+**12. Operar con tipos incompatibles.**
+Comparar una fecha con un texto mal formateado, o unir con `UNION` columnas de tipos distintos, da resultados raros o errores. Usa formato `'AAAA-MM-DD'`.
+
+**13. `SELECT *` en consultas que van a quedarse.**
+Se rompe cuando cambia la tabla y trae columnas que no necesitas.
+
+**14. Aplicar funciones a la columna filtrada.**
+`WHERE YEAR(fecha_prestamo) = 2024` impide usar un índice sobre `fecha_prestamo`. Es mejor `WHERE fecha_prestamo >= '2024-01-01' AND fecha_prestamo < '2025-01-01'`.
+
+**Hábito que evita casi todo lo anterior:** escribe la consulta por partes. Primero el `FROM` y los `JOIN`, mira cuántas filas salen. Luego el `WHERE`. Luego agrupa. Verificar en cada paso es más rápido que depurar una consulta larga de golpe.
+
+---
+
+## 11. Chuleta de consulta rápida
+
+| Quiero... | Uso |
+|---|---|
+| Filtrar filas | `WHERE` |
+| Filtrar grupos | `HAVING` |
+| Quitar repetidos | `DISTINCT` |
+| Ordenar | `ORDER BY` |
+| Traer solo N filas | `LIMIT` / `FETCH FIRST` |
+| Datos relacionados | `INNER JOIN` |
+| Todo de una tabla, con o sin pareja | `LEFT JOIN` |
+| Lo que no tiene pareja | `LEFT JOIN ... WHERE x IS NULL` o `NOT EXISTS` |
+| Resultado intermedio con nombre | `WITH` (CTE) |
+| Unir resultados | `UNION` / `UNION ALL` |
+| Solo lo común | `INTERSECT` |
+| Lo que está en A y no en B | `EXCEPT` / `MINUS` |
+| Ranking sin perder filas | `RANK()`, `ROW_NUMBER()`, `DENSE_RANK()` |
+| Comparar con la fila anterior | `LAG()` |
+
+---
+
+## 12. Referencias
+
+**Documentación oficial**
+
+- MySQL 8.0 Reference Manual, capítulo "SQL Statements" (SELECT, JOIN, WITH, Window Functions): https://dev.mysql.com/doc/refman/8.0/en/
+- PostgreSQL Documentation, capítulo "Queries": https://www.postgresql.org/docs/current/queries.html
+- Oracle Database SQL Language Reference: https://docs.oracle.com/en/database/oracle/oracle-database/
+- Microsoft Learn, Transact-SQL reference: https://learn.microsoft.com/en-us/sql/t-sql/
+
+**Libros**
+
+- Silberschatz, A., Korth, H. y Sudarshan, S. *Fundamentos de bases de datos* (*Database System Concepts*). McGraw-Hill.
+- Elmasri, R. y Navathe, S. *Fundamentos de sistemas de bases de datos* (*Fundamentals of Database Systems*). Pearson.
+- Date, C. J. *An Introduction to Database Systems*. Pearson.
+- Ben-Gan, I. *T-SQL Fundamentals*. Microsoft Press. Excelente en JOINs, subconsultas y window functions, útil en cualquier motor.
+
+**Recursos en línea**
+
+- Modern SQL, características del estándar y soporte por motor: https://modern-sql.com
+- Use The Index, Luke, rendimiento y uso de índices: https://use-the-index-luke.com
+- SQLBolt, ejercicios interactivos para practicar: https://sqlbolt.com
+
+**Material del curso**
+
+- Taller 1, *Bases de Datos I — MER: Evaluación y Corrección*. Sistema de Gestión de una Biblioteca Universitaria.
+
+---
+
+### Origen del ejercicio
+
+Este es un ejercicio de **otro grupo de Bases De Datos 1**, proporcionado por el profesor **Alexander Dario Agudelo Cubillos**. El esquema y las consultas corresponden al Taller 1 de consultas SQL sobre el sistema de gestión de una biblioteca universitaria.

@@ -32,6 +32,12 @@ export const projectCategories = [
     intro: "Scripts y consultas SQL: creación de tablas, inserciones y consultas sobre esquemas reales.",
   },
   {
+    slug: "consultas",
+    label: "Consultas SQL",
+    tagline: "De SELECT a window functions",
+    intro: "Guía de estudio de consultas sobre el esquema de biblioteca universitaria del Taller 1, con MySQL 8 como referencia.",
+  },
+  {
     slug: "proyecto",
     label: "Proyecto",
     tagline: "Entrega Final",
