@@ -1,0 +1,150 @@
+---
+title: "MER Entidad Académica — Normalización del modelo universitario"
+tagline: "Del MER de gestión académica al esquema relacional en 3FN: dependencias funcionales, anomalías y descomposición"
+description: "Ejercicio de normalización sobre el MER de gestión académica universitaria: análisis de dependencias funcionales, verificación de 1FN, 2FN y 3FN, y esquema relacional resultante con siete tablas."
+status: "complete"
+category: "normalizacion"
+moduleId: "BD1-NOR-008"
+order: 16
+thumbnail: "../../../assets/evidencias/mer-entidad-academica-normalizacion/thumbnail.png"
+thumbnailAlt: "Esquema MER de gestión académica con siete entidades: PROGRAMA, CURSO, GRUPO, PROFESOR, ESTUDIANTE, MATRICULA y PLAN_ESTUDIO"
+
+tech:
+  - "Normalización (1FN · 2FN · 3FN)"
+  - "Dependencias funcionales"
+  - "Modelo Entidad-Relación"
+  - "Esquema relacional"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Gestión académica universitaria: estudiantes, profesores, programas, cursos, grupos, matrículas y planes de estudio"
+  - label: "Entidades"
+    value: "Siete: PROGRAMA, PLAN_ESTUDIO, CURSO, PROFESOR, GRUPO, ESTUDIANTE, MATRICULA"
+  - label: "Forma normal final"
+    value: "3FN — cada atributo depende únicamente de la llave de su tabla"
+  - label: "Origen"
+    value: "Ejercicio de otro grupo de Bases De Datos 1, proporcionado por el profesor Alexander Dario Agudelo Cubillos"
+
+features:
+  - lead: "Dependencias funcionales"
+    text: "Se identifican las dependencias entre atributos de cada entidad para detectar anomalías de inserción, actualización y borrado."
+  - lead: "Verificación de formas normales"
+    text: "Se revisa cada tabla contra 1FN, 2FN y 3FN; se documenta dónde cumple y dónde no."
+  - lead: "Esquema relacional final"
+    text: "Siete tablas con claves primarias, foráneas y restricciones de unicidad listas para implementar en SQL."
+
+archCaption: "Esquema MER original de gestión académica universitaria"
+
+challenge:
+  title: "Problema"
+  body: "Partiendo del MER de un sistema de gestión académica universitaria, determinar en qué forma normal se encuentra cada entidad, justificar la respuesta con dependencias funcionales, y convertir el modelo a 3FN eliminando las anomalías de datos."
+
+solution:
+  title: "Solución"
+  body: "Se analizan las siete entidades del MER (PROGRAMA, CURSO, GRUPO, PROFESOR, ESTUDIANTE, MATRICULA, PLAN_ESTUDIO), se extraen las dependencias funcionales y se verifica que el esquema cumple 1FN y 2FN. Se identifican dos candidatos a violar 3FN (facultad en PROGRAMA y departamento en PROFESOR) y se justifica por qué se mantienen como atributos simples dentro del alcance de siete tablas pedidas."
+---
+
+## Descripción
+
+Este documento resuelve el ejercicio de normalización basado en el **MER de gestión académica universitaria**. El modelo define siete entidades y sus relaciones. El trabajo consiste en analizar cada tabla contra las formas normales y entregar el esquema relacional listo para implementar.
+
+## Las siete entidades del MER
+
+El diagrama original contempla estas entidades:
+
+| Entidad | Atributos principales |
+|---|---|
+| PROGRAMA | id_programa, nombre, nivel, facultad, duracion |
+| PLAN_ESTUDIO | id_plan, id_programa, nombre_plan, descripcion, fechas |
+| CURSO | id_curso, nombre, creditos, descripcion, id_programa |
+| PROFESOR | id_profesor, nombre, apellido, documento, correo, telefono, departamento |
+| GRUPO | id_grupo, id_curso, id_profesor, periodo, horario, salon, capacidad |
+| ESTUDIANTE | id_estudiante, nombre, apellido, documento, correo, telefono, fecha_nacimiento, estado |
+| MATRICULA | id_matricula, id_estudiante, id_grupo, fecha_matricula, estado, nota_final |
+
+## Verificación de la Primera Forma Normal (1FN)
+
+**Cumple 1FN.** Cada celda guarda un valor atómico. No hay listas, ni columnas repetidas tipo `curso1`, `curso2`, ni teléfonos múltiples en un solo campo. Cada fila es única gracias a su llave primaria.
+
+## Verificación de la Segunda Forma Normal (2FN)
+
+**Cumple 2FN.** Todas las tablas tienen llave primaria simple, salvo MATRICULA cuya llave es `id_matricula` (también simple). Con una llave de un solo campo no existen dependencias parciales: cada atributo no clave depende de la llave completa por definición.
+
+Si en MATRICULA se hubiera usado la llave compuesta `(id_estudiante, id_grupo)`, la nota final y la fecha de matrícula dependen del par completo, por lo que también se cumpliría la 2FN.
+
+## Verificación de la Tercera Forma Normal (3FN)
+
+**Cumple 3FN con dos notas.** Ningún atributo no clave depende de otro atributo no clave. Cada dato describe directamente a su entidad: el salón es del grupo, el departamento del profesor, los créditos del curso.
+
+Hay dos atributos que merecen atención porque son candidatos clásicos a romper la 3FN si el sistema creciera:
+
+- **`facultad` en PROGRAMA**: si la facultad tuviera decano, sede o código propio, saldría a su propia tabla.
+- **`departamento` en PROFESOR**: mismo argumento, con jefe de departamento o presupuesto.
+
+Con los datos del enunciado, ambos son atributos simples que dependen solo de su clave. Separarlos en tablas aparte sobrepasaría las siete tablas pedidas sin una necesidad real. Es una decisión de diseño justificada, no un descuido.
+
+## Esquema relacional resultante
+
+Siete tablas, claves primarias subrayadas conceptualmente y foráneas con flecha:
+
+```
+PROGRAMA      (id_programa PK, nombre, nivel, facultad, duracion)
+PLAN_ESTUDIO  (id_plan PK, id_programa FK→PROGRAMA UNIQUE, nombre_plan,
+               descripcion, fecha_inicio, fecha_fin)
+CURSO         (id_curso PK, nombre, creditos, descripcion,
+               id_programa FK→PROGRAMA)
+PROFESOR      (id_profesor PK, nombre, apellido, documento UNIQUE,
+               correo UNIQUE, telefono, departamento)
+GRUPO         (id_grupo PK, id_curso FK→CURSO, id_profesor FK→PROFESOR,
+               periodo, horario, salon, capacidad)
+ESTUDIANTE    (id_estudiante PK, nombre, apellido, documento UNIQUE,
+               correo UNIQUE, telefono, fecha_nacimiento, estado)
+MATRICULA     (id_matricula PK, id_estudiante FK→ESTUDIANTE,
+               id_grupo FK→GRUPO, fecha_matricula, estado, nota_final,
+               UNIQUE(id_estudiante, id_grupo))
+```
+
+## Sobre la regla de pertenencia a plan de estudio
+
+El enunciado indica que un estudiante pertenece a un único plan "a través de su programa". Pero la tabla ESTUDIANTE no tiene FK hacia programa ni hacia plan. El vínculo se reconstruye por el camino:
+
+```
+Estudiante → Matrícula → Grupo → Curso → Programa → Plan_Estudio
+```
+
+Funciona mientras el estudiante tenga al menos una matrícula. Un estudiante recién admitido, sin ninguna, no pertenece a ningún programa según el modelo. Nada impide que alguien se matricule en cursos de dos programas distintos.
+
+Para un sistema real, la mejora natural es agregar `id_programa` (FK) a ESTUDIANTE, de modo que la pertenencia quede registrada desde la admisión y no se deduzca de las matrículas.
+
+## Anomalías eliminadas
+
+Con el esquema en 3FN ya no ocurren las tres anomalías clásicas:
+
+- **Actualización:** cambiar el nombre de un facultad toca una sola fila de PROGRAMA.
+- **Inserción:** se puede registrar un plan de estudio nuevo sin necesidad de cursos asociados.
+- **Borrado:** eliminar una matrícula no borra al estudiante ni al grupo.
+
+## Documento del trabajo
+
+- [Esquema MER original (PNG)](/evidencias/mer-entidad-academica-normalizacion/mer-entidad-academica.png)
+- [Enunciado del ejercicio (PDF)](/evidencias/mer-entidad-academica-normalizacion/mer-gestion-academica.pdf)
+
+## Ver el esquema en tamaño completo
+
+El diagrama MER tiene alta resolución y los nombres de entidades, atributos y cardinalidades no se leen al tamaño de la página. La original se abre en una pestaña aparte.
+
+<a
+  href="/evidencias/mer-entidad-academica-normalizacion/mer-entidad-academica.png"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="pixel-btn pixel-btn--blue px-5 py-3 text-sm uppercase"
+>
+  Abrir el diagrama MER original
+</a>
+
+---
+
+### Origen del ejercicio
+
+Este es un ejercicio de **otro grupo de Bases De Datos 1**, proporcionado por el profesor **Alexander Dario Agudelo Cubillos**. El esquema MER adjunto corresponde al modelo original de gestión académica universitaria sobre el cual se realizó el análisis de normalización presentado en este documento.

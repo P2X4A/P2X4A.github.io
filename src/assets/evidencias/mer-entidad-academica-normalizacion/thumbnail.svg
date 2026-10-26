@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0f172a"/>
+  <rect x="40" y="40" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="100" y="75" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">PROGRAMA</text>
+  <text x="100" y="92" font-family="monospace" font-size="12" fill="#94a3b8" text-anchor="middle">1:N</text>
+  <rect x="240" y="40" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="300" y="75" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">CURSO</text>
+  <rect x="40" y="140" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="100" y="175" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">ESTUDIANTE</text>
+  <text x="100" y="192" font-family="monospace" font-size="12" fill="#94a3b8" text-anchor="middle">N:M</text>
+  <rect x="240" y="140" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="300" y="175" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">GRUPO</text>
+  <rect x="140" y="240" width="120" height="40" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="200" y="268" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">MATRICULA</text>
+  <line x1="160" y1="100" x2="240" y2="100" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="160" y1="200" x2="240" y2="200" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="200" y1="160" x2="200" y2="240" stroke="#3b82f6" stroke-width="2"/>
+  <text x="200" y="225" font-family="monospace" font-size="12" fill="#94a3b8" text-anchor="middle">1:N</text>
+</svg>
