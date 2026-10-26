@@ -3,8 +3,8 @@ title: "Guía de estudio: Consultas SQL"
 tagline: "Todo lo que hay que saber de consultas SQL para Bases de Datos I, de SELECT a window functions, con el esquema del Taller 1 (biblioteca universitaria)."
 description: "Guía de estudio de consultas SQL sobre el esquema de biblioteca universitaria del Taller 1: anatomía del SELECT, JOINs, subconsultas, CTE, operadores de conjunto, window functions, 6 ejemplos resueltos y 14 errores comunes."
 status: "complete"
-category: "consultas"
-moduleId: "BD1-CON-001"
+category: "sql"
+moduleId: "BD1-SQL-001"
 order: 19
 thumbnail: "../../../assets/evidencias/consultas-sql/thumbnail.png"
 thumbnailAlt: "Esquema relacional de seis tablas del Taller 1: USUARIO, PRESTAMO, LIBRO, CATEGORIA, AUTOR y LIBRO_AUTOR"
@@ -1263,6 +1263,39 @@ Se rompe cuando cambia la tabla y trae columnas que no necesitas.
 **Material del curso**
 
 - Taller 1, *Bases de Datos I — MER: Evaluación y Corrección*. Sistema de Gestión de una Biblioteca Universitaria.
+- Taller 2, *Bases de Datos I — MER: Evaluación y Corrección*. Sistema de Gestión de una Tienda en Línea (E-commerce).
+
+---
+
+## 13. Taller 2 — Tienda en Línea (E-commerce)
+
+Este taller aplica las mismas consultas SQL sobre un esquema diferente: una tienda en línea con clientes, pedidos, productos, categorías, detalles de pedido, pagos y envíos.
+
+### 13.1 Reglas de negocio
+
+- Un cliente puede realizar muchos pedidos, pero cada pedido pertenece a un solo cliente (1:N).
+- Un pedido puede tener varios productos, y un producto puede aparecer en varios pedidos (N:M, resuelta con la entidad asociativa `DETALLE_PEDIDO`).
+- Un producto pertenece a una sola categoría, pero una categoría puede tener muchos productos (1:N).
+- Un pedido tiene un único pago asociado, y un pago corresponde a un único pedido (1:1).
+- Un pedido tiene un único envío asociado, y un envío corresponde a un único pedido (1:1).
+
+### 13.2 Siete tablas del modelo
+
+| Tabla | Clave principal | Llaves foráneas |
+|---|---|---|
+| CATEGORIA | id_categoria | — |
+| CLIENTE | id_cliente | — |
+| PRODUCTO | id_producto | id_categoria |
+| PEDIDO | id_pedido | id_cliente |
+| DETALLE_PEDIDO | id_detalle | id_pedido, id_producto |
+| PAGO | id_pago | id_pedido (UNIQUE) |
+| ENVIO | id_envio | id_pedido (UNIQUE) |
+
+### 13.3 Documento del trabajo
+
+- [Taller 2 — Tienda en Línea (Markdown)](/evidencias/sql/taller-2-tienda-en-linea.md)
+
+> **Nota sobre el PDF:** no se pudo generar un archivo PDF a partir del `.docx` original en este entorno porque no hay herramientas de conversión disponibles (no hay LibreOffice, Pandoc ni librerías de Python para DOCX→PDF). El documento fuente en Markdown está disponible para descarga arriba. El archivo `.docx` original se encuentra en `Downloads/DB/portfolio/consultas-sql-taller2/part-2.docx`.
 
 ---
 
