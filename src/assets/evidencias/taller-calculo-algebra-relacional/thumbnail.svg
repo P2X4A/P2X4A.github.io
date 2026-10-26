@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#0f172a"/>
+  <rect x="40" y="40" width="120" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="100" y="68" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">CARRERA</text>
+  <rect x="240" y="40" width="120" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="300" y="68" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">ESTUDIANTE</text>
+  <rect x="40" y="130" width="120" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="100" y="158" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">CURSO</text>
+  <rect x="240" y="130" width="120" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="300" y="158" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">MATRICULA</text>
+  <rect x="140" y="220" width="120" height="50" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="200" y="248" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">PROFESOR</text>
+  <line x1="160" y1="90" x2="240" y2="90" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="160" y1="180" x2="240" y2="180" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="200" y1="250" x2="200" y2="220" stroke="#3b82f6" stroke-width="2"/>
+  <text x="200" y="212" font-family="monospace" font-size="11" fill="#94a3b8" text-anchor="middle">1:N</text>
+</svg>
