@@ -32,7 +32,7 @@ const { label: statusLabel, variant: statusVariant } = statusMeta(status);
     class="primary-focus text-info hover:text-success inline-flex w-fit items-center gap-2 text-xs font-bold tracking-wide uppercase transition-colors"
   >
     <PixelIcon name="arrow-left" class="size-3.5" />
-    Back to Project Log
+    Volver a los proyectos
   </a>
 
   <!-- Hero Panel (node 72:211) -->
@@ -63,7 +63,7 @@ const { label: statusLabel, variant: statusVariant } = statusMeta(status);
            MDX markup (headings, lists, tables — see global.css); `overflow-x-auto` lets a wide table
            scroll inside the card instead of stretching the panel. -->
       <PixelPanel class="flex flex-col gap-4 p-6 sm:p-7">
-        <h2 class="h3 text-secondary-700 dark:text-secondary">Project Overview</h2>
+        <h2 class="h3 text-secondary-700 dark:text-secondary">Resumen del proyecto</h2>
         <div
           class="project-body text-muted-foreground space-y-4 text-base leading-relaxed overflow-x-auto"
         >
@@ -73,7 +73,7 @@ const { label: statusLabel, variant: statusVariant } = statusMeta(status);
 
       <!-- Key Features Card (node 72:223) -->
       <PixelPanel class="flex flex-col gap-4 p-6 sm:p-7">
-        <h2 class="h3 text-secondary-700 dark:text-secondary">System Features</h2>
+        <h2 class="h3 text-secondary-700 dark:text-secondary">Características</h2>
         <ul class="flex flex-col gap-4">
           {
             features.map((feature) => (
@@ -128,7 +128,7 @@ const { label: statusLabel, variant: statusVariant } = statusMeta(status);
     class="flex flex-col gap-6 p-6 sm:p-7"
   >
     <h2 id="challenges-heading" class="h3 text-secondary-700 dark:text-secondary">
-      Challenges &amp; Solutions
+      Reto y solución
     </h2>
     <div class="grid gap-6 md:grid-cols-2">
       <div class="flex flex-col gap-2">

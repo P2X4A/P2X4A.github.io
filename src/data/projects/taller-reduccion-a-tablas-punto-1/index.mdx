@@ -29,7 +29,7 @@ specs:
 
 features:
   - lead: "Entidades fuertes identificadas"
-    text: "Se modelaron seis entidades fuertes con sus atributos simples y claves primarias (ID_autor, ID_editor, ISBN, IDcesta, código_almacén)."
+    text: "Se modelaron seis entidades fuertes con sus atributos simples y claves primarias (ID_autor, ID_editor, ISBN, correo_electrónico, IDcesta, código_almacén)."
   - lead: "Relaciones M:N a tablas intermedias"
     text: "Cada relación muchos-a-muchos se transformó en una tabla asociativa con clave primaria compuesta: AUTOR_LIBRO, EDITOR_LIBRO, LIBRO_CESTA, LIBRO_ALMACÉN y CLIENTE_CESTA."
   - lead: "Claves foráneas definidas"
@@ -62,7 +62,7 @@ Este trabajo corresponde al **Punto 1 del Taller de Reducción a Tablas** de la 
 | **AUTOR** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, URL | ID_autor |
 | **EDITOR** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, teléfono, URL | ID_editor |
 | **LIBRO** | año, título, precio, ISBN | ISBN |
-| **CLIENTE** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, correo_electrónico, teléfono | — |
+| **CLIENTE** | nombre1, nombre2, apellido1, apellido2, calle, carrera, número_dirección, correo_electrónico, teléfono | correo_electrónico |
 | **CESTA_DE_LA_COMPRA** | IDcesta | IDcesta |
 | **ALMACÉN** | código, calle, carrera, número_dirección, teléfono | código |
 

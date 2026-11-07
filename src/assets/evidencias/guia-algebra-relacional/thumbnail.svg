@@ -35,6 +35,6 @@
 
     <!--caption -->
     <text x="16" y="224" fill="#63de86" font-size="10">GUÍA 1 · ÁLGEBRA RELACIONAL</text>
-    <text x="196" y="224" fill="#b8b8d8" font-size="8" font-weight="normal">11 ejercicios · álgebra y SQL</text>
+    <text x="196" y="224" fill="#b8b8d8" font-size="8" font-weight="normal">11 ejercicios · álgebra relacional</text>
   </g>
 </svg>

@@ -51,11 +51,9 @@ solution:
 
 ---
 
-# Guía de estudio: Consultas SQL
-
 Una consulta es una pregunta que le haces a la base de datos, escrita en un lenguaje que el motor entiende. "¿Qué libros están prestados?", "¿quién debe una multa?", "¿cuántos ejemplares quedan por categoría?". Todo eso se contesta con una sentencia `SELECT`.
 
-En este portafolio, la sección **Consultas** demuestra que el modelo que diseñé en el MER no es un dibujo bonito: se puede interrogar y devuelve respuestas correctas. Por eso esta guía trabaja sobre el esquema real del **Taller 1** (Sistema de Gestión de una Biblioteca Universitaria) y usa MySQL 8 como motor de referencia. Cuando otro motor haga las cosas distinto (Oracle, PostgreSQL, SQL Server), lo marco.
+En este portafolio, la sección **SQL** demuestra que el modelo que diseñé en el MER no es un dibujo bonito: se puede interrogar y devuelve respuestas correctas. Por eso esta guía trabaja sobre el esquema real del **Taller 1** (Sistema de Gestión de una Biblioteca Universitaria) y usa MySQL 8 como motor de referencia. Cuando otro motor haga las cosas distinto (Oracle, PostgreSQL, SQL Server), lo marco.
 
 **Cómo leerla:** los primeros bloques son base (cláusulas, JOINs, agregación). Luego suben el nivel (subconsultas, CTE, conjuntos, window functions). Al final hay ejemplos resueltos, errores típicos y referencias.
 
@@ -63,7 +61,7 @@ En este portafolio, la sección **Consultas** demuestra que el modelo que diseñ
 
 ## 1. El esquema con el que vamos a trabajar (Taller 1)
 
-Antes de escribir una sola consulta hay que saber qué tablas existen y cómo se conectan. Esta sección describe el MER del taller tal como aparece en el documento original, ya corregido.
+Antes de escribir una sola consulta hay que saber qué tablas existen y cómo se conectan. Esta sección describe el MER del taller, ya con las correcciones aplicadas.
 
 ### 1.1 Reglas de negocio
 

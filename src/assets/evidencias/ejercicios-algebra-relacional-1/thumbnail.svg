@@ -6,11 +6,11 @@
 
   <g font-family="'Courier New', Courier, monospace" font-weight="bold">
     <text x="16" y="44" fill="#63de86" font-size="13">RESOLUCIÓN PASO A PASO</text>
-    <text x="16" y="62" fill="#b8b8d8" font-size="8" font-weight="normal">expresion, pasos intermedios y resultado</text>
+    <text x="16" y="62" fill="#b8b8d8" font-size="8" font-weight="normal">expresión, pasos intermedios y resultado</text>
 
     <!-- panel 1: expresion -->
     <rect x="16" y="78" width="132" height="104" fill="#171740" stroke="#62b4f8" stroke-width="2" />
-    <text x="26" y="96" fill="#62b4f8" font-size="9">EXPRESION</text>
+    <text x="26" y="96" fill="#62b4f8" font-size="9">EXPRESIÓN</text>
     <g font-size="8" fill="#cfe6ff" font-weight="normal">
       <text x="26" y="116">π Nombre(</text>
       <text x="26" y="130">σ Poblacion =</text>
