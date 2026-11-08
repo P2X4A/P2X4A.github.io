@@ -34,6 +34,7 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# claude code local state
-.claude/memory.db
-.claude/settings.local.json
+# local-only files
+.claude/
+AGENTS.md
+CLAUDE.md
