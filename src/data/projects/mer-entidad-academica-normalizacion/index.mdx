@@ -117,11 +117,11 @@ Funciona mientras el estudiante tenga al menos una matrícula. Un estudiante rec
 
 Para un sistema real, la mejora natural es agregar `id_programa` (FK) a ESTUDIANTE, de modo que la pertenencia quede registrada desde la admisión y no se deduzca de las matrículas.
 
-## Anomalías eliminadas
+## Anomalías de datos
 
-Con el esquema en 3FN ya no ocurren las tres anomalías clásicas:
+Con el esquema en 3FN las tres anomalías clásicas quedan bajo control, con una excepción:
 
-- **Actualización:** cambiar el nombre de un facultad toca una sola fila de PROGRAMA.
+- **Actualización:** cada dato se guarda una sola vez, en la tabla de la entidad que describe. Cambiar el salón de un grupo toca una sola fila de GRUPO, no todas las matrículas. La excepción es `facultad`: al ser un texto repetido en cada PROGRAMA, renombrar una facultad obliga a actualizar todos los programas que la usan. Lo mismo pasa con `departamento` en PROFESOR. Por eso ambos quedaron señalados como candidatos a tabla propia.
 - **Inserción:** se puede registrar un plan de estudio nuevo sin necesidad de cursos asociados.
 - **Borrado:** eliminar una matrícula no borra al estudiante ni al grupo.
 
