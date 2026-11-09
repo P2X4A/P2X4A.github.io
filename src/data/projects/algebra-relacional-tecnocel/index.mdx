@@ -49,7 +49,7 @@ solution:
 
 ## Descripción
 
-Este documento resuelve el taller de **álgebra relacional aplicado al caso TecnoCel S.A.S.** El modelo tiene ocho relaciones conectadas por relaciones 1:N. Se resuelven quince casos paso a paso usando solo producto cartesiano y selección (sin reunión natural), tal como se pide en la notación de la clase.
+Este documento resuelve el taller de **álgebra relacional aplicado al caso TecnoCel S.A.S.** El modelo tiene ocho relaciones conectadas por relaciones 1:N. Se resuelven quince casos con la notación de la clase: solo producto cartesiano y selección, sin reunión natural. El enunciado original escribe las uniones con ⋈; aquí cada ⋈ se reemplaza por un producto cartesiano y una igualdad de llave dentro del σ, que da el mismo resultado.
 
 ## Las ocho relaciones del modelo
 
@@ -86,63 +86,271 @@ Dos detalles importantes del modelo:
 
 ## Operadores y restricciones
 
-### Selección: sigma
+### Selección: σ (sigma)
 
 Recorre las filas y se queda con las que cumplen la condición. Las columnas no cambian. Es el filtro del álgebra relacional. Restricciones: usa solo atributos que existan, no cambia las columnas, una comparación con NULL no es verdadera, la condición se evalúa fila por fila.
 
-### Proyección: pi
+### Proyección: π (pi)
 
 Elige qué columnas se muestran. Como el resultado es un conjunto, las filas repetidas desaparecen. Restricciones: solo atributos que existan, elimina duplicados, lo que se proyecta fuera no se puede usar después, no filtra filas (para eso está sigma).
 
-### Producto cartesiano: cartesiano
+### Producto cartesiano: ×
 
 Empareja cada fila de una relación con todas las filas de la otra. Con n y m filas produce n·m filas. Los atributos con igual nombre se califican con alias. Unir k relaciones exige k−1 igualdades de llave en el sigma. Sin esas igualdades el resultado es ruido.
 
-### Diferencia: menos
+### Diferencia: −
 
 Entrega las filas que están en el primer conjunto y no en el segundo. Los operandos deben ser compatibles (mismo número de atributos y dominios). No es conmutativa.
 
 ## Los tres tipos de casos
 
-Los quince casos se agrupan en tres tipos según la forma de la condición:
+Los quince casos se agrupan en tres tipos según la forma de la condición. La numeración (1), (4) y (5) es la del enunciado original.
 
 | Tipo | Casos | Forma | Idea |
 |---|---|---|---|
 | 1 | 1 a 5 | A − B | Universo de candidatos menos los que sí cumplen lo que se excluye |
-| 2 | 6 a 10 | (p1 ∧ p2) ∨ p3 | Dos condiciones juntas, más una alternativa independiente |
-| 3 | 11 a 15 | (p1 ∨ p2) ∧ p3 | Una alternativa, y a ambas se les exige además otra condición |
+| 4 | 6 a 10 | (p1 ∧ p2) ∨ p3 | Dos condiciones juntas, más una alternativa independiente |
+| 5 | 11 a 15 | (p1 ∨ p2) ∧ p3 | Una alternativa, y a ambas se les exige además otra condición |
+
+Cómo se leyeron los enunciados: el estado de la venta solo se filtra donde el enunciado lo nombra (caso 1: estado distinto de 'Anulada'; caso 9: ventas anuladas). En los demás, «pagada en» o «pagada con» se lee como medio de pago (casos 2, 7, 9 y 12) y «compró» incluye cualquier venta (casos 8 y 14).
 
 ### Tipo 1: Diferencia y negación (casos 1 a 5)
 
-Se arma el universo de candidatos (A) y se resta el grupo que cumple lo que se quiere excluir (B). Casos resueltos:
+Se arma el universo de candidatos (A) y se resta el grupo que cumple lo que se quiere excluir (B). A y B tienen las mismas columnas, por eso la resta es válida.
 
-1. Marcas con celulares que nunca se han vendido en ventas válidas.
-2. Clientes fuera de Bogotá que nunca han pagado en efectivo.
-3. Empleados no administradores que nunca han vendido en la sede Unicentro.
-4. Celulares que no son iOS y que nunca se han vendido.
-5. Proveedores fuera de Bogotá que no suministran marcas coreanas.
+#### Caso 1 — Marcas con celulares que nunca se han vendido en ventas válidas
 
-### Tipo 2: (p1 ∧ p2) ∨ p3 (casos 6 a 10)
+**Pide.** Código y nombre de las marcas que tienen celulares registrados y que no han vendido ninguno de ellos en una venta cuyo estado no sea 'Anulada'.
 
-Las igualdades de unión van por fuera del paréntesis del OR. Si se meten adentro, la alternativa dejaría pasar filas que nunca se unieron. Casos resueltos:
+```text
+A ← Π M.id_marca, M.nombre_marca(
+      σ M.id_marca = P.id_marca ∧ P.tipo_producto = 'Celular'
+        (MARCA × PRODUCTO))
+B ← Π M.id_marca, M.nombre_marca(
+      σ M.id_marca = P.id_marca ∧ P.id_producto = D.id_producto
+        ∧ D.id_venta = V.id_venta ∧ P.tipo_producto = 'Celular'
+        ∧ ¬(V.estado_venta = 'Anulada')
+        (MARCA × PRODUCTO × DETALLE_VENTA × VENTA))
+Resultado ← A − B
+```
 
-6. Celulares costosos o productos con stock crítico.
-7. Ventas en efectivo en Cali o ventas de alto valor.
-8. Clientes bogotanos que compraron Apple, o líneas con descuento alto.
-9. Ventas anuladas por vendedores, o ventas con tarjeta de crédito.
-10. Proveedores de Medellín con buen stock, o marcas chinas.
+**Esquema del resultado:** `(id_marca, nombre_marca)`. A son las marcas con celulares. B son las marcas que sí vendieron un celular en una venta no anulada: cuatro relaciones, tres igualdades. El filtro de celular también va en B; sin él, una marca que solo vendió accesorios saldría del resultado por error. Una marca cuyos celulares solo aparecen en facturas anuladas queda dentro, que es lo que pide el enunciado.
 
-### Tipo 3: (p1 ∨ p2) ∧ p3 (casos 11 a 15)
+#### Caso 2 — Clientes fuera de Bogotá que nunca han pagado en efectivo
 
-Todo es AND por fuera. Las igualdades de unión y la condición extra se escriben seguidas. Solo el paréntesis del OR importa. Casos resueltos:
+**Pide.** Código, nombres y apellidos de los clientes cuya ciudad no es 'Bogotá' y que nunca han hecho una venta pagada en 'Efectivo'.
 
-11. Samsung o Xiaomi con almacenamiento grande.
-12. Ventas con tarjeta en sedes de Bogotá.
-13. Cajeros o vendedores con salario alto y su sede base.
-14. Clientes de Bogotá o Cali que compraron accesorios.
-15. Líneas de Apple o Motorola con dos o más unidades.
+```text
+A ← Π C.id_cliente, C.nombres_cliente, C.apellidos_cliente(
+      σ ¬(C.ciudad_cliente = 'Bogotá')(CLIENTE))
+B ← Π C.id_cliente, C.nombres_cliente, C.apellidos_cliente(
+      σ C.id_cliente = V.id_cliente ∧ V.medio_pago = 'Efectivo'
+        (CLIENTE × VENTA))
+Resultado ← A − B
+```
 
-Cada caso incluye su esquema de resultado, las igualdades de unión usadas y la justificación paso a paso de cada decisión.
+**Esquema del resultado:** `(id_cliente, nombres_cliente, apellidos_cliente)`. A sale de una sola relación, sin producto cartesiano. B reúne a los clientes con alguna venta en efectivo. Los clientes que nunca compraron nada también quedan en el resultado: nunca han pagado en efectivo.
+
+#### Caso 3 — Empleados no administradores que nunca han vendido en la sede Unicentro
+
+**Pide.** Código, nombres y apellidos de los empleados cuyo cargo no es 'Administrador' y que nunca han atendido una venta registrada en la sede 'Unicentro'.
+
+```text
+A ← Π E.id_empleado, E.nombres_empleado, E.apellidos_empleado(
+      σ ¬(E.cargo = 'Administrador')(EMPLEADO))
+B ← Π E.id_empleado, E.nombres_empleado, E.apellidos_empleado(
+      σ E.id_empleado = V.id_empleado ∧ V.id_sede = S.id_sede
+        ∧ S.nombre_sede = 'Unicentro'
+        (EMPLEADO × VENTA × SEDE))
+Resultado ← A − B
+```
+
+**Esquema del resultado:** `(id_empleado, nombres_empleado, apellidos_empleado)`. B usa la sede de la venta (V.id_sede), no la sede base del empleado. Con id_sede_asignada se estaría preguntando quién trabaja en Unicentro, no quién vendió allí.
+
+#### Caso 4 — Celulares que no son iOS y que nunca se han vendido
+
+**Pide.** Código del producto, nombre de la marca y modelo de los celulares cuyo sistema operativo no es 'iOS' y que nunca aparecen en un detalle de venta.
+
+```text
+A ← Π P.id_producto, M.nombre_marca, P.modelo(
+      σ M.id_marca = P.id_marca ∧ P.tipo_producto = 'Celular'
+        ∧ ¬(P.sistema_operativo = 'iOS')
+        (MARCA × PRODUCTO))
+B ← Π P.id_producto, M.nombre_marca, P.modelo(
+      σ M.id_marca = P.id_marca ∧ P.id_producto = D.id_producto
+        (MARCA × PRODUCTO × DETALLE_VENTA))
+Resultado ← A − B
+```
+
+**Esquema del resultado:** `(id_producto, nombre_marca, modelo)`. El filtro de celular va explícito en A porque los accesorios tienen sistema_operativo en NULL y no deben pasar por la negación. B incluye MARCA para tener las mismas tres columnas que A; sin eso la diferencia no sería compatible.
+
+#### Caso 5 — Proveedores fuera de Bogotá que no suministran marcas coreanas
+
+**Pide.** Código y razón social de los proveedores cuya ciudad no es 'Bogotá' y que no suministran ningún producto de una marca de 'Corea del Sur'.
+
+```text
+A ← Π PR.id_proveedor, PR.razon_social(
+      σ ¬(PR.ciudad_proveedor = 'Bogotá')(PROVEEDOR))
+B ← Π PR.id_proveedor, PR.razon_social(
+      σ PR.id_proveedor = P.id_proveedor ∧ P.id_marca = M.id_marca
+        ∧ M.pais_origen = 'Corea del Sur'
+        (PROVEEDOR × PRODUCTO × MARCA))
+Resultado ← A − B
+```
+
+**Esquema del resultado:** `(id_proveedor, razon_social)`. B recorre proveedor, producto y marca, y deja a quien suministra algo de una marca surcoreana. Los proveedores que todavía no han suministrado ningún producto también quedan en el resultado.
+
+### Tipo 4: (p1 ∧ p2) ∨ p3 (casos 6 a 10)
+
+Las igualdades de unión van con ∧ por fuera del paréntesis del OR. Si se meten adentro, la alternativa dejaría pasar filas que nunca se unieron entre sí y el resultado sería un producto cartesiano casi completo. La forma correcta es siempre σ igualdades_de_unión ∧ ((p1 ∧ p2) ∨ p3).
+
+#### Caso 6 — Celulares costosos o productos con stock crítico
+
+**Pide.** Marca, modelo, tipo, precio y stock de los celulares con precio de venta mayor a $3.000.000, o de cualquier producto con stock menor a 5 unidades.
+
+```text
+Π M.nombre_marca, P.modelo, P.tipo_producto, P.precio_venta, P.stock(
+  σ M.id_marca = P.id_marca
+    ∧ ((P.tipo_producto = 'Celular' ∧ P.precio_venta > 3000000)
+       ∨ P.stock < 5)
+    (MARCA × PRODUCTO))
+```
+
+**Esquema del resultado:** `(nombre_marca, modelo, tipo_producto, precio_venta, stock)`. La igualdad de marca va fuera del paréntesis del OR. El stock bajo vale para celulares y accesorios por igual.
+
+#### Caso 7 — Ventas en efectivo en Cali o ventas de alto valor
+
+**Pide.** Número de venta, fecha, nombre de la sede, medio de pago y total de las ventas pagadas en 'Efectivo' en sedes de 'Cali', o de cualquier venta cuyo total supere $5.000.000.
+
+```text
+Π V.id_venta, V.fecha_venta, S.nombre_sede, V.medio_pago, V.total_venta(
+  σ V.id_sede = S.id_sede
+    ∧ ((V.medio_pago = 'Efectivo' ∧ S.ciudad_sede = 'Cali')
+       ∨ V.total_venta > 5000000)
+    (VENTA × SEDE))
+```
+
+**Esquema del resultado:** `(id_venta, fecha_venta, nombre_sede, medio_pago, total_venta)`. Una venta entra por una de dos puertas: efectivo en una sede de Cali, o total mayor a cinco millones sin importar ciudad ni medio de pago.
+
+#### Caso 8 — Clientes bogotanos que compraron Apple, o líneas con descuento alto
+
+**Pide.** Nombres y apellidos del cliente, modelo, marca y descuento, para las compras de un cliente de 'Bogotá' de un producto 'Apple', o para cualquier línea con descuento mayor al 20 %.
+
+```text
+Π C.nombres_cliente, C.apellidos_cliente, P.modelo, M.nombre_marca,
+  D.descuento_pct(
+  σ C.id_cliente = V.id_cliente ∧ V.id_venta = D.id_venta
+    ∧ D.id_producto = P.id_producto ∧ P.id_marca = M.id_marca
+    ∧ ((C.ciudad_cliente = 'Bogotá' ∧ M.nombre_marca = 'Apple')
+       ∨ D.descuento_pct > 20)
+    (CLIENTE × VENTA × DETALLE_VENTA × PRODUCTO × MARCA))
+```
+
+**Esquema del resultado:** `(nombres_cliente, apellidos_cliente, modelo, nombre_marca, descuento_pct)`. La cadena va de cliente a marca pasando por venta, detalle y producto: cinco relaciones, cuatro igualdades. Se entra si el cliente es de Bogotá y la marca es Apple, o si la línea tiene descuento mayor a 20, con cualquier ciudad y cualquier marca.
+
+#### Caso 9 — Ventas anuladas por vendedores, o ventas con tarjeta de crédito
+
+**Pide.** Código, nombres y apellidos del empleado, número de venta, medio de pago y estado, para las ventas anuladas atendidas por empleados con cargo 'Vendedor', o para cualquier venta pagada con 'Tarjeta crédito'.
+
+```text
+Π E.id_empleado, E.nombres_empleado, E.apellidos_empleado,
+  V.id_venta, V.medio_pago, V.estado_venta(
+  σ E.id_empleado = V.id_empleado
+    ∧ ((E.cargo = 'Vendedor' ∧ V.estado_venta = 'Anulada')
+       ∨ V.medio_pago = 'Tarjeta crédito')
+    (EMPLEADO × VENTA))
+```
+
+**Esquema del resultado:** `(id_empleado, nombres_empleado, apellidos_empleado, id_venta, medio_pago, estado_venta)`. Solo hay una igualdad posible: el empleado que atendió la venta. La primera puerta pide dos cosas a la vez (vendedor y venta anulada). La segunda es independiente: tarjeta de crédito con cualquier cargo y cualquier estado.
+
+#### Caso 10 — Productos de proveedores de Medellín con buen stock o de marcas chinas
+
+**Pide.** Modelo, color, razón social del proveedor y nombre de la marca de los productos de proveedores de 'Medellín' con más de 50 unidades en stock, o de cualquier producto de una marca de 'China'.
+
+```text
+Π P.modelo, P.color, PR.razon_social, M.nombre_marca(
+  σ PR.id_proveedor = P.id_proveedor ∧ P.id_marca = M.id_marca
+    ∧ ((PR.ciudad_proveedor = 'Medellín' ∧ P.stock > 50)
+       ∨ M.pais_origen = 'China')
+    (PROVEEDOR × PRODUCTO × MARCA))
+```
+
+**Esquema del resultado:** `(modelo, color, razon_social, nombre_marca)`. La primera alternativa mezcla un dato del proveedor con uno del producto. La segunda mira solo la marca, así que un producto chino entra aunque su proveedor sea de otra ciudad y tenga poco stock.
+
+### Tipo 5: (p1 ∨ p2) ∧ p3 (casos 11 a 15)
+
+Todo es AND por fuera, así que las igualdades de unión y la condición extra se escriben seguidas. Solo el paréntesis del OR importa: sin él, el ∧ ganaría por precedencia y el resultado cambiaría.
+
+#### Caso 11 — Celulares Samsung o Xiaomi de gran almacenamiento
+
+**Pide.** Nombre de la marca, modelo, color y almacenamiento de los productos 'Samsung' o 'Xiaomi' con 256 GB o más.
+
+```text
+Π M.nombre_marca, P.modelo, P.color, P.almacenamiento_gb(
+  σ M.id_marca = P.id_marca
+    ∧ (M.nombre_marca = 'Samsung' ∨ M.nombre_marca = 'Xiaomi')
+    ∧ P.almacenamiento_gb ≥ 256
+    (MARCA × PRODUCTO))
+```
+
+**Esquema del resultado:** `(nombre_marca, modelo, color, almacenamiento_gb)`. Los accesorios tienen almacenamiento_gb en NULL y una comparación con NULL nunca es verdadera, así que quedan fuera sin un filtro extra. Sin los paréntesis, Samsung ∨ Xiaomi ∧ ≥ 256 se lee como Samsung de cualquier almacenamiento más Xiaomi de 256 o más: el error clásico de este caso.
+
+#### Caso 12 — Ventas con tarjeta en sedes de Bogotá
+
+**Pide.** Número de venta, fecha, nombre de la sede y total de las ventas pagadas con 'Tarjeta débito' o 'Tarjeta crédito' registradas en sedes de 'Bogotá'.
+
+```text
+Π V.id_venta, V.fecha_venta, S.nombre_sede, V.total_venta(
+  σ V.id_sede = S.id_sede
+    ∧ (V.medio_pago = 'Tarjeta débito' ∨ V.medio_pago = 'Tarjeta crédito')
+    ∧ S.ciudad_sede = 'Bogotá'
+    (VENTA × SEDE))
+```
+
+**Esquema del resultado:** `(id_venta, fecha_venta, nombre_sede, total_venta)`. Cualquiera de los dos tipos de tarjeta sirve, pero la sede debe estar siempre en Bogotá. VENTA y SEDE se unen por la sede donde ocurrió la venta.
+
+#### Caso 13 — Cajeros o vendedores con salario superior a $2.500.000 y su sede base
+
+**Pide.** Nombres, apellidos, cargo y nombre de la sede base de los empleados con cargo 'Cajero' o 'Vendedor' y salario mayor a $2.500.000.
+
+```text
+Π E.nombres_empleado, E.apellidos_empleado, E.cargo, S.nombre_sede(
+  σ E.id_sede_asignada = S.id_sede
+    ∧ (E.cargo = 'Cajero' ∨ E.cargo = 'Vendedor')
+    ∧ E.salario > 2500000
+    (EMPLEADO × SEDE))
+```
+
+**Esquema del resultado:** `(nombres_empleado, apellidos_empleado, cargo, nombre_sede)`. Es el caso de la reunión theta: EMPLEADO y SEDE no comparten ningún atributo con el mismo nombre, porque la llave se llama id_sede_asignada de un lado e id_sede del otro. Con la notación de clase la igualdad se escribe tal cual, E.id_sede_asignada = S.id_sede.
+
+#### Caso 14 — Clientes de Bogotá o Cali que han comprado accesorios
+
+**Pide.** Código, nombres, apellidos y ciudad de los clientes de 'Bogotá' o 'Cali' que hayan comprado al menos un producto de tipo 'Accesorio'.
+
+```text
+Π C.id_cliente, C.nombres_cliente, C.apellidos_cliente, C.ciudad_cliente(
+  σ C.id_cliente = V.id_cliente ∧ V.id_venta = D.id_venta
+    ∧ D.id_producto = P.id_producto
+    ∧ (C.ciudad_cliente = 'Bogotá' ∨ C.ciudad_cliente = 'Cali')
+    ∧ P.tipo_producto = 'Accesorio'
+    (CLIENTE × VENTA × DETALLE_VENTA × PRODUCTO))
+```
+
+**Esquema del resultado:** `(id_cliente, nombres_cliente, apellidos_cliente, ciudad_cliente)`. Cuatro relaciones, tres igualdades. La proyección elimina duplicados: un cliente con diez accesorios comprados aparece una sola vez, porque el álgebra relacional trabaja con conjuntos.
+
+#### Caso 15 — Líneas de Apple o Motorola con dos o más unidades
+
+**Pide.** Número de venta, modelo, marca, cantidad y precio unitario de las líneas de detalle de productos 'Apple' o 'Motorola' con 2 o más unidades vendidas.
+
+```text
+Π D.id_venta, P.modelo, M.nombre_marca, D.cantidad, D.precio_unitario(
+  σ D.id_producto = P.id_producto ∧ P.id_marca = M.id_marca
+    ∧ (M.nombre_marca = 'Apple' ∨ M.nombre_marca = 'Motorola')
+    ∧ D.cantidad ≥ 2
+    (DETALLE_VENTA × PRODUCTO × MARCA))
+```
+
+**Esquema del resultado:** `(id_venta, modelo, nombre_marca, cantidad, precio_unitario)`. Se parte de DETALLE_VENTA porque lo que se pide es la línea. Se une con PRODUCTO y luego con MARCA.
 
 ## Errores comunes al corregir
 

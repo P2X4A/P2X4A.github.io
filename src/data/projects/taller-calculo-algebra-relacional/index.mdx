@@ -79,21 +79,110 @@ El resultado esperado es nombre, apellido y correo de esos estudiantes.
 
 La idea es partir de cada estudiante `e` y filtrarlo con siete condiciones unidas por Y. El camino entre tablas es: ESTUDIANTE -> CARRERA, ESTUDIANTE -> MATRICULA -> CURSO -> PROFESOR.
 
+Notación: ∃ es «existe», ∀ es «para todo», ¬ es la negación, → es la implicación y ≠ es «distinto». `MATRICULA(m1)` dice que `m1` es una tupla de MATRICULA.
+
 **Paso 1 — Pertenece a Ingeniería de Sistemas.** Se busca la carrera del estudiante y se verifica el nombre.
 
-**Paso 2 — Al menos tres cursos.** Como el álgebra no tiene conteo, se piden tres matrículas distintas del mismo estudiante en el mismo semestre, comparando los id_curso entre sí. Las tres desigualdades son necesarias; si falta una, dos variables podrían apuntar a la misma matrícula.
+```text
+∃ca ( CARRERA(ca) ∧ ca.id_carrera = e.id_carrera
+      ∧ ca.nombre = "Ingeniería de Sistemas" )
+```
+
+**Paso 2 — Al menos tres cursos.** Como no hay conteo, se piden tres matrículas distintas del mismo estudiante en el mismo semestre, comparando los id_curso entre sí. Las tres desigualdades son necesarias; si falta una, dos variables podrían apuntar a la misma matrícula.
+
+```text
+∃m1 ( MATRICULA(m1) ∧ m1.id_estudiante = e.id_estudiante
+      ∧ m1.semestre = "2026-1"
+  ∧ ∃m2 ( MATRICULA(m2) ∧ m2.id_estudiante = e.id_estudiante
+          ∧ m2.semestre = "2026-1" ∧ m2.id_curso ≠ m1.id_curso
+    ∧ ∃m3 ( MATRICULA(m3) ∧ m3.id_estudiante = e.id_estudiante
+            ∧ m3.semestre = "2026-1"
+            ∧ m3.id_curso ≠ m1.id_curso ∧ m3.id_curso ≠ m2.id_curso ) ) )
+```
 
 **Paso 3 — Alguna nota mayor a 4.0.** Se busca una matrícula del estudiante en 2026-1 con nota_final mayor a 4.0.
 
+```text
+∃m4 ( MATRICULA(m4) ∧ m4.id_estudiante = e.id_estudiante
+      ∧ m4.semestre = "2026-1" ∧ m4.nota_final > 4.0 )
+```
+
 **Paso 4 — Ningún curso perdido.** Se dice con "no existe" una matrícula con nota menor a 3.0.
+
+```text
+¬∃m5 ( MATRICULA(m5) ∧ m5.id_estudiante = e.id_estudiante
+       ∧ m5.semestre = "2026-1" ∧ m5.nota_final < 3.0 )
+```
 
 **Paso 5 — Aprobó todos sus cursos de 3 créditos.** Es una regla universal con implicación: si es un curso de 3 créditos de su carrera y lo matriculó, entonces lo aprobó. Los cursos que no cumplen el antecedente no molestan.
 
+```text
+∀c ( ( CURSO(c) ∧ c.id_carrera = e.id_carrera ∧ c.creditos = 3
+       ∧ ∃mx ( MATRICULA(mx) ∧ mx.id_estudiante = e.id_estudiante
+               ∧ mx.id_curso = c.id_curso ∧ mx.semestre = "2026-1" ) )
+     → ∃my ( MATRICULA(my) ∧ my.id_estudiante = e.id_estudiante
+             ∧ my.id_curso = c.id_curso ∧ my.semestre = "2026-1"
+             ∧ my.nota_final ≥ 3.0 ) )
+```
+
 **Paso 6 — Cursos de 3 créditos con profesor de Bases de Datos.** Misma estructura, con un filtro más en el antecedente y una nota más exigente (mayor o igual a 3.5) en el consecuente.
+
+```text
+∀c2 ( ( CURSO(c2) ∧ c2.id_carrera = e.id_carrera ∧ c2.creditos = 3
+        ∧ ∃p ( PROFESOR(p) ∧ p.id_profesor = c2.id_profesor
+               ∧ p.especialidad = "Bases de Datos" )
+        ∧ ∃m6 ( MATRICULA(m6) ∧ m6.id_estudiante = e.id_estudiante
+                ∧ m6.id_curso = c2.id_curso ∧ m6.semestre = "2026-1" ) )
+      → ∃m7 ( MATRICULA(m7) ∧ m7.id_estudiante = e.id_estudiante
+              ∧ m7.id_curso = c2.id_curso ∧ m7.semestre = "2026-1"
+              ∧ m7.nota_final ≥ 3.5 ) )
+```
 
 **Paso 7 — Al menos un curso de 4 o más créditos aprobado.** Se cruza MATRICULA con CURSO para saber los créditos y se exige nota aprobatoria.
 
+```text
+∃m8 ( MATRICULA(m8) ∧ m8.id_estudiante = e.id_estudiante
+      ∧ m8.semestre = "2026-1" ∧ m8.nota_final ≥ 3.0
+      ∧ ∃c3 ( CURSO(c3) ∧ c3.id_curso = m8.id_curso ∧ c3.creditos ≥ 4 ) )
+```
+
 La consulta completa combina las siete condiciones en un solo conjunto con proyección de nombre, apellido y correo.
+
+```text
+{ e.nombre, e.apellido, e.correo |
+    ESTUDIANTE(e)
+  ∧ ∃ca ( CARRERA(ca) ∧ ca.id_carrera = e.id_carrera
+          ∧ ca.nombre = "Ingeniería de Sistemas" )
+  ∧ ∃m1 ( MATRICULA(m1) ∧ m1.id_estudiante = e.id_estudiante
+          ∧ m1.semestre = "2026-1"
+      ∧ ∃m2 ( MATRICULA(m2) ∧ m2.id_estudiante = e.id_estudiante
+              ∧ m2.semestre = "2026-1" ∧ m2.id_curso ≠ m1.id_curso
+        ∧ ∃m3 ( MATRICULA(m3) ∧ m3.id_estudiante = e.id_estudiante
+                ∧ m3.semestre = "2026-1"
+                ∧ m3.id_curso ≠ m1.id_curso ∧ m3.id_curso ≠ m2.id_curso ) ) )
+  ∧ ∃m4 ( MATRICULA(m4) ∧ m4.id_estudiante = e.id_estudiante
+          ∧ m4.semestre = "2026-1" ∧ m4.nota_final > 4.0 )
+  ∧ ¬∃m5 ( MATRICULA(m5) ∧ m5.id_estudiante = e.id_estudiante
+           ∧ m5.semestre = "2026-1" ∧ m5.nota_final < 3.0 )
+  ∧ ∀c ( ( CURSO(c) ∧ c.id_carrera = e.id_carrera ∧ c.creditos = 3
+           ∧ ∃mx ( MATRICULA(mx) ∧ mx.id_estudiante = e.id_estudiante
+                   ∧ mx.id_curso = c.id_curso ∧ mx.semestre = "2026-1" ) )
+         → ∃my ( MATRICULA(my) ∧ my.id_estudiante = e.id_estudiante
+                 ∧ my.id_curso = c.id_curso ∧ my.semestre = "2026-1"
+                 ∧ my.nota_final ≥ 3.0 ) )
+  ∧ ∀c2 ( ( CURSO(c2) ∧ c2.id_carrera = e.id_carrera ∧ c2.creditos = 3
+            ∧ ∃p ( PROFESOR(p) ∧ p.id_profesor = c2.id_profesor
+                   ∧ p.especialidad = "Bases de Datos" )
+            ∧ ∃m6 ( MATRICULA(m6) ∧ m6.id_estudiante = e.id_estudiante
+                    ∧ m6.id_curso = c2.id_curso ∧ m6.semestre = "2026-1" ) )
+          → ∃m7 ( MATRICULA(m7) ∧ m7.id_estudiante = e.id_estudiante
+                  ∧ m7.id_curso = c2.id_curso ∧ m7.semestre = "2026-1"
+                  ∧ m7.nota_final ≥ 3.5 ) )
+  ∧ ∃m8 ( MATRICULA(m8) ∧ m8.id_estudiante = e.id_estudiante
+          ∧ m8.semestre = "2026-1" ∧ m8.nota_final ≥ 3.0
+          ∧ ∃c3 ( CURSO(c3) ∧ c3.id_curso = m8.id_curso ∧ c3.creditos ≥ 4 ) )
+}
+```
 
 ## Solución en Álgebra Relacional (notación de clase)
 
@@ -101,23 +190,97 @@ En álgebra no hay cuantificadores, así que la estrategia cambia. Se calcula, p
 
 Todos los conjuntos intermedios tienen un solo atributo, id_estudiante, por eso son compatibles para intersección y diferencia.
 
+Notación: `←` guarda un resultado con nombre, `ρ` renombra una relación para poder usarla varias veces en el mismo producto, y los prefijos CA, E, M, C y P son alias de CARRERA, ESTUDIANTE, MATRICULA, CURSO y PROFESOR. Una selección anidada, σA(σB(R)), equivale a una sola selección con A ∧ B; se escribe anidada para que cada paso se lea por separado.
+
 **Paso 0 — Insumos base.** Se filtra la matrícula del periodo una sola vez y se reutiliza en todos los pasos siguientes.
+
+```text
+M26   ← σ M.semestre = '2026-1'(MATRICULA)
+TODOS ← Π E.id_estudiante(ESTUDIANTE)
+```
 
 **Paso 1 — Estudiantes de Ingeniería de Sistemas.** Se filtra el nombre de la carrera, después se amarra la clave foránea. El orden se puede invertir, pero se manejarían más tuplas intermedias.
 
+```text
+C1 ← Π E.id_estudiante(
+       σ E.id_carrera = CA.id_carrera(
+         σ CA.nombre = 'Ingeniería de Sistemas'(CARRERA) × ESTUDIANTE))
+```
+
 **Paso 2 — Al menos tres cursos.** Se toman tres copias de la matrícula filtrada con renombre. Se exige que sean del mismo estudiante y de cursos distintos entre sí. Quien tenga cuatro o más cursos también aparece, porque basta con encontrar una terna de cursos distintos.
+
+```text
+M1 ← ρ M1(M26)
+M2 ← ρ M2(M26)
+M3 ← ρ M3(M26)
+C2 ← Π M1.id_estudiante(
+       σ M2.id_curso ≠ M3.id_curso(
+       σ M1.id_curso ≠ M3.id_curso(
+       σ M1.id_curso ≠ M2.id_curso(
+       σ M2.id_estudiante = M3.id_estudiante(
+       σ M1.id_estudiante = M2.id_estudiante(
+         M1 × M2 × M3))))))
+```
 
 **Paso 3 — Alguna nota superior a 4.0.** Proyección directa sobre las matrículas filtradas.
 
+```text
+C3 ← Π M.id_estudiante(σ M.nota_final > 4.0(M26))
+```
+
 **Paso 4 — Ningún curso perdido.** Se calculan los que sí perdieron alguno y se restan del total de estudiantes.
+
+```text
+PERDIERON ← Π M.id_estudiante(σ M.nota_final < 3.0(M26))
+C4 ← TODOS − PERDIERON
+```
 
 **Paso 5 — Aprobó todos sus cursos de 3 créditos.** Se buscan los que reprobaron un curso de 3 créditos de su propia carrera y se les resta del total. Este conjunto es un subconjunto del anterior.
 
+```text
+REPRUEBAN3 ← Π E.id_estudiante(
+               σ M.nota_final < 3.0(
+               σ C.creditos = 3(
+               σ C.id_carrera = E.id_carrera(
+               σ M.id_curso = C.id_curso(
+               σ M.id_estudiante = E.id_estudiante(
+                 ESTUDIANTE × M26 × CURSO))))))
+C5 ← TODOS − REPRUEBAN3
+```
+
 **Paso 6 — Cursos de 3 créditos con profesor de Bases de Datos.** Misma idea, con PROFESOR en el producto y el umbral de 3.5.
+
+```text
+FALLAN_BD ← Π E.id_estudiante(
+              σ M.nota_final < 3.5(
+              σ P.especialidad = 'Bases de Datos'(
+              σ P.id_profesor = C.id_profesor(
+              σ C.creditos = 3(
+              σ C.id_carrera = E.id_carrera(
+              σ M.id_curso = C.id_curso(
+              σ M.id_estudiante = E.id_estudiante(
+                ESTUDIANTE × M26 × CURSO × PROFESOR))))))))
+C6 ← TODOS − FALLAN_BD
+```
 
 **Paso 7 — Un curso de 4 o más créditos aprobado.** Se cruza matrícula con curso para obtener los créditos y se filtra por nota aprobatoria.
 
+```text
+C7 ← Π M.id_estudiante(
+       σ C.creditos ≥ 4(
+       σ M.nota_final ≥ 3.0(
+       σ M.id_curso = C.id_curso(
+         M26 × CURSO))))
+```
+
 **Paso 8 — Intersección y proyección final.** Se intersectan los siete conjuntos y se recuperan los datos personales del estudiante. Los pasos anteriores trabajan solo con identificadores porque así las operaciones de conjuntos son válidas.
+
+```text
+IDS ← C1 ∩ C2 ∩ C3 ∩ C4 ∩ C5 ∩ C6 ∩ C7
+RESULTADO ← Π E.nombre, E.apellido, E.correo(
+              σ E.id_estudiante = I.id_estudiante(
+                ESTUDIANTE × ρ I(IDS)))
+```
 
 ## Observaciones para la revisión
 
