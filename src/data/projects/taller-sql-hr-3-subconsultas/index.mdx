@@ -24,7 +24,7 @@ specs:
   - label: "Motor"
     value: "Oracle Database 19c"
   - label: "Contenido"
-    value: "12 ejercicios de nivel básico a reto, con resolución paso a paso y dos PDF: el taller y la resolución"
+    value: "12 ejercicios de nivel básico a reto, con resolución paso a paso, el resultado de cada consulta ejecutada en HR y dos PDF: el taller y la resolución"
 
 features:
   - lead: "Subconsultas escalares"
@@ -55,7 +55,7 @@ El comité de compensación de una multinacional pide listados que no se resuelv
 
 ## 1. El esquema HR
 
-El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamentos, 19 cargos, 10 registros de historial, 23 ubicaciones, 25 países y 5 regiones). El usuario solo puede leerlo, así que todos los ejercicios son consultas `SELECT`. Las llaves siguen el diseño estándar del esquema HR.
+El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamentos, 19 cargos, 10 registros de historial, 23 ubicaciones, 25 países y 5 regiones). El usuario solo puede leerlo, así que todos los ejercicios son consultas `SELECT`. Las llaves se comprobaron en el diccionario de datos de la base.
 
 | Tabla | Columnas | Llaves |
 |---|---|---|
@@ -76,10 +76,11 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 - Todas las tablas se escriben con el prefijo `hr.`, por ejemplo `hr.employees`.
 - Los alias de tabla van sin `AS` (`hr.employees e`). El `AS` solo se usa en los alias de columna.
-- El texto va entre comillas simples y distingue mayúsculas de minúsculas: `'United Kingdom'` no es igual a `'united kingdom'`.
+- El texto va entre comillas simples y distingue mayúsculas de minúsculas: `'Canada'` no es igual a `'canada'`.
 - La concatenación es `||`. `FETCH FIRST n ROWS ONLY` limita las filas y va al final de la consulta.
 - Las fechas se escriben con `DATE 'AAAA-MM-DD'` y se muestran con `TO_CHAR(fecha, 'DD/MM/YYYY')`.
 - El esquema HR es de solo lectura: todos los ejercicios son consultas `SELECT`.
+- Cada ejercicio indica cuántas filas y columnas debe devolver. Esas cifras salen de ejecutar la consulta en una base Oracle Database 19c con el esquema HR (107 empleados); con otra copia de HR los nombres, las fechas y algunas cifras pueden cambiar.
 
 ## 2. El taller
 
@@ -89,7 +90,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Mostrar los empleados que ganan más que el salario promedio de toda la empresa.
 
-**Mostrar:** nombre, apellido y salario, del mayor al menor.
+**Mostrar:** nombre, apellido y salario, del mayor al menor y, si empatan, por apellido.
+
+**Debe devolver:** 51 filas y 3 columnas.
 
 ### Ejercicio 2 — Mejor pagados que su departamento
 
@@ -97,7 +100,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Mostrar todos los empleados cuyo salario sea mayor al promedio de su departamento.
 
-**Mostrar:** nombre completo del empleado, salario y promedio del departamento (dos decimales).
+**Mostrar:** nombre completo del empleado, salario y promedio del departamento (dos decimales), ordenado por departamento y, dentro de cada uno, de mayor a menor salario.
+
+**Debe devolver:** 38 filas y 3 columnas.
 
 ### Ejercicio 3 — El máximo de cada departamento
 
@@ -107,13 +112,17 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** departamento, nombre, apellido y salario, ordenado por departamento y apellido.
 
+**Debe devolver:** 11 filas y 4 columnas.
+
 ### Ejercicio 4 — ¿Quiénes son jefes?
 
 **Nivel:** Intermedio · **Tablas:** `employees`, `jobs`
 
 **Se pide.** Listar los empleados que son jefes de al menos una persona.
 
-**Mostrar:** nombre, apellido y cargo (`job_title`), ordenados por apellido.
+**Mostrar:** nombre, apellido y cargo (`job_title`), ordenados por apellido y nombre.
+
+**Debe devolver:** 18 filas y 3 columnas.
 
 ### Ejercicio 5 — Sin subordinados y buen sueldo
 
@@ -123,13 +132,17 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** nombre, apellido y salario, del mayor al menor.
 
+**Debe devolver:** 3 filas y 3 columnas.
+
 ### Ejercicio 6 — Candidatos que cumplen todo
 
 **Nivel:** Reto · **Tablas:** `employees`
 
 **Se pide.** Una empresa quiere identificar a los empleados que cumplan todas estas condiciones: (a) su salario es superior al promedio de su departamento; (b) fueron contratados después del empleado más antiguo de su departamento; (c) no tienen subordinados directos, es decir, ningún empleado los tiene como jefe; (d) su salario es inferior al salario máximo de su departamento.
 
-**Mostrar:** todas las columnas del empleado.
+**Mostrar:** todas las columnas del empleado, ordenadas por `employee_id`.
+
+**Debe devolver:** 20 filas y 11 columnas.
 
 ### Ejercicio 7 — El segundo salario más alto
 
@@ -139,6 +152,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** nombre, apellido y salario, ordenados por apellido.
 
+**Debe devolver:** 2 filas y 3 columnas.
+
 ### Ejercicio 8 — Departamentos que pagan por encima de la empresa
 
 **Nivel:** Avanzado · **Tablas:** `employees`, `departments`
@@ -147,13 +162,17 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** departamento y salario promedio (dos decimales), de mayor a menor.
 
+**Debe devolver:** 7 filas y 2 columnas.
+
 ### Ejercicio 9 — Un cargo que ya habían tenido
 
 **Nivel:** Avanzado · **Tablas:** `employees`, `jobs`, `job_history`
 
 **Se pide.** Listar los empleados que hoy ocupan el mismo cargo que ya habían tenido en otro periodo registrado en el historial de cargos.
 
-**Mostrar:** nombre, apellido y cargo actual (`job_title`).
+**Mostrar:** nombre, apellido y cargo actual (`job_title`), ordenados por apellido.
+
+**Debe devolver:** 2 filas y 3 columnas.
 
 ### Ejercicio 10 — Por encima del promedio de su cargo
 
@@ -161,7 +180,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Mostrar los empleados que ganan más que el promedio de los empleados que tienen su mismo cargo.
 
-**Mostrar:** nombre, apellido, cargo, salario y promedio del cargo (dos decimales), ordenados por cargo y salario descendente.
+**Mostrar:** nombre, apellido, cargo, salario y promedio del cargo (dos decimales), ordenados por cargo, salario descendente y, si empatan, apellido.
+
+**Debe devolver:** 43 filas y 5 columnas.
 
 ### Ejercicio 11 — Más que todos los de Shipping
 
@@ -169,7 +190,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Mostrar los empleados que ganan más que cualquiera de los empleados del departamento Shipping, es decir, más que todos ellos.
 
-**Mostrar:** nombre, apellido y salario, del mayor al menor.
+**Mostrar:** nombre, apellido y salario, del mayor al menor y, si empatan, por apellido.
+
+**Debe devolver:** 31 filas y 3 columnas.
 
 ### Ejercicio 12 — El mejor pagado de cada país
 
@@ -179,6 +202,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** país, nombre, apellido y salario, ordenado por país.
 
+**Debe devolver:** 4 filas y 4 columnas.
+
 ## 3. Resolución paso a paso
 
 ### Ejercicio 1 — Por encima del promedio de la empresa
@@ -187,7 +212,7 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 1. La subconsulta `(SELECT AVG(salary) FROM hr.employees)` devuelve un único valor.
 2. La consulta externa compara `e.salary` contra ese valor.
-3. Se ordena por salario de mayor a menor.
+3. Se ordena por salario de mayor a menor y, en empate, por apellido.
 
 ```sql
 SELECT e.first_name,
@@ -195,7 +220,20 @@ SELECT e.first_name,
        e.salary
 FROM hr.employees e
 WHERE e.salary > (SELECT AVG(x.salary) FROM hr.employees x)
-ORDER BY e.salary DESC;
+ORDER BY e.salary DESC, e.last_name;
+```
+
+**Resultado en HR.** 51 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  SALARY
+----------  ---------  ------
+Steven      King        24000
+Lex         Garcia      17000
+Neena       Yang        17000
+John        Singh       14000
+Karen       Partners    13500
+Michael     Martinez    13000
 ```
 
 **Ojo.** La subconsulta va entre paréntesis y se ejecuta una sola vez, porque no depende de la fila de la consulta externa.
@@ -220,19 +258,33 @@ JOIN (SELECT x.department_id,
       GROUP BY x.department_id) p
   ON p.department_id = e.department_id
 WHERE e.salary > p.promedio
-ORDER BY e.department_id, e.salary DESC;
+ORDER BY e.department_id, e.salary DESC, e.last_name;
+```
+
+**Resultado en HR.** 38 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+NOMBRE_EMPLEADO   SALARY  PROMEDIO_DEPARTAMENTO
+----------------  ------  ---------------------
+Michael Martinez   13000                   9500
+Den Li             11000                   4150
+Adam Fripp          8200                3475.56
+Matthew Weiss       8000                3475.56
+Payam Kaufling      7900                3475.56
+Shanta Vollman      6500                3475.56
 ```
 
 **Ojo.** Quien no tiene departamento queda fuera: `NULL = NULL` no es verdadero en el `JOIN`.
 
-**Variante.** Con una subconsulta correlacionada en el `WHERE` (sin mostrar el promedio):
+**Variante.** Con una subconsulta correlacionada en el `WHERE` (sin mostrar el promedio). Devuelve las mismas 38 personas:
 
 ```sql
 SELECT e.first_name, e.last_name, e.salary
 FROM hr.employees e
 WHERE e.salary > (SELECT AVG(x.salary)
                   FROM hr.employees x
-                  WHERE x.department_id = e.department_id);
+                  WHERE x.department_id = e.department_id)
+ORDER BY e.department_id, e.salary DESC, e.last_name;
 ```
 
 ### Ejercicio 3 — El máximo de cada departamento
@@ -257,7 +309,20 @@ WHERE e.salary = (SELECT MAX(x.salary)
 ORDER BY d.department_name, e.last_name;
 ```
 
-**Ojo.** Si dos empleados empatan en el máximo salen los dos: la igualdad no elige uno solo.
+**Resultado en HR.** 11 filas y 4 columnas; se muestran las primeras 6 filas:
+
+```text
+DEPARTMENT_NAME  FIRST_NAME  LAST_NAME  SALARY
+---------------  ----------  ---------  ------
+Accounting       Shelley     Higgins     12008
+Administration   Jennifer    Whalen       4400
+Executive        Steven      King        24000
+Finance          Nancy       Gruenberg   12008
+Human Resources  Susan       Jacobs       6500
+IT               Alexander   James        9000
+```
+
+**Ojo.** Si dos empleados empatan en el máximo salen los dos: la igualdad no elige uno solo. En HR nadie empata en el máximo de su departamento: salen 11 filas, una por departamento.
 
 ### Ejercicio 4 — ¿Quiénes son jefes?
 
@@ -276,7 +341,20 @@ JOIN hr.jobs j ON j.job_id = e.job_id
 WHERE EXISTS (SELECT 1
               FROM hr.employees s
               WHERE s.manager_id = e.employee_id)
-ORDER BY e.last_name;
+ORDER BY e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 18 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  JOB_TITLE
+----------  ---------  -----------------------------
+Gerald      Cambrault  Sales Manager
+Alberto     Errazuriz  Sales Manager
+Adam        Fripp      Stock Manager
+Lex         Garcia     Administration Vice President
+Nancy       Gruenberg  Finance Manager
+Shelley     Higgins    Accounting Manager
 ```
 
 **Ojo.** `EXISTS` se detiene en la primera coincidencia; no cuenta subordinados. Si necesitas saber cuántos son, usa un `JOIN` con `COUNT`.
@@ -301,6 +379,16 @@ WHERE e.salary > 10000
 ORDER BY e.salary DESC;
 ```
 
+**Resultado en HR.** 3 filas y 3 columnas:
+
+```text
+FIRST_NAME  LAST_NAME  SALARY
+----------  ---------  ------
+Lisa        Ozer        11500
+Ellen       Abel        11000
+Clara       Vishney     10500
+```
+
 **Ojo.** La versión con `NOT IN (SELECT manager_id FROM hr.employees)` devuelve cero filas: `manager_id` contiene un `NULL` (el empleado sin jefe) y `x NOT IN (..., NULL)` nunca es verdadero. `NOT EXISTS` no tiene ese problema.
 
 ### Ejercicio 6 — Candidatos que cumplen todo
@@ -312,7 +400,7 @@ ORDER BY e.salary DESC;
 3. Condición (b): `e.hire_date > (SELECT MIN(x.hire_date) ...)`, la fecha del más antiguo de su departamento.
 4. Condición (c): `NOT EXISTS` de empleados cuyo `manager_id` sea el `employee_id` del evaluado.
 5. Condición (d): `e.salary < (SELECT MAX(x.salary) ...)` sobre su departamento.
-6. `e.*` proyecta todas las columnas del empleado.
+6. `e.*` proyecta todas las columnas del empleado, y `ORDER BY e.employee_id` las ordena por identificador.
 
 ```sql
 SELECT e.*
@@ -328,12 +416,26 @@ WHERE e.salary > (SELECT AVG(x.salary)
                   WHERE s.manager_id = e.employee_id)
   AND e.salary < (SELECT MAX(x.salary)
                   FROM hr.employees x
-                  WHERE x.department_id = e.department_id);
+                  WHERE x.department_id = e.department_id)
+ORDER BY e.employee_id;
+```
+
+**Resultado en HR.** 20 filas y 11 columnas; se muestran las primeras 6 filas y 6 de las 11 columnas:
+
+```text
+EMPLOYEE_ID  FIRST_NAME  LAST_NAME  EMAIL     PHONE_NUMBER    HIRE_DATE
+-----------  ----------  ---------  --------  --------------  ---------
+        104  Bruce       Miller     BMILLER   1.590.555.0104  21-MAY-17
+        137  Renske      Ladwig     RLADWIG   1.650.555.0137  14-JUL-13
+        141  Trenna      Rajs       TRAJS     1.650.555.0141  17-OCT-13
+        150  Sean        Tucker     STUCKER   44.1632.960005  30-JAN-15
+        151  David       Bernstein  DBERNSTE  44.1632.960006  24-MAR-15
+        152  Peter       Hall       PHALL     44.1632.960007  20-AUG-15
 ```
 
 **Ojo.** Los empleados sin departamento se descartan: `x.department_id = NULL` nunca es verdadero. Traduce cada condición del enunciado de forma literal y léelas una por una antes de unirlas.
 
-**Variante.** La misma lógica en una sola pasada por departamento: una vista en línea calcula promedio, fecha más antigua y máximo, y el `JOIN` los reparte a cada empleado.
+**Variante.** La misma lógica en una sola pasada por departamento: una vista en línea calcula promedio, fecha más antigua y máximo, y el `JOIN` los reparte a cada empleado. Devuelve los mismos 20 empleados.
 
 ```sql
 SELECT e.*
@@ -350,7 +452,8 @@ WHERE e.salary > d.promedio
   AND e.salary < d.maximo
   AND NOT EXISTS (SELECT 1
                   FROM hr.employees s
-                  WHERE s.manager_id = e.employee_id);
+                  WHERE s.manager_id = e.employee_id)
+ORDER BY e.employee_id;
 ```
 
 ### Ejercicio 7 — El segundo salario más alto
@@ -373,7 +476,16 @@ WHERE e.salary = (SELECT MAX(x.salary)
 ORDER BY e.last_name;
 ```
 
-**Ojo.** `ORDER BY salary DESC FETCH FIRST 2 ROWS ONLY` no sirve: si dos personas cobran el salario máximo, la segunda fila tendría el mismo valor y no sería el segundo salario. Hablar del segundo valor distinto exige la subconsulta.
+**Resultado en HR.** 2 filas y 3 columnas:
+
+```text
+FIRST_NAME  LAST_NAME  SALARY
+----------  ---------  ------
+Lex         Garcia      17000
+Neena       Yang        17000
+```
+
+**Ojo.** `ORDER BY salary DESC FETCH FIRST 2 ROWS ONLY` no sirve: devolvería a Steven King (24000) y solo a una de las dos personas que cobran 17000, y la primera fila ni siquiera es del segundo salario. Hablar del segundo valor distinto, que aquí comparten dos empleados, exige la subconsulta.
 
 ### Ejercicio 8 — Departamentos que pagan por encima de la empresa
 
@@ -392,6 +504,20 @@ JOIN hr.departments d ON d.department_id = e.department_id
 GROUP BY d.department_id, d.department_name
 HAVING AVG(e.salary) > (SELECT AVG(x.salary) FROM hr.employees x)
 ORDER BY promedio DESC;
+```
+
+**Resultado en HR.** 7 filas y 2 columnas:
+
+```text
+DEPARTMENT_NAME   PROMEDIO
+----------------  --------
+Executive         19333.33
+Accounting           10154
+Public Relations     10000
+Marketing             9500
+Sales              8955.88
+Finance            8601.33
+Human Resources       6500
 ```
 
 **Ojo.** La comparación va en `HAVING` y no en `WHERE`, porque depende de una función de agregación. Y se compara con el promedio exacto, no con el redondeado.
@@ -413,7 +539,17 @@ JOIN hr.jobs j ON j.job_id = e.job_id
 WHERE EXISTS (SELECT 1
               FROM hr.job_history h
               WHERE h.employee_id = e.employee_id
-                AND h.job_id      = e.job_id);
+                AND h.job_id      = e.job_id)
+ORDER BY e.last_name;
+```
+
+**Resultado en HR.** 2 filas y 3 columnas:
+
+```text
+FIRST_NAME  LAST_NAME  JOB_TITLE
+----------  ---------  ------------------------
+Jonathon    Taylor     Sales Representative
+Jennifer    Whalen     Administration Assistant
 ```
 
 **Ojo.** Puede devolver muy pocas filas: `job_history` solo tiene 10 registros en este esquema.
@@ -441,7 +577,20 @@ JOIN (SELECT x.job_id,
       GROUP BY x.job_id) p
   ON p.job_id = e.job_id
 WHERE e.salary > p.promedio
-ORDER BY j.job_title, e.salary DESC;
+ORDER BY j.job_title, e.salary DESC, e.last_name;
+```
+
+**Resultado en HR.** 43 filas y 5 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  JOB_TITLE         SALARY  PROMEDIO_CARGO
+----------  ---------  ----------------  ------  --------------
+Daniel      Faviet     Accountant          9000            7920
+John        Chen       Accountant          8200            7920
+Alexander   James      Programmer          9000            5760
+Bruce       Miller     Programmer          6000            5760
+Alexander   Khoo       Purchasing Clerk    3100            2780
+Shelli      Baida      Purchasing Clerk    2900            2780
 ```
 
 **Ojo.** Los cargos con un solo empleado nunca aparecen: nadie supera su propio promedio.
@@ -464,12 +613,25 @@ WHERE e.salary > ALL (SELECT x.salary
                       JOIN hr.departments dx
                         ON dx.department_id = x.department_id
                       WHERE dx.department_name = 'Shipping')
-ORDER BY e.salary DESC;
+ORDER BY e.salary DESC, e.last_name;
+```
+
+**Resultado en HR.** 31 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  SALARY
+----------  ---------  ------
+Steven      King        24000
+Lex         Garcia      17000
+Neena       Yang        17000
+John        Singh       14000
+Karen       Partners    13500
+Michael     Martinez    13000
 ```
 
 **Ojo.** Si la subconsulta devolviera algún `NULL`, `> ALL` nunca sería verdadero. Y sobre un conjunto vacío es verdadero para todas las filas.
 
-**Variante.** `> ANY` equivale a «mayor que el mínimo» y `> ALL` a «mayor que el máximo». Por eso este ejercicio también se resuelve con `e.salary > (SELECT MAX(...))`.
+**Variante.** `> ANY` equivale a «mayor que el mínimo» y `> ALL` a «mayor que el máximo». Por eso este ejercicio también se resuelve con `e.salary > (SELECT MAX(...))`: el máximo de Shipping es 8200 y las dos formas devuelven las mismas 31 filas.
 
 ### Ejercicio 12 — El mejor pagado de cada país
 
@@ -499,6 +661,17 @@ WHERE e.salary = (SELECT MAX(x.salary)
 ORDER BY c.country_name, e.last_name;
 ```
 
+**Resultado en HR.** 4 filas y 4 columnas:
+
+```text
+COUNTRY_NAME                    FIRST_NAME  LAST_NAME  SALARY
+------------------------------  ----------  ---------  ------
+Canada                          Michael     Martinez    13000
+Germany                         Hermann     Brown       10000
+United Kingdom of Great Bri...  John        Singh       14000
+United States of America        Steven      King        24000
+```
+
 **Ojo.** Usar alias distintos en la subconsulta (`x`, `dx`, `lx`) evita confundirla con las tablas de afuera. Es la forma explícita; con funciones de ventana quedaría más corta.
 
 ## Documento del trabajo
@@ -510,4 +683,4 @@ ORDER BY c.country_name, e.last_name;
 
 ### Contexto
 
-Taller de práctica de la asignatura **Bases de Datos 1** sobre el esquema de ejemplo `HR` de Oracle. El primer PDF reúne los enunciados y los entregables; el segundo, la resolución de cada ejercicio con sus pasos y avisos.
+Taller de práctica de la asignatura **Bases de Datos 1** sobre el esquema de ejemplo `HR` de Oracle. El primer PDF reúne los enunciados y los entregables; el segundo, la resolución de cada ejercicio con sus pasos, el resultado de la consulta en HR y sus avisos.

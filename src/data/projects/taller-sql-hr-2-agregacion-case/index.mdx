@@ -24,7 +24,7 @@ specs:
   - label: "Motor"
     value: "Oracle Database 19c"
   - label: "Contenido"
-    value: "12 ejercicios de nivel básico a reto, con resolución paso a paso y dos PDF: el taller y la resolución"
+    value: "12 ejercicios de nivel básico a reto, con resolución paso a paso, el resultado de cada consulta ejecutada en HR y dos PDF: el taller y la resolución"
 
 features:
   - lead: "Funciones de agregación"
@@ -55,7 +55,7 @@ La gerencia de una multinacional quiere entender su nómina: cuánto cuesta, có
 
 ## 1. El esquema HR
 
-El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamentos, 19 cargos, 10 registros de historial, 23 ubicaciones, 25 países y 5 regiones). El usuario solo puede leerlo, así que todos los ejercicios son consultas `SELECT`. Las llaves siguen el diseño estándar del esquema HR.
+El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamentos, 19 cargos, 10 registros de historial, 23 ubicaciones, 25 países y 5 regiones). El usuario solo puede leerlo, así que todos los ejercicios son consultas `SELECT`. Las llaves se comprobaron en el diccionario de datos de la base.
 
 | Tabla | Columnas | Llaves |
 |---|---|---|
@@ -76,10 +76,11 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 - Todas las tablas se escriben con el prefijo `hr.`, por ejemplo `hr.employees`.
 - Los alias de tabla van sin `AS` (`hr.employees e`). El `AS` solo se usa en los alias de columna.
-- El texto va entre comillas simples y distingue mayúsculas de minúsculas: `'United Kingdom'` no es igual a `'united kingdom'`.
+- El texto va entre comillas simples y distingue mayúsculas de minúsculas: `'Canada'` no es igual a `'canada'`.
 - La concatenación es `||`. `FETCH FIRST n ROWS ONLY` limita las filas y va al final de la consulta.
 - Las fechas se escriben con `DATE 'AAAA-MM-DD'` y se muestran con `TO_CHAR(fecha, 'DD/MM/YYYY')`.
 - El esquema HR es de solo lectura: todos los ejercicios son consultas `SELECT`.
+- Cada ejercicio indica cuántas filas y columnas debe devolver. Esas cifras salen de ejecutar la consulta en una base Oracle Database 19c con el esquema HR (107 empleados); con otra copia de HR los nombres, las fechas y algunas cifras pueden cambiar.
 
 ## 2. El taller
 
@@ -91,6 +92,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** el total de empleados y el total con comisión (una sola fila).
 
+**Debe devolver:** 1 fila y 2 columnas.
+
 ### Ejercicio 2 — Radiografía de la nómina
 
 **Nivel:** Básico · **Tablas:** `employees`
@@ -98,6 +101,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 **Se pide.** Buscar la suma de todos los salarios, el salario más alto, el más bajo, el promedio y la desviación estándar.
 
 **Mostrar:** una sola fila con cinco columnas; el promedio y la desviación con dos decimales.
+
+**Debe devolver:** 1 fila y 5 columnas.
 
 ### Ejercicio 3 — Extremos por departamento
 
@@ -107,6 +112,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** nombre del departamento, salario máximo y salario mínimo, ordenado por nombre del departamento.
 
+**Debe devolver:** 11 filas y 3 columnas.
+
 ### Ejercicio 4 — Departamentos con más de diez empleados
 
 **Nivel:** Intermedio · **Tablas:** `employees`, `departments`
@@ -114,6 +121,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 **Se pide.** Listar los departamentos que tengan más de 10 empleados.
 
 **Mostrar:** nombre del departamento y cantidad de empleados, de mayor a menor.
+
+**Debe devolver:** 2 filas y 2 columnas.
 
 ### Ejercicio 5 — Los cinco cargos que más nómina concentran
 
@@ -123,6 +132,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** cargo (`job_title`), cantidad de empleados y suma de salarios.
 
+**Debe devolver:** 5 filas y 3 columnas.
+
 ### Ejercicio 6 — Costo real con comisiones
 
 **Nivel:** Intermedio · **Tablas:** `employees`, `departments`
@@ -131,13 +142,17 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** departamento, nómina base y nómina con comisiones (número entero).
 
+**Debe devolver:** 2 filas y 3 columnas.
+
 ### Ejercicio 7 — Mensaje según el salario
 
 **Nivel:** Intermedio · **Tablas:** `employees`
 
 **Se pide.** Traer el empleado, su salario y un mensaje según el monto: menor a 1000, «pobrecito»; menor a 3000, «sigue intentando»; menor a 5000, «ya casi»; mayor a 10000, «Buenos días ingeniero»; cualquier otro caso, «otros».
 
-**Mostrar:** nombre, apellido, salario y mensaje, ordenados por salario.
+**Mostrar:** nombre, apellido, salario y mensaje, ordenados por salario y, si empatan, por apellido y nombre.
+
+**Debe devolver:** 107 filas y 4 columnas.
 
 ### Ejercicio 8 — Cuántos empleados hay de cada mensaje
 
@@ -147,6 +162,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** mensaje y cantidad de empleados, de más a menos.
 
+**Debe devolver:** 4 filas y 2 columnas.
+
 ### Ejercicio 9 — Contrataciones por año
 
 **Nivel:** Avanzado · **Tablas:** `employees`
@@ -155,13 +172,17 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** año, cantidad de contratados y salario promedio redondeado a entero; ordenado por año.
 
+**Debe devolver:** 5 filas y 3 columnas.
+
 ### Ejercicio 10 — El peso de cada departamento
 
 **Nivel:** Avanzado · **Tablas:** `employees`, `departments`
 
 **Se pide.** Mostrar, por departamento, cuántos empleados tiene y qué porcentaje de la plantilla total representa.
 
-**Mostrar:** departamento, empleados y porcentaje con un decimal, de mayor a menor porcentaje.
+**Mostrar:** departamento, empleados y porcentaje con un decimal, de mayor a menor porcentaje y, si empatan, por nombre del departamento.
+
+**Debe devolver:** 11 filas y 3 columnas.
 
 ### Ejercicio 11 — Bien pagados y los demás
 
@@ -171,6 +192,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** departamento, cantidad de bien pagados y cantidad de los demás, ordenado por bien pagados de mayor a menor y luego por nombre.
 
+**Debe devolver:** 9 filas y 3 columnas.
+
 ### Ejercicio 12 — Una lista en una sola celda
 
 **Nivel:** Avanzado · **Tablas:** `employees`, `departments`
@@ -178,6 +201,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 **Se pide.** Por cada departamento con menos de 7 empleados, mostrar la lista de apellidos de sus empleados separados por coma y ordenados alfabéticamente.
 
 **Mostrar:** departamento, cantidad de empleados y la lista de apellidos, ordenado por nombre del departamento.
+
+**Debe devolver:** 9 filas y 3 columnas.
 
 ## 3. Resolución paso a paso
 
@@ -193,6 +218,14 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 SELECT COUNT(*)                AS total_empleados,
        COUNT(e.commission_pct) AS con_comision
 FROM hr.employees e;
+```
+
+**Resultado en HR.** 1 fila y 2 columnas:
+
+```text
+TOTAL_EMPLEADOS  CON_COMISION
+---------------  ------------
+            107            35
 ```
 
 **Ojo.** La diferencia entre las dos cuentas es justo la cantidad de empleados sin comisión.
@@ -216,7 +249,15 @@ SELECT SUM(e.salary)                AS suma_salarios,
 FROM hr.employees e;
 ```
 
-**Ojo.** `STDDEV` en Oracle es la desviación estándar muestral; la poblacional es `STDDEV_POP`. Con 107 empleados la diferencia es pequeña, pero no es la misma cifra.
+**Resultado en HR.** 1 fila y 5 columnas:
+
+```text
+SUMA_SALARIOS  SALARIO_MAXIMO  SALARIO_MINIMO  PROMEDIO  DESVIACION_ESTANDAR
+-------------  --------------  --------------  --------  -------------------
+       691416           24000            2100   6461.83              3909.58
+```
+
+**Ojo.** `STDDEV` en Oracle es la desviación estándar muestral (3909.58 aquí); la poblacional es `STDDEV_POP` (3891.27). Con 107 empleados la diferencia es pequeña, pero no es la misma cifra.
 
 ### Ejercicio 3 — Extremos por departamento
 
@@ -237,6 +278,19 @@ GROUP BY d.department_id, d.department_name
 ORDER BY d.department_name;
 ```
 
+**Resultado en HR.** 11 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+DEPARTMENT_NAME  MAXIMO  MINIMO
+---------------  ------  ------
+Accounting        12008    8300
+Administration     4400    4400
+Executive         24000   17000
+Finance           12008    6900
+Human Resources    6500    6500
+IT                 9000    4200
+```
+
 **Ojo.** Toda columna del `SELECT` que no sea una función de agregación debe estar en el `GROUP BY`. Quien no tiene departamento no aparece: el `JOIN` interno lo descarta.
 
 ### Ejercicio 4 — Departamentos con más de diez empleados
@@ -255,6 +309,15 @@ JOIN hr.departments d ON d.department_id = e.department_id
 GROUP BY d.department_id, d.department_name
 HAVING COUNT(*) > 10
 ORDER BY empleados DESC;
+```
+
+**Resultado en HR.** 2 filas y 2 columnas:
+
+```text
+DEPARTMENT_NAME  EMPLEADOS
+---------------  ---------
+Shipping                45
+Sales                   34
 ```
 
 **Ojo.** `WHERE COUNT(*) > 10` falla con `ORA-00934` (función de grupo no permitida aquí): las funciones de agregación no se pueden usar en el `WHERE`.
@@ -279,7 +342,19 @@ ORDER BY nomina DESC
 FETCH FIRST 5 ROWS ONLY;
 ```
 
-**Ojo.** Si el quinto puesto está empatado, `FETCH FIRST 5 ROWS ONLY` corta de forma arbitraria; con `FETCH FIRST 5 ROWS WITH TIES` salen todos los empatados.
+**Resultado en HR.** 5 filas y 3 columnas:
+
+```text
+JOB_TITLE             EMPLEADOS  NOMINA
+--------------------  ---------  ------
+Sales Representative         30  250500
+Shipping Clerk               20   64300
+Sales Manager                 5   61000
+Stock Clerk                  20   55700
+Accountant                    5   39600
+```
+
+**Ojo.** Si el quinto puesto está empatado, `FETCH FIRST 5 ROWS ONLY` corta de forma arbitraria; con `FETCH FIRST 5 ROWS WITH TIES` salen todos los empatados. En HR no hay empate en el quinto puesto, así que las dos formas devuelven lo mismo.
 
 ### Ejercicio 6 — Costo real con comisiones
 
@@ -302,7 +377,16 @@ GROUP BY d.department_id, d.department_name
 ORDER BY d.department_name;
 ```
 
-**Ojo.** Sin `NVL`, `salary * (1 + NULL)` da `NULL`: quienes no tienen comisión dejarían de sumar su salario y la nómina con comisión saldría menor que la base.
+**Resultado en HR.** 2 filas y 3 columnas:
+
+```text
+DEPARTMENT_NAME  NOMINA_BASE  NOMINA_CON_COMISION
+---------------  -----------  -------------------
+Sales                 304500               377140
+Shipping              156400               156400
+```
+
+**Ojo.** Sin `NVL`, `salary * (1 + NULL)` da `NULL` y `SUM` ignora los `NULL`: quien no tiene comisión no aportaría su salario. En Sales los 34 empleados tienen comisión y el resultado no cambia, pero en Shipping, donde nadie la tiene, la nómina con comisión saldría `NULL` en lugar de 156400.
 
 ### Ejercicio 7 — Mensaje según el salario
 
@@ -325,10 +409,23 @@ SELECT e.first_name,
          ELSE 'otros'
        END AS mensaje
 FROM hr.employees e
-ORDER BY e.salary;
+ORDER BY e.salary, e.last_name, e.first_name;
 ```
 
-**Ojo.** Si pones primero `WHEN e.salary < 5000`, todos los salarios bajos reciben «ya casi»: los rangos más angostos van primero. Los bordes también cuentan: 1000 es «sigue intentando», 3000 es «ya casi», y 5000 y 10000 caen en «otros».
+**Resultado en HR.** 107 filas y 4 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME   SALARY  MENSAJE
+----------  ----------  ------  ----------------
+TJ          Olson         2100  sigue intentando
+Steven      Markle        2200  sigue intentando
+Hazel       Philtanker    2200  sigue intentando
+Ki          Gee           2400  sigue intentando
+James       Landry        2400  sigue intentando
+Karen       Colmenares    2500  sigue intentando
+```
+
+**Ojo.** Si pones primero `WHEN e.salary < 5000`, todos los salarios bajos reciben «ya casi»: los rangos más angostos van primero. Los bordes también cuentan: 1000 es «sigue intentando», 3000 es «ya casi», y 5000 y 10000 caen en «otros». En HR hay 2 empleados que ganan exactamente 3000 y 4 que ganan exactamente 10000; y nadie gana menos de 1000, así que «pobrecito» no aparece.
 
 ### Ejercicio 8 — Cuántos empleados hay de cada mensaje
 
@@ -354,7 +451,18 @@ GROUP BY x.mensaje
 ORDER BY empleados DESC;
 ```
 
-**Ojo.** Oracle no deja usar un alias del `SELECT` en el `GROUP BY` de la misma consulta (`ORA-00904`). Se repite el `CASE` o se usa una vista en línea, como aquí. Y los alias de tabla (`x`) van sin `AS`.
+**Resultado en HR.** 4 filas y 2 columnas:
+
+```text
+MENSAJE                EMPLEADOS
+---------------------  ---------
+otros                         43
+ya casi                       25
+sigue intentando              24
+Buenos días ingeniero         15
+```
+
+**Ojo.** Oracle no deja usar un alias del `SELECT` en el `GROUP BY` de la misma consulta (`ORA-00904`). Se repite el `CASE` o se usa una vista en línea, como aquí. Y los alias de tabla (`x`) van sin `AS`. Como nadie gana menos de 1000, el grupo «pobrecito» no tiene filas y no aparece: `GROUP BY` solo muestra los grupos que existen, así que salen 4 mensajes y no 5.
 
 ### Ejercicio 9 — Contrataciones por año
 
@@ -375,7 +483,19 @@ HAVING COUNT(*) >= 10
 ORDER BY anio;
 ```
 
-**Ojo.** En el `GROUP BY` se repite `EXTRACT(YEAR FROM e.hire_date)`; el alias `anio` solo sirve en el `ORDER BY`. Si ningún año alcanza el umbral, el resultado sale vacío, y es una respuesta válida.
+**Resultado en HR.** 5 filas y 3 columnas:
+
+```text
+ANIO  CONTRATADOS  SALARIO_PROMEDIO
+----  -----------  ----------------
+2014           10              8600
+2015           29              6824
+2016           24              5046
+2017           19              4995
+2018           11              5382
+```
+
+**Ojo.** En el `GROUP BY` se repite `EXTRACT(YEAR FROM e.hire_date)`; el alias `anio` solo sirve en el `ORDER BY`. Si ningún año alcanza el umbral, el resultado sale vacío, y es una respuesta válida. En HR el año 2014 tiene exactamente 10 contrataciones: entra por el `>=` y quedaría fuera con `> 10`.
 
 ### Ejercicio 10 — El peso de cada departamento
 
@@ -384,7 +504,7 @@ ORDER BY anio;
 1. Se cuenta cuántos empleados tiene cada departamento.
 2. El total de la plantilla sale de `(SELECT COUNT(*) FROM hr.employees)`.
 3. El porcentaje es `COUNT(*) * 100 / total`, redondeado a un decimal.
-4. Se ordena por porcentaje.
+4. Se ordena por porcentaje y, en empate, por el nombre del departamento.
 
 ```sql
 SELECT d.department_name,
@@ -394,10 +514,23 @@ SELECT d.department_name,
 FROM hr.employees e
 JOIN hr.departments d ON d.department_id = e.department_id
 GROUP BY d.department_id, d.department_name
-ORDER BY porcentaje DESC;
+ORDER BY porcentaje DESC, d.department_name;
 ```
 
-**Ojo.** El total cuenta a todos los empleados, también a quien no tiene departamento: por eso los porcentajes suman un poco menos de 100.
+**Resultado en HR.** 11 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+DEPARTMENT_NAME  EMPLEADOS  PORCENTAJE
+---------------  ---------  ----------
+Shipping                45        42.1
+Sales                   34        31.8
+Finance                  6         5.6
+Purchasing               6         5.6
+IT                       5         4.7
+Executive                3         2.8
+```
+
+**Ojo.** El total cuenta a todos los empleados, también a quien no tiene departamento: por eso los porcentajes suman 99.1 y no 100. El 0.9 que falta es Kimberely Grant, a quien no se le asignó departamento.
 
 ### Ejercicio 11 — Bien pagados y los demás
 
@@ -417,6 +550,19 @@ JOIN hr.departments d ON d.department_id = e.department_id
 GROUP BY d.department_id, d.department_name
 HAVING COUNT(CASE WHEN e.salary > 8000 THEN 1 END) >= 1
 ORDER BY bien_pagados DESC, d.department_name;
+```
+
+**Resultado en HR.** 9 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+DEPARTMENT_NAME  BIEN_PAGADOS  OTROS
+---------------  ------------  -----
+Sales                      20     14
+Executive                   3      0
+Finance                     3      3
+Accounting                  2      0
+IT                          1      4
+Marketing                   1      1
 ```
 
 **Ojo.** Es equivalente a `SUM(CASE WHEN ... THEN 1 ELSE 0 END)`. Con `COUNT` el `ELSE` no se escribe; con `SUM` el `ELSE 0` es obligatorio.
@@ -442,6 +588,19 @@ HAVING COUNT(*) < 7
 ORDER BY d.department_name;
 ```
 
+**Resultado en HR.** 9 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+DEPARTMENT_NAME  EMPLEADOS  APELLIDOS
+---------------  ---------  ------------------------------
+Accounting               2  Gietz, Higgins
+Administration           1  Whalen
+Executive                3  Garcia, King, Yang
+Finance                  6  Chen, Faviet, Gruenberg, Po...
+Human Resources          1  Jacobs
+IT                       5  Jackson, James, Miller, Ngu...
+```
+
 **Ojo.** El resultado de `LISTAGG` no puede pasar de 4000 bytes (`ORA-01489`). Con departamentos grandes hay que filtrar o usar `ON OVERFLOW TRUNCATE`.
 
 ## Documento del trabajo
@@ -453,4 +612,4 @@ ORDER BY d.department_name;
 
 ### Contexto
 
-Taller de práctica de la asignatura **Bases de Datos 1** sobre el esquema de ejemplo `HR` de Oracle. El primer PDF reúne los enunciados y los entregables; el segundo, la resolución de cada ejercicio con sus pasos y avisos.
+Taller de práctica de la asignatura **Bases de Datos 1** sobre el esquema de ejemplo `HR` de Oracle. El primer PDF reúne los enunciados y los entregables; el segundo, la resolución de cada ejercicio con sus pasos, el resultado de la consulta en HR y sus avisos.

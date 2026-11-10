@@ -24,7 +24,7 @@ specs:
   - label: "Motor"
     value: "Oracle Database 19c"
   - label: "Contenido"
-    value: "12 ejercicios de nivel básico a reto, con resolución paso a paso y dos PDF: el taller y la resolución"
+    value: "12 ejercicios de nivel básico a reto, con resolución paso a paso, el resultado de cada consulta ejecutada en HR y dos PDF: el taller y la resolución"
 
 features:
   - lead: "Filtros y comodines"
@@ -55,7 +55,7 @@ Eres analista de datos en el área de Recursos Humanos de una multinacional. Cad
 
 ## 1. El esquema HR
 
-El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamentos, 19 cargos, 10 registros de historial, 23 ubicaciones, 25 países y 5 regiones). El usuario solo puede leerlo, así que todos los ejercicios son consultas `SELECT`. Las llaves siguen el diseño estándar del esquema HR.
+El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamentos, 19 cargos, 10 registros de historial, 23 ubicaciones, 25 países y 5 regiones). El usuario solo puede leerlo, así que todos los ejercicios son consultas `SELECT`. Las llaves se comprobaron en el diccionario de datos de la base.
 
 | Tabla | Columnas | Llaves |
 |---|---|---|
@@ -76,10 +76,11 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 - Todas las tablas se escriben con el prefijo `hr.`, por ejemplo `hr.employees`.
 - Los alias de tabla van sin `AS` (`hr.employees e`). El `AS` solo se usa en los alias de columna.
-- El texto va entre comillas simples y distingue mayúsculas de minúsculas: `'United Kingdom'` no es igual a `'united kingdom'`.
+- El texto va entre comillas simples y distingue mayúsculas de minúsculas: `'Canada'` no es igual a `'canada'`.
 - La concatenación es `||`. `FETCH FIRST n ROWS ONLY` limita las filas y va al final de la consulta.
 - Las fechas se escriben con `DATE 'AAAA-MM-DD'` y se muestran con `TO_CHAR(fecha, 'DD/MM/YYYY')`.
 - El esquema HR es de solo lectura: todos los ejercicios son consultas `SELECT`.
+- Cada ejercicio indica cuántas filas y columnas debe devolver. Esas cifras salen de ejecutar la consulta en una base Oracle Database 19c con el esquema HR (107 empleados); con otra copia de HR los nombres, las fechas y algunas cifras pueden cambiar.
 
 ## 2. El taller
 
@@ -89,7 +90,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Traer todos los empleados cuya comisión sea diferente de nulo.
 
-**Mostrar:** nombre, apellido y porcentaje de comisión.
+**Mostrar:** nombre, apellido y porcentaje de comisión, ordenados por apellido y nombre.
+
+**Debe devolver:** 35 filas y 3 columnas.
 
 ### Ejercicio 2 — Salario dentro de un rango
 
@@ -97,7 +100,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Listar los empleados del departamento 50 cuyo salario esté entre 2500 y 3500, incluyendo ambos extremos, del salario más alto al más bajo.
 
-**Mostrar:** nombre, apellido y salario.
+**Mostrar:** nombre, apellido y salario; si dos salarios empatan, por apellido.
+
+**Debe devolver:** 28 filas y 3 columnas.
 
 ### Ejercicio 3 — Empieza por S y termina en n
 
@@ -107,6 +112,8 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** nombre y apellido, ordenados por apellido.
 
+**Debe devolver:** 1 fila y 2 columnas.
+
 ### Ejercicio 4 — Apellidos de exactamente cinco letras
 
 **Nivel:** Intermedio · **Tablas:** `employees`
@@ -115,13 +122,17 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** apellido y su longitud, ordenados alfabéticamente.
 
+**Debe devolver:** 30 filas y 2 columnas.
+
 ### Ejercicio 5 — Correo corporativo
 
 **Nivel:** Intermedio · **Tablas:** `employees`
 
 **Se pide.** Generar el correo corporativo de los empleados del departamento 90 con el formato `usuario@empresa.com`, en minúsculas, donde `usuario` es la columna `email`.
 
-**Mostrar:** nombre, apellido y correo corporativo.
+**Mostrar:** nombre, apellido y correo corporativo, ordenados por apellido.
+
+**Debe devolver:** 3 filas y 3 columnas.
 
 ### Ejercicio 6 — Nombre en formato de lista
 
@@ -131,13 +142,17 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Mostrar:** una sola columna llamada `empleado`.
 
+**Debe devolver:** 5 filas y 1 columna.
+
 ### Ejercicio 7 — Teléfonos con guiones
 
 **Nivel:** Intermedio · **Tablas:** `employees`
 
-**Se pide.** De los empleados cuyo teléfono empieza por «515», mostrar el teléfono reemplazando cada punto por un guion.
+**Se pide.** De los empleados cuyo teléfono empieza por «1.515», mostrar el teléfono reemplazando cada punto por un guion.
 
-**Mostrar:** nombre, apellido y teléfono con guiones.
+**Mostrar:** nombre, apellido y teléfono con guiones, ordenados por apellido y nombre.
+
+**Debe devolver:** 21 filas y 3 columnas.
 
 ### Ejercicio 8 — Los cinco empleados más antiguos
 
@@ -145,7 +160,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Mostrar los cinco empleados con más antigüedad, es decir, los primeros contratados.
 
-**Mostrar:** nombre, apellido y fecha de contratación con el formato DD/MM/AAAA.
+**Mostrar:** nombre, apellido y fecha de contratación con el formato DD/MM/AAAA; si dos fechas empatan, por apellido.
+
+**Debe devolver:** 5 filas y 3 columnas.
 
 ### Ejercicio 9 — Contratados en junio, julio o agosto
 
@@ -153,7 +170,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Listar los empleados que fueron contratados en junio, julio o agosto de cualquier año.
 
-**Mostrar:** nombre, apellido y fecha de contratación (DD/MM/AAAA), ordenados por fecha.
+**Mostrar:** nombre, apellido y fecha de contratación (DD/MM/AAAA), ordenados por fecha y, si empatan, por apellido.
+
+**Debe devolver:** 27 filas y 3 columnas.
 
 ### Ejercicio 10 — Sin departamento o sin jefe
 
@@ -161,7 +180,9 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Encontrar los empleados que no tienen departamento asignado o que no tienen jefe.
 
-**Mostrar:** nombre, apellido, `department_id` y `manager_id`.
+**Mostrar:** nombre, apellido, `department_id` y `manager_id`, ordenados por apellido.
+
+**Debe devolver:** 2 filas y 4 columnas.
 
 ### Ejercicio 11 — Dos letras «a» en el nombre
 
@@ -169,15 +190,19 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 
 **Se pide.** Listar los empleados cuyo nombre tenga al menos dos letras «a», sean mayúsculas o minúsculas.
 
-**Mostrar:** nombre, apellido y cuántas «a» tiene el nombre; primero quienes más tienen y, en empate, por nombre.
+**Mostrar:** nombre, apellido y cuántas «a» tiene el nombre; primero quienes más tienen y, en empate, por nombre y apellido.
+
+**Debe devolver:** 18 filas y 3 columnas.
 
 ### Ejercicio 12 — Reino Unido y la tercera letra
 
 **Nivel:** Avanzado · **Tablas:** `employees`, `departments`, `locations`, `countries`
 
-**Se pide.** Todos los empleados que pertenezcan al Reino Unido (`United Kingdom`) y que tengan una «a» minúscula en la tercera posición del nombre.
+**Se pide.** Todos los empleados que pertenezcan al Reino Unido (en inglés, United Kingdom) y que tengan una «a» minúscula en la tercera posición del nombre.
 
-**Mostrar:** nombre y apellido.
+**Mostrar:** nombre y apellido, ordenados por apellido.
+
+**Debe devolver:** 3 filas y 2 columnas.
 
 ## 3. Resolución paso a paso
 
@@ -188,13 +213,28 @@ El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamen
 1. La comisión vive en la columna `commission_pct` de `hr.employees`; no hace falta ningún `JOIN`.
 2. El filtro es `commission_pct IS NOT NULL`.
 3. En el `SELECT` van solo las tres columnas pedidas.
+4. `ORDER BY e.last_name, e.first_name` fija el orden: sin él, Oracle puede devolver las filas en cualquier orden.
 
 ```sql
 SELECT e.first_name,
        e.last_name,
        e.commission_pct
 FROM hr.employees e
-WHERE e.commission_pct IS NOT NULL;
+WHERE e.commission_pct IS NOT NULL
+ORDER BY e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 35 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  COMMISSION_PCT
+----------  ---------  --------------
+Ellen       Abel                  0.3
+Sundar      Ande                  0.1
+Amit        Banda                 0.1
+Elizabeth   Bates                0.15
+David       Bernstein            0.25
+Harrison    Bloom                 0.2
 ```
 
 **Ojo.** `commission_pct <> NULL` y `commission_pct != NULL` no dan error, pero devuelven cero filas: cualquier comparación con `NULL` no es verdadera.
@@ -205,7 +245,7 @@ WHERE e.commission_pct IS NOT NULL;
 
 1. Las dos condiciones salen de `hr.employees`: `department_id = 50` y `salary BETWEEN 2500 AND 3500`.
 2. Se unen con `AND`, porque el empleado debe cumplir ambas.
-3. `ORDER BY e.salary DESC` ordena del mayor al menor.
+3. `ORDER BY e.salary DESC, e.last_name` ordena del mayor al menor y, si empatan, por apellido.
 
 ```sql
 SELECT e.first_name,
@@ -214,7 +254,20 @@ SELECT e.first_name,
 FROM hr.employees e
 WHERE e.department_id = 50
   AND e.salary BETWEEN 2500 AND 3500
-ORDER BY e.salary DESC;
+ORDER BY e.salary DESC, e.last_name;
+```
+
+**Resultado en HR.** 28 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  SALARY
+----------  ---------  ------
+Trenna      Rajs         3500
+Julia       Dellinger    3400
+Laura       Bissot       3300
+Jason       Mallin       3300
+Samuel      McLeod       3200
+Julia       Nayer        3200
 ```
 
 **Ojo.** El valor menor va primero: `BETWEEN 3500 AND 2500` no da error, pero tampoco devuelve ninguna fila.
@@ -236,6 +289,14 @@ WHERE e.first_name LIKE 'S%'
 ORDER BY e.last_name;
 ```
 
+**Resultado en HR.** 1 fila y 2 columnas:
+
+```text
+FIRST_NAME  LAST_NAME
+----------  ---------
+Shanta      Vollman
+```
+
 **Ojo.** En Oracle `LIKE` distingue mayúsculas de minúsculas: `'S%'` no encuentra «sandra». Si no sabes cómo está escrito el dato, compara contra `UPPER(first_name) LIKE 'S%'`.
 
 ### Ejercicio 4 — Apellidos de exactamente cinco letras
@@ -254,6 +315,19 @@ WHERE LENGTH(e.last_name) = 5
 ORDER BY e.last_name;
 ```
 
+**Resultado en HR.** 30 filas y 2 columnas; se muestran las primeras 6 filas:
+
+```text
+LAST_NAME  LETRAS
+---------  ------
+Baida           5
+Banda           5
+Bates           5
+Bloom           5
+Brown           5
+Chung           5
+```
+
 **Ojo.** `LENGTH` cuenta espacios y guiones como caracteres: un apellido compuesto suma más de lo que parece.
 
 **Variante.** El mismo filtro con comodines: `WHERE e.last_name LIKE '_____'` (cinco guiones bajos).
@@ -263,15 +337,26 @@ ORDER BY e.last_name;
 **Idea.** `||` concatena texto en Oracle y `LOWER` pasa todo a minúsculas.
 
 1. Los empleados salen de `hr.employees` filtrando `department_id = 90`.
-2. El correo se arma con `LOWER(e.email) || '@empresa.com'`.
-3. Se le pone el alias `correo_corporativo`.
+2. En la tabla los correos están en mayúsculas (`SKING`), por eso el correo se arma con `LOWER(e.email) || '@empresa.com'`.
+3. Se le pone el alias `correo_corporativo` y se ordena por apellido.
 
 ```sql
 SELECT e.first_name,
        e.last_name,
        LOWER(e.email) || '@empresa.com' AS correo_corporativo
 FROM hr.employees e
-WHERE e.department_id = 90;
+WHERE e.department_id = 90
+ORDER BY e.last_name;
+```
+
+**Resultado en HR.** 3 filas y 3 columnas:
+
+```text
+FIRST_NAME  LAST_NAME  CORREO_CORPORATIVO
+----------  ---------  -------------------
+Lex         Garcia     lgarcia@empresa.com
+Steven      King       sking@empresa.com
+Neena       Yang       nyang@empresa.com
 ```
 
 **Ojo.** `+` no concatena texto en Oracle: `e.email + '@empresa.com'` falla con `ORA-01722` (número no válido).
@@ -291,31 +376,57 @@ WHERE e.department_id = 60
 ORDER BY empleado;
 ```
 
+**Resultado en HR.** 5 filas y 1 columna:
+
+```text
+EMPLEADO
+----------------
+JACKSON, Valli
+JAMES, Alexander
+MILLER, Bruce
+NGUYEN, Diana
+WILLIAMS, David
+```
+
 **Ojo.** El alias solo se puede usar en `ORDER BY`; en `WHERE` y `GROUP BY` hay que repetir la expresión.
 
 ### Ejercicio 7 — Teléfonos con guiones
 
 **Idea.** `REPLACE(texto, buscar, reemplazo)` cambia todas las apariciones del texto buscado.
 
-1. El filtro es `phone_number LIKE '515%'`.
+1. El filtro es `phone_number LIKE '1.515%'`: el texto fijo «1.515» seguido de cualquier cosa.
 2. La transformación es `REPLACE(e.phone_number, '.', '-')`; en `REPLACE` el punto es un carácter normal, no un comodín.
-3. Se le pone el alias `telefono`.
+3. Se le pone el alias `telefono` y se ordena por apellido y nombre.
 
 ```sql
 SELECT e.first_name,
        e.last_name,
        REPLACE(e.phone_number, '.', '-') AS telefono
 FROM hr.employees e
-WHERE e.phone_number LIKE '515%';
+WHERE e.phone_number LIKE '1.515%'
+ORDER BY e.last_name, e.first_name;
 ```
 
-**Ojo.** En `LIKE` el punto tampoco es comodín: los únicos comodines son `%` y `_`.
+**Resultado en HR.** 21 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME   TELEFONO
+----------  ----------  --------------
+Shelli      Baida       1-515-555-0116
+Hermann     Brown       1-515-555-0169
+John        Chen        1-515-555-0110
+Karen       Colmenares  1-515-555-0119
+Daniel      Faviet      1-515-555-0109
+Lex         Garcia      1-515-555-0102
+```
+
+**Ojo.** En `LIKE` el punto tampoco es comodín: los únicos comodines son `%` y `_`. El patrón `'1_515%'` devuelve las mismas filas, pero solo porque `_` acepta cualquier carácter, también un punto.
 
 ### Ejercicio 8 — Los cinco empleados más antiguos
 
 **Idea.** Ordenar por fecha ascendente deja primero la más antigua, y `FETCH FIRST` corta el resultado.
 
-1. Se ordena por la fecha real: `ORDER BY e.hire_date`.
+1. Se ordena por la fecha real: `ORDER BY e.hire_date`, y el apellido desempata.
 2. La fecha se formatea solo en el `SELECT`, con `TO_CHAR(e.hire_date, 'DD/MM/YYYY')`.
 3. `FETCH FIRST 5 ROWS ONLY` va al final de la consulta.
 
@@ -324,13 +435,34 @@ SELECT e.first_name,
        e.last_name,
        TO_CHAR(e.hire_date, 'DD/MM/YYYY') AS fecha_contratacion
 FROM hr.employees e
-ORDER BY e.hire_date
+ORDER BY e.hire_date, e.last_name
 FETCH FIRST 5 ROWS ONLY;
+```
+
+**Resultado en HR.** 5 filas y 3 columnas:
+
+```text
+FIRST_NAME  LAST_NAME  FECHA_CONTRATACION
+----------  ---------  ------------------
+Lex         Garcia     13/01/2011
+Hermann     Brown      07/06/2012
+William     Gietz      07/06/2012
+Shelley     Higgins    07/06/2012
+Susan       Jacobs     07/06/2012
 ```
 
 **Ojo.** Si ordenaras por el alias `fecha_contratacion` (ya convertida a texto), el orden sería alfabético: «01/…» antes que «02/…» sin importar el año. Ordena siempre por la columna original.
 
-**Variante.** `FETCH FIRST 5 ROWS WITH TIES` incluye también a quienes empatan con el quinto.
+**Variante.** `FETCH FIRST n ROWS WITH TIES` no corta los empates del último puesto. Aquí cuatro personas entraron el 07/06/2012, así que ordenando solo por `hire_date`, con `n` igual a 3 salen cinco filas. Si el `ORDER BY` incluye otra columna, como el apellido, ya no hay empate y salen tres.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       TO_CHAR(e.hire_date, 'DD/MM/YYYY') AS fecha_contratacion
+FROM hr.employees e
+ORDER BY e.hire_date
+FETCH FIRST 3 ROWS WITH TIES;
+```
 
 ### Ejercicio 9 — Contratados en junio, julio o agosto
 
@@ -338,7 +470,7 @@ FETCH FIRST 5 ROWS ONLY;
 
 1. El mes se extrae con `EXTRACT(MONTH FROM e.hire_date)`.
 2. `IN (6, 7, 8)` equivale a tres comparaciones unidas por `OR`.
-3. Se muestra la fecha formateada y se ordena por la fecha real.
+3. Se muestra la fecha formateada y se ordena por la fecha real y luego por apellido.
 
 ```sql
 SELECT e.first_name,
@@ -346,7 +478,20 @@ SELECT e.first_name,
        TO_CHAR(e.hire_date, 'DD/MM/YYYY') AS fecha_contratacion
 FROM hr.employees e
 WHERE EXTRACT(MONTH FROM e.hire_date) IN (6, 7, 8)
-ORDER BY e.hire_date;
+ORDER BY e.hire_date, e.last_name;
+```
+
+**Resultado en HR.** 27 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  FECHA_CONTRATACION
+----------  ---------  ------------------
+Hermann     Brown      07/06/2012
+William     Gietz      07/06/2012
+Shelley     Higgins    07/06/2012
+Susan       Jacobs     07/06/2012
+Daniel      Faviet     16/08/2012
+Nancy       Gruenberg  17/08/2012
 ```
 
 **Ojo.** `EXTRACT(MONTH FROM ...)` devuelve un número (6), no el nombre del mes.
@@ -368,7 +513,17 @@ SELECT e.first_name,
        e.manager_id
 FROM hr.employees e
 WHERE e.department_id IS NULL
-   OR e.manager_id IS NULL;
+   OR e.manager_id IS NULL
+ORDER BY e.last_name;
+```
+
+**Resultado en HR.** 2 filas y 4 columnas:
+
+```text
+FIRST_NAME  LAST_NAME  DEPARTMENT_ID  MANAGER_ID
+----------  ---------  -------------  ----------
+Kimberely   Grant             (null)         149
+Steven      King                  90      (null)
 ```
 
 **Ojo.** `department_id = NULL` nunca es verdadero: para preguntar por un `NULL` siempre se usa `IS NULL`.
@@ -390,7 +545,20 @@ SELECT e.first_name,
 FROM hr.employees e
 WHERE LENGTH(e.first_name)
         - LENGTH(REPLACE(LOWER(e.first_name), 'a', '')) >= 2
-ORDER BY cantidad_a DESC, e.first_name;
+ORDER BY cantidad_a DESC, e.first_name, e.last_name;
+```
+
+**Resultado en HR.** 18 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  CANTIDAD_A
+----------  ---------  ----------
+Alana       Walsh               3
+Adam        Fripp               2
+Alexander   James               2
+Alexander   Khoo                2
+Allan       McEwen              2
+Alyssa      Hutton              2
 ```
 
 **Ojo.** El alias `cantidad_a` no se puede usar en el `WHERE`: se repite la expresión o se envuelve la consulta en una vista en línea.
@@ -404,7 +572,7 @@ ORDER BY cantidad_a DESC, e.first_name;
 1. `hr.employees` guarda el departamento del empleado (`department_id`).
 2. `hr.departments` guarda la ubicación del departamento (`location_id`).
 3. `hr.locations` guarda el país de la ubicación (`country_id`).
-4. `hr.countries` traduce el código al nombre: `country_name = 'United Kingdom'`.
+4. `hr.countries` traduce el código al nombre. En esta base el Reino Unido figura como `United Kingdom of Great Britain and Northern Ireland`, así que el filtro es `country_name LIKE 'United Kingdom%'`.
 5. `SUBSTR(e.first_name, 3, 1) = 'a'` toma 1 carácter a partir de la posición 3 y lo compara con «a».
 
 ```sql
@@ -414,13 +582,35 @@ FROM hr.employees   e
 JOIN hr.departments d ON d.department_id = e.department_id
 JOIN hr.locations   l ON l.location_id   = d.location_id
 JOIN hr.countries   c ON c.country_id    = l.country_id
-WHERE c.country_name = 'United Kingdom'
-  AND SUBSTR(e.first_name, 3, 1) = 'a';
+WHERE c.country_name LIKE 'United Kingdom%'
+  AND SUBSTR(e.first_name, 3, 1) = 'a'
+ORDER BY e.last_name;
 ```
 
-**Ojo.** Con `JOIN` interno quedan fuera los empleados sin departamento: como no tienen ubicación, tampoco pertenecen a ningún país.
+**Resultado en HR.** 3 filas y 2 columnas:
 
-**Variante.** `e.first_name LIKE '__a%'` (dos guiones bajos, la «a» y cualquier cosa después) hace lo mismo que `SUBSTR`.
+```text
+FIRST_NAME  LAST_NAME
+----------  ---------
+Charles     Johnson
+Sean        Tucker
+Clara       Vishney
+```
+
+**Ojo.** El nombre del país no es `United Kingdom` sino el largo: `c.country_name = 'United Kingdom'` devuelve cero filas, y su código es `GB`, no `UK`. Cuando un filtro por texto no trae nada, mira cómo está escrito el dato. Además, con `JOIN` interno quedan fuera los empleados sin departamento: no tienen ubicación, tampoco país.
+
+**Variante.** `e.first_name LIKE '__a%'` (dos guiones bajos, la «a» y cualquier cosa después) hace lo mismo que `SUBSTR`. Y como `hr.locations` ya trae el código del país, también se puede filtrar con `l.country_id = 'GB'` y ahorrarse el `JOIN` a `hr.countries`.
+
+```sql
+SELECT e.first_name,
+       e.last_name
+FROM hr.employees   e
+JOIN hr.departments d ON d.department_id = e.department_id
+JOIN hr.locations   l ON l.location_id   = d.location_id
+WHERE l.country_id = 'GB'
+  AND e.first_name LIKE '__a%'
+ORDER BY e.last_name;
+```
 
 ## Documento del trabajo
 
@@ -431,4 +621,4 @@ WHERE c.country_name = 'United Kingdom'
 
 ### Contexto
 
-Taller de práctica de la asignatura **Bases de Datos 1** sobre el esquema de ejemplo `HR` de Oracle. El primer PDF reúne los enunciados y los entregables; el segundo, la resolución de cada ejercicio con sus pasos y avisos.
+Taller de práctica de la asignatura **Bases de Datos 1** sobre el esquema de ejemplo `HR` de Oracle. El primer PDF reúne los enunciados y los entregables; el segundo, la resolución de cada ejercicio con sus pasos, el resultado de la consulta en HR y sus avisos.
