@@ -151,7 +151,7 @@
       @apply flex list-disc flex-col gap-2 pl-6;
     }
     & ol {
-      @apply flex list-decimal flex-col gap-2 pl-6;
+      @apply flex list-decimal flex-col gap-2 pl-10;
     }
     & strong {
       @apply text-info font-bold;
