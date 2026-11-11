@@ -1,0 +1,696 @@
+---
+title: "Taller SQL sobre HR 4 — JOIN y combinación de tablas"
+tagline: "Doce reportes que cruzan las tablas del esquema HR de Oracle: INNER, LEFT, RIGHT y FULL JOIN, autorreuniones entre jefe y subordinado, cadenas de cinco tablas y consultas que buscan lo que no tiene pareja"
+description: "Taller de SQL sobre el esquema HR de Oracle con doce ejercicios resueltos paso a paso: JOIN interno y externo, USING, autorreunión, uniones con desigualdad, cadenas de varias tablas, departamentos sin empleados y conteos con LEFT JOIN. Incluye el taller y la resolución en PDF con el resultado de cada consulta."
+status: "complete"
+category: "sql"
+moduleId: "BD1-SQL-006"
+order: 24
+thumbnail: "../../../assets/evidencias/taller-sql-hr-4-joins/thumbnail.png"
+thumbnailAlt: "Portada del taller 4 de SQL sobre el esquema HR de Oracle: una consulta de ejemplo y las etiquetas LEFT JOIN, SELF JOIN, FULL JOIN, USING"
+
+tech:
+  - "SQL (Oracle)"
+  - "INNER, LEFT, RIGHT y FULL JOIN"
+  - "Autorreunión (self join)"
+  - "USING y uniones con desigualdad"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Dominio"
+    value: "Recursos humanos de una multinacional (esquema HR de Oracle): empleados, departamentos, cargos, ubicaciones y países"
+  - label: "Esquema"
+    value: "HR, solo lectura: EMPLOYEES, DEPARTMENTS, JOBS, JOB_HISTORY, LOCATIONS, COUNTRIES y REGIONS"
+  - label: "Motor"
+    value: "Oracle Database 19c"
+  - label: "Contenido"
+    value: "12 ejercicios de nivel básico a reto, con resolución paso a paso, el resultado de cada consulta ejecutada en HR y dos PDF: el taller y la resolución"
+
+features:
+  - lead: "INNER y OUTER JOIN"
+    text: "Qué filas se pierden con un JOIN interno y cómo conservarlas con LEFT, RIGHT y FULL JOIN."
+  - lead: "Autorreunión"
+    text: "Unir la tabla de empleados consigo misma para ver al jefe, al jefe del jefe y comparar fechas y salarios."
+  - lead: "Cadenas de tablas"
+    text: "Viajar de empleados a departamentos, ubicaciones, países y regiones en una sola consulta."
+  - lead: "Lo que no tiene pareja"
+    text: "Departamentos sin empleados con LEFT JOIN e IS NULL, y por qué COUNT de una columna da cero y COUNT(*) da uno."
+
+archCaption: "Esquema HR de Oracle: siete tablas de recursos humanos"
+
+challenge:
+  title: "Problema"
+  body: "Responder doce pedidos que obligan a cruzar dos o más tablas del esquema HR, decidiendo en cada caso qué tipo de JOIN conserva las filas que no se pueden perder."
+
+solution:
+  title: "Solución"
+  body: "Cada reporte empieza por preguntar qué tabla manda: la que tiene todas las filas que deben salir. Desde ahí se elige el tipo de JOIN, se escribe la condición de unión y se comprueba cuántas filas devuelve. La resolución muestra el resultado real de cada consulta en HR."
+
+---
+La gerencia pide reportes que no caben en una sola tabla: empleados con su departamento, jefes con sus equipos, departamentos que nadie ocupa, sedes y países sin actividad. Este taller practica los distintos `JOIN` de Oracle y la forma de decidir cuál usar según las filas que no se pueden perder.
+
+**Cómo leerlo:** primero está el taller, con lo que se pide en cada ejercicio; después, la resolución paso a paso. Conviene intentar cada consulta antes de mirar la solución.
+
+---
+
+## 1. El esquema HR
+
+El taller usa el esquema de ejemplo `HR` de Oracle (107 empleados, 27 departamentos, 19 cargos, 10 registros de historial, 23 ubicaciones, 25 países y 5 regiones). El usuario solo puede leerlo, así que todos los ejercicios son consultas `SELECT`. Las llaves se comprobaron en el diccionario de datos de la base.
+
+| Tabla | Columnas | Llaves |
+|---|---|---|
+| `EMPLOYEES` | `employee_id`, `first_name`, `last_name`, `email`, `phone_number`, `hire_date`, `job_id`, `salary`, `commission_pct`, `manager_id`, `department_id` | PK employee_id. FK job_id, manager_id (a EMPLOYEES) y department_id |
+| `DEPARTMENTS` | `department_id`, `department_name`, `manager_id`, `location_id` | PK department_id. FK manager_id y location_id |
+| `JOBS` | `job_id`, `job_title`, `min_salary`, `max_salary` | PK job_id |
+| `JOB_HISTORY` | `employee_id`, `start_date`, `end_date`, `job_id`, `department_id` | PK (employee_id, start_date). FK employee_id, job_id y department_id |
+| `LOCATIONS` | `location_id`, `street_address`, `postal_code`, `city`, `state_province`, `country_id` | PK location_id. FK country_id |
+| `COUNTRIES` | `country_id`, `country_name`, `region_id` | PK country_id. FK region_id |
+| `REGIONS` | `region_id`, `region_name` | PK region_id |
+
+- `EMPLOYEES` se une con `DEPARTMENTS` por `department_id` y con `JOBS` por `job_id`.
+- `EMPLOYEES.manager_id` apunta a `EMPLOYEES.employee_id`: la tabla se relaciona consigo misma (jefe y subordinado).
+- `DEPARTMENTS` llega a `LOCATIONS` por `location_id`, y `LOCATIONS` a `COUNTRIES` por `country_id`.
+- `COUNTRIES` llega a `REGIONS` por `region_id`. `JOB_HISTORY` guarda los cargos anteriores de cada empleado.
+
+### Reglas del taller
+
+- Todas las tablas se escriben con el prefijo `hr.`, por ejemplo `hr.employees`.
+- Los alias de tabla van sin `AS` (`hr.employees e`). El `AS` solo se usa en los alias de columna.
+- El texto va entre comillas simples y distingue mayúsculas de minúsculas: `'Canada'` no es igual a `'canada'`.
+- La concatenación es `||`. `FETCH FIRST n ROWS ONLY` limita las filas y va al final de la consulta.
+- Las fechas se escriben con `DATE 'AAAA-MM-DD'` y se muestran con `TO_CHAR(fecha, 'DD/MM/YYYY')`.
+- El esquema HR es de solo lectura: todos los ejercicios son consultas `SELECT`.
+- Cada ejercicio indica cuántas filas y columnas debe devolver. Esas cifras salen de ejecutar la consulta en una base Oracle Database 19c con el esquema HR (107 empleados); con otra copia de HR los nombres, las fechas y algunas cifras pueden cambiar.
+
+## 2. El taller
+
+### Ejercicio 1 — Empleados con su departamento
+
+**Nivel:** Básico · **Tablas:** `employees`, `departments`
+
+**Se pide.** Listar los empleados con el nombre del departamento donde trabajan.
+
+**Mostrar:** nombre, apellido y nombre del departamento, ordenados por departamento, apellido y nombre.
+
+**Debe devolver:** 106 filas y 3 columnas.
+
+### Ejercicio 2 — Tres tablas en una consulta
+
+**Nivel:** Básico · **Tablas:** `employees`, `departments`, `jobs`
+
+**Se pide.** Mostrar los empleados del departamento Finance con el título de su cargo y el rango salarial permitido para ese cargo.
+
+**Mostrar:** nombre, apellido, cargo (`job_title`), salario, salario mínimo y salario máximo del cargo, de mayor a menor salario y, si empatan, por apellido.
+
+**Debe devolver:** 6 filas y 6 columnas.
+
+### Ejercicio 3 — Todos los empleados, con o sin departamento
+
+**Nivel:** Intermedio · **Tablas:** `employees`, `departments`
+
+**Se pide.** Listar a todos los empleados con el nombre de su departamento. A quien no tenga departamento hay que mostrarlo con el texto «Sin departamento».
+
+**Mostrar:** nombre, apellido y departamento, ordenados por departamento (primero quien no tiene), apellido y nombre.
+
+**Debe devolver:** 107 filas y 3 columnas.
+
+### Ejercicio 4 — Departamentos que nadie ocupa
+
+**Nivel:** Intermedio · **Tablas:** `departments`, `employees`
+
+**Se pide.** Listar los departamentos que no tienen ningún empleado.
+
+**Mostrar:** código y nombre del departamento, ordenados por código.
+
+**Debe devolver:** 16 filas y 2 columnas.
+
+### Ejercicio 5 — El cruce completo con FULL JOIN
+
+**Nivel:** Avanzado · **Tablas:** `employees`, `departments`
+
+**Se pide.** Mostrar en una sola lista a los empleados que no tienen departamento y a los departamentos que no tienen empleados.
+
+**Mostrar:** nombre y apellido del empleado (si lo hay) y nombre del departamento (si lo hay), con el empleado sin departamento primero y luego los departamentos por nombre.
+
+**Debe devolver:** 17 filas y 3 columnas.
+
+### Ejercicio 6 — Cada empleado con su jefe
+
+**Nivel:** Intermedio · **Tablas:** `employees`
+
+**Se pide.** Mostrar a cada empleado con el nombre de su jefe directo. Quien no tenga jefe debe salir con el texto «Sin jefe».
+
+**Mostrar:** empleado, jefe y salario del empleado, ordenados por jefe (primero quien no tiene), nombre del jefe, apellido y nombre del empleado.
+
+**Debe devolver:** 107 filas y 3 columnas.
+
+### Ejercicio 7 — Contratados antes que su jefe
+
+**Nivel:** Avanzado · **Tablas:** `employees`
+
+**Se pide.** Encontrar a los empleados que fueron contratados antes que su jefe directo.
+
+**Mostrar:** empleado, su fecha de contratación, jefe y fecha de contratación del jefe (DD/MM/AAAA), ordenados por la fecha del empleado y, si empatan, por apellido.
+
+**Debe devolver:** 37 filas y 4 columnas.
+
+### Ejercicio 8 — El jefe del jefe
+
+**Nivel:** Avanzado · **Tablas:** `employees`
+
+**Se pide.** Para cada empleado del departamento IT (`department_id` 60), mostrar su jefe directo y el jefe de su jefe.
+
+**Mostrar:** empleado, jefe directo y jefe del jefe, ordenados por apellido y nombre del empleado.
+
+**Debe devolver:** 5 filas y 3 columnas.
+
+### Ejercicio 9 — Quién gana más que quién
+
+**Nivel:** Avanzado · **Tablas:** `employees`
+
+**Se pide.** En el departamento IT (`department_id` 60), listar todas las parejas de empleados en las que el primero gana más que el segundo.
+
+**Mostrar:** quien gana más y su salario, quien gana menos y su salario, de mayor a menor diferencia de salario y, si empatan, por apellidos.
+
+**Debe devolver:** 9 filas y 4 columnas.
+
+### Ejercicio 10 — Cuántos empleados tiene cada departamento, incluso los vacíos
+
+**Nivel:** Avanzado · **Tablas:** `departments`, `employees`
+
+**Se pide.** Mostrar todos los departamentos con la cantidad de empleados que tiene cada uno, incluidos los que tienen cero.
+
+**Mostrar:** nombre del departamento y cantidad de empleados, de menor a mayor cantidad y, si empatan, por nombre del departamento.
+
+**Debe devolver:** 27 filas y 2 columnas.
+
+### Ejercicio 11 — Cinco tablas: de empleado a región
+
+**Nivel:** Avanzado · **Tablas:** `employees`, `departments`, `locations`, `countries`, `regions`
+
+**Se pide.** Mostrar los empleados que trabajan fuera de Estados Unidos, con su departamento, la ciudad, el código del país y la región.
+
+**Mostrar:** nombre, apellido, departamento, ciudad, código del país y región, ordenados por nombre del país, ciudad, apellido y nombre.
+
+**Debe devolver:** 38 filas y 6 columnas.
+
+### Ejercicio 12 — Países con ubicaciones y ubicaciones con departamentos
+
+**Nivel:** Reto · **Tablas:** `countries`, `locations`, `departments`
+
+**Se pide.** Para cada país de la tabla, mostrar cuántas ubicaciones tiene y cuántas de ellas tienen al menos un departamento. Los países sin ubicaciones también deben salir.
+
+**Mostrar:** nombre del país, cantidad de ubicaciones y cantidad de ubicaciones con departamento, de mayor a menor cantidad de ubicaciones y, si empatan, por nombre del país.
+
+**Debe devolver:** 25 filas y 3 columnas.
+
+## 3. Resolución paso a paso
+
+### Ejercicio 1 — Empleados con su departamento
+
+**Idea.** Un `JOIN` une dos tablas con una condición: aquí, la columna `department_id`, que las dos tienen.
+
+1. `hr.employees` guarda el `department_id` de cada empleado y `hr.departments` guarda el nombre de ese departamento.
+2. `JOIN hr.departments d ON d.department_id = e.department_id` empareja cada empleado con su departamento.
+3. En el `SELECT` van las dos columnas del empleado y `d.department_name`.
+4. Se ordena por departamento, apellido y nombre.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       d.department_name
+FROM hr.employees e
+JOIN hr.departments d ON d.department_id = e.department_id
+ORDER BY d.department_name, e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 106 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  DEPARTMENT_NAME
+----------  ---------  ---------------
+William     Gietz      Accounting
+Shelley     Higgins    Accounting
+Jennifer    Whalen     Administration
+Lex         Garcia     Executive
+Steven      King       Executive
+Neena       Yang       Executive
+```
+
+**Ojo.** Un `JOIN` interno solo devuelve las filas que tienen pareja: Kimberely Grant no tiene departamento y no aparece, por eso salen 106 filas y no 107. Y `NATURAL JOIN` no sirve aquí: las dos tablas comparten `department_id` y también `manager_id`, así que une por las dos y devuelve solo 32 filas.
+
+**Variante.** Cuando la columna de unión se llama igual en las dos tablas se puede usar `USING`. Con `USING` esa columna no lleva prefijo de alias en el resto de la consulta.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       d.department_name
+FROM hr.employees e
+JOIN hr.departments d USING (department_id)
+ORDER BY d.department_name, e.last_name, e.first_name;
+```
+
+### Ejercicio 2 — Tres tablas en una consulta
+
+**Idea.** Cada `JOIN` agrega una tabla al resultado: las uniones se encadenan, y cada una lleva su propia condición `ON`.
+
+1. Se parte de `hr.employees e` y se une `hr.departments d` para poder filtrar por el nombre del departamento.
+2. Se une `hr.jobs j` por `job_id` para traer el título del cargo y sus salarios mínimo y máximo.
+3. El filtro `d.department_name = 'Finance'` va en el `WHERE`.
+4. Se ordena por salario descendente y, en empate, por apellido.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       j.job_title,
+       e.salary,
+       j.min_salary,
+       j.max_salary
+FROM hr.employees e
+JOIN hr.departments d ON d.department_id = e.department_id
+JOIN hr.jobs j ON j.job_id = e.job_id
+WHERE d.department_name = 'Finance'
+ORDER BY e.salary DESC, e.last_name;
+```
+
+**Resultado en HR.** 6 filas y 6 columnas:
+
+```text
+FIRST_NAME   LAST_NAME  JOB_TITLE        SALARY  MIN_SALARY  MAX_SALARY
+-----------  ---------  ---------------  ------  ----------  ----------
+Nancy        Gruenberg  Finance Manager   12008        8200       16000
+Daniel       Faviet     Accountant         9000        4200        9000
+John         Chen       Accountant         8200        4200        9000
+Jose Manuel  Urman      Accountant         7800        4200        9000
+Ismael       Sciarra    Accountant         7700        4200        9000
+Luis         Popp       Accountant         6900        4200        9000
+```
+
+**Ojo.** Si una tabla se une sin condición, Oracle no avisa: devuelve el producto cartesiano, cada fila con todas las de la otra. Los 6 empleados de Finance combinados con los 19 cargos con `CROSS JOIN` darían 114 filas.
+
+### Ejercicio 3 — Todos los empleados, con o sin departamento
+
+**Idea.** `LEFT JOIN` conserva todas las filas de la tabla de la izquierda, tengan o no pareja. Donde no hay pareja, las columnas de la derecha salen en `NULL`.
+
+1. La tabla que manda es `hr.employees`: todas sus filas tienen que salir, así que va a la izquierda.
+2. `LEFT JOIN hr.departments d ON d.department_id = e.department_id` agrega el departamento; para quien no tiene, `d.department_name` sale `NULL`.
+3. `NVL(d.department_name, 'Sin departamento')` cambia ese `NULL` por el texto pedido.
+4. `ORDER BY d.department_name NULLS FIRST` pone primero a quien no tiene departamento.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       NVL(d.department_name, 'Sin departamento') AS departamento
+FROM hr.employees e
+LEFT JOIN hr.departments d ON d.department_id = e.department_id
+ORDER BY d.department_name NULLS FIRST, e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 107 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  DEPARTAMENTO
+----------  ---------  ----------------
+Kimberely   Grant      Sin departamento
+William     Gietz      Accounting
+Shelley     Higgins    Accounting
+Jennifer    Whalen     Administration
+Lex         Garcia     Executive
+Steven      King       Executive
+```
+
+**Ojo.** El `NULL` aparece siempre en las columnas de la tabla de la derecha. Aquí salen las 107 filas: la de Kimberely Grant se conserva y `NVL` pone el texto. Con el `JOIN` interno del ejercicio 1 esa persona desaparecía.
+
+**Variante.** Escrito al revés da lo mismo: `RIGHT JOIN` conserva todas las filas de la tabla de la derecha. Casi siempre se prefiere `LEFT JOIN` con la tabla que manda a la izquierda, porque se lee de corrido.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       NVL(d.department_name, 'Sin departamento') AS departamento
+FROM hr.departments d
+RIGHT JOIN hr.employees e ON d.department_id = e.department_id
+ORDER BY d.department_name NULLS FIRST, e.last_name, e.first_name;
+```
+
+### Ejercicio 4 — Departamentos que nadie ocupa
+
+**Idea.** Un `LEFT JOIN` deja en `NULL` las columnas de la derecha cuando no hay pareja. Si se filtra por ese `NULL`, quedan solo las filas sin pareja.
+
+1. Manda `hr.departments`: se buscan sus filas que no tienen coincidencia en `hr.employees`.
+2. `LEFT JOIN hr.employees e ON e.department_id = d.department_id` empareja cada departamento con sus empleados.
+3. Un departamento vacío queda con `e.employee_id` en `NULL`.
+4. `WHERE e.employee_id IS NULL` deja solo a esos departamentos.
+
+```sql
+SELECT d.department_id,
+       d.department_name
+FROM hr.departments d
+LEFT JOIN hr.employees e ON e.department_id = d.department_id
+WHERE e.employee_id IS NULL
+ORDER BY d.department_id;
+```
+
+**Resultado en HR.** 16 filas y 2 columnas; se muestran las primeras 6 filas:
+
+```text
+DEPARTMENT_ID  DEPARTMENT_NAME
+-------------  --------------------
+          120  Treasury
+          130  Corporate Tax
+          140  Control And Credit
+          150  Shareholder Services
+          160  Benefits
+          170  Manufacturing
+```
+
+**Ojo.** Se prueba la llave primaria de la tabla de la derecha (`employee_id`) porque en una fila real nunca es `NULL`: si lo es, es que no hubo pareja. En HR salen 16 departamentos, del 120 al 270; solo los once primeros (10 a 110) tienen empleados.
+
+**Variante.** `NOT EXISTS` da el mismo resultado y se lee más cerca del enunciado:
+
+```sql
+SELECT d.department_id,
+       d.department_name
+FROM hr.departments d
+WHERE NOT EXISTS (SELECT 1
+                  FROM hr.employees e
+                  WHERE e.department_id = d.department_id)
+ORDER BY d.department_id;
+```
+
+### Ejercicio 5 — El cruce completo con FULL JOIN
+
+**Idea.** `FULL OUTER JOIN` conserva las filas sin pareja de los dos lados. Después, un `WHERE` se queda solo con las que no tienen pareja.
+
+1. `FULL OUTER JOIN` empareja empleados con departamentos y además conserva a los empleados sin departamento y a los departamentos sin empleados.
+2. Un empleado sin departamento deja `d.department_id` en `NULL`; un departamento vacío deja `e.employee_id` en `NULL`.
+3. `WHERE e.employee_id IS NULL OR d.department_id IS NULL` se queda con esas dos clases de fila.
+4. `NULLS FIRST` sube al empleado sin departamento, y los departamentos se ordenan por nombre.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       d.department_name
+FROM hr.employees e
+FULL OUTER JOIN hr.departments d ON d.department_id = e.department_id
+WHERE e.employee_id IS NULL
+   OR d.department_id IS NULL
+ORDER BY d.department_name NULLS FIRST, e.last_name;
+```
+
+**Resultado en HR.** 17 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  DEPARTMENT_NAME
+----------  ---------  ------------------
+Kimberely   Grant      (null)
+(null)      (null)     Benefits
+(null)      (null)     Construction
+(null)      (null)     Contracting
+(null)      (null)     Control And Credit
+(null)      (null)     Corporate Tax
+```
+
+**Ojo.** Es una consulta de auditoría: busca datos sin pareja en los dos lados. En HR salen 17 filas, un empleado sin departamento y 16 departamentos vacíos. `OUTER` es opcional: `FULL JOIN` y `FULL OUTER JOIN` son lo mismo.
+
+### Ejercicio 6 — Cada empleado con su jefe
+
+**Idea.** Una tabla puede unirse consigo misma si se usan dos alias: `e` hace de empleado y `m` de jefe. La condición enlaza la llave del jefe (`employee_id`) con la columna `manager_id` del empleado.
+
+1. `hr.employees e` es el empleado y `hr.employees m` es la misma tabla leída como jefe: dos alias, una tabla.
+2. La condición es `m.employee_id = e.manager_id`: el jefe es la fila cuyo identificador está en `manager_id`.
+3. Se usa `LEFT JOIN` porque Steven King no tiene `manager_id` y no debe desaparecer.
+4. `NVL2(m.employee_id, nombre del jefe, 'Sin jefe')` devuelve el nombre si hay jefe y el texto si no lo hay.
+
+```sql
+SELECT e.first_name || ' ' || e.last_name AS empleado,
+       NVL2(m.employee_id, m.first_name || ' ' || m.last_name, 'Sin jefe')
+         AS jefe,
+       e.salary
+FROM hr.employees e
+LEFT JOIN hr.employees m ON m.employee_id = e.manager_id
+ORDER BY m.last_name NULLS FIRST, m.first_name, e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 107 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+EMPLEADO         JEFE              SALARY
+---------------  ----------------  ------
+Steven King      Sin jefe           24000
+Elizabeth Bates  Gerald Cambrault    7300
+Harrison Bloom   Gerald Cambrault   10000
+Tayler Fox       Gerald Cambrault    9600
+Sundita Kumar    Gerald Cambrault    6100
+Lisa Ozer        Gerald Cambrault   11500
+```
+
+**Ojo.** `NVL(m.first_name || ' ' || m.last_name, 'Sin jefe')` no funciona: en Oracle, concatenar `NULL` con un espacio da un espacio y no `NULL`, así que Steven King saldría con el jefe en blanco. Por eso se pregunta por la llave del jefe con `NVL2`.
+
+### Ejercicio 7 — Contratados antes que su jefe
+
+**Idea.** En una autorreunión se pueden comparar las columnas de las dos lecturas: aquí, la fecha del empleado contra la de su jefe.
+
+1. Se unen `e` (empleado) y `m` (jefe) con `m.employee_id = e.manager_id`.
+2. Es un `JOIN` interno: Steven King no tiene jefe y no puede cumplir una comparación de fechas.
+3. El filtro `e.hire_date < m.hire_date` compara las dos fechas.
+4. Las fechas se muestran con `TO_CHAR` y se ordena por la fecha real del empleado.
+
+```sql
+SELECT e.first_name || ' ' || e.last_name AS empleado,
+       TO_CHAR(e.hire_date, 'DD/MM/YYYY') AS fecha_empleado,
+       m.first_name || ' ' || m.last_name AS jefe,
+       TO_CHAR(m.hire_date, 'DD/MM/YYYY') AS fecha_jefe
+FROM hr.employees e
+JOIN hr.employees m ON m.employee_id = e.manager_id
+WHERE e.hire_date < m.hire_date
+ORDER BY e.hire_date, e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 37 filas y 4 columnas; se muestran las primeras 6 filas:
+
+```text
+EMPLEADO         FECHA_EMPLEADO  JEFE             FECHA_JEFE
+---------------  --------------  ---------------  ----------
+Lex Garcia       13/01/2011      Steven King      17/06/2013
+Hermann Brown    07/06/2012      Neena Yang       21/09/2015
+Shelley Higgins  07/06/2012      Neena Yang       21/09/2015
+Susan Jacobs     07/06/2012      Neena Yang       21/09/2015
+Daniel Faviet    16/08/2012      Nancy Gruenberg  17/08/2012
+Nancy Gruenberg  17/08/2012      Neena Yang       21/09/2015
+```
+
+**Ojo.** Son 37 de los 106 empleados que tienen jefe: mucha gente entró antes que quien hoy la dirige. Con otra comparación, `e.salary > m.salary`, la misma consulta devuelve a quienes ganan más que su jefe, y son solo dos: Ellen Abel y Lisa Ozer, ambas representantes de ventas que ganan 500 más que su gerente.
+
+### Ejercicio 8 — El jefe del jefe
+
+**Idea.** Cada nivel que se sube en la jerarquía es una autorreunión más, con un alias nuevo.
+
+1. `e` es el empleado, `m1` su jefe directo (`m1.employee_id = e.manager_id`) y `m2` el jefe de ese jefe (`m2.employee_id = m1.manager_id`).
+2. Son tres lecturas de la misma tabla, cada una con su alias.
+3. El filtro `e.department_id = 60` se aplica al empleado.
+4. Se ordena por apellido y nombre.
+
+```sql
+SELECT e.first_name || ' ' || e.last_name AS empleado,
+       m1.first_name || ' ' || m1.last_name AS jefe,
+       m2.first_name || ' ' || m2.last_name AS jefe_del_jefe
+FROM hr.employees e
+JOIN hr.employees m1 ON m1.employee_id = e.manager_id
+JOIN hr.employees m2 ON m2.employee_id = m1.manager_id
+WHERE e.department_id = 60
+ORDER BY e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 5 filas y 3 columnas:
+
+```text
+EMPLEADO         JEFE             JEFE_DEL_JEFE
+---------------  ---------------  -------------
+Valli Jackson    Alexander James  Lex Garcia
+Alexander James  Lex Garcia       Steven King
+Bruce Miller     Alexander James  Lex Garcia
+Diana Nguyen     Alexander James  Lex Garcia
+David Williams   Alexander James  Lex Garcia
+```
+
+**Ojo.** Con `JOIN` interno, quien no tenga jefe del jefe quedaría fuera. Para subir un número cualquiera de niveles no se encadenan alias: se usan las consultas jerárquicas con `CONNECT BY`.
+
+**Variante.** Con `LEFT JOIN` en los dos pasos también se conservan los empleados cuya cadena de jefes es más corta. Aquí el resultado es el mismo porque los cinco tienen jefe del jefe.
+
+```sql
+SELECT e.first_name || ' ' || e.last_name AS empleado,
+       m1.first_name || ' ' || m1.last_name AS jefe,
+       m2.first_name || ' ' || m2.last_name AS jefe_del_jefe
+FROM hr.employees e
+LEFT JOIN hr.employees m1 ON m1.employee_id = e.manager_id
+LEFT JOIN hr.employees m2 ON m2.employee_id = m1.manager_id
+WHERE e.department_id = 60
+ORDER BY e.last_name, e.first_name;
+```
+
+### Ejercicio 9 — Quién gana más que quién
+
+**Idea.** No todos los `JOIN` comparan con `=`. Una condición con `<`, `>` o `BETWEEN` también une: cada fila se empareja con todas las que cumplen la desigualdad.
+
+1. `a` y `b` son dos lecturas de `hr.employees`.
+2. `b.department_id = a.department_id` pone a las dos personas en el mismo departamento.
+3. `b.salary < a.salary` empareja a cada empleado con todos los que ganan menos que él.
+4. El filtro `a.department_id = 60` limita el cálculo a IT, y se ordena por la diferencia de salario.
+
+```sql
+SELECT a.first_name || ' ' || a.last_name AS gana_mas,
+       a.salary AS salario_a,
+       b.first_name || ' ' || b.last_name AS gana_menos,
+       b.salary AS salario_b
+FROM hr.employees a
+JOIN hr.employees b ON b.department_id = a.department_id
+                   AND b.salary < a.salary
+WHERE a.department_id = 60
+ORDER BY a.salary - b.salary DESC, a.last_name, b.last_name;
+```
+
+**Resultado en HR.** 9 filas y 4 columnas; se muestran las primeras 6 filas:
+
+```text
+GANA_MAS         SALARIO_A  GANA_MENOS      SALARIO_B
+---------------  ---------  --------------  ---------
+Alexander James       9000  Diana Nguyen         4200
+Alexander James       9000  Valli Jackson        4800
+Alexander James       9000  David Williams       4800
+Alexander James       9000  Bruce Miller         6000
+Bruce Miller          6000  Diana Nguyen         4200
+Bruce Miller          6000  Valli Jackson        4800
+```
+
+**Ojo.** La desigualdad es estricta: David Williams y Valli Jackson ganan lo mismo (4800) y no forman pareja. Y como solo se acepta un sentido (`<`), cada pareja sale una vez y no dos. Con cinco empleados en IT salen 9 parejas.
+
+### Ejercicio 10 — Cuántos empleados tiene cada departamento, incluso los vacíos
+
+**Idea.** `COUNT(columna)` no cuenta los `NULL`. Sobre un `LEFT JOIN`, los departamentos vacíos dan 0 y no desaparecen.
+
+1. Manda `hr.departments`, que va a la izquierda de un `LEFT JOIN` con `hr.employees`.
+2. Se agrupa por departamento.
+3. `COUNT(e.employee_id)` cuenta solo las filas donde hubo empleado.
+4. Se ordena de menor a mayor para ver primero los vacíos.
+
+```sql
+SELECT d.department_name,
+       COUNT(e.employee_id) AS empleados
+FROM hr.departments d
+LEFT JOIN hr.employees e ON e.department_id = d.department_id
+GROUP BY d.department_id, d.department_name
+ORDER BY empleados, d.department_name;
+```
+
+**Resultado en HR.** 27 filas y 2 columnas; se muestran las primeras 6 filas:
+
+```text
+DEPARTMENT_NAME     EMPLEADOS
+------------------  ---------
+Benefits                    0
+Construction                0
+Contracting                 0
+Control And Credit          0
+Corporate Tax               0
+Government Sales            0
+```
+
+**Ojo.** Con `COUNT(*)` los departamentos vacíos saldrían con 1: el `LEFT JOIN` produce una fila (con `NULL`) por cada uno y `COUNT(*)` cuenta filas. Para contar solo lo que existe se cuenta una columna de la tabla de la derecha.
+
+**Variante.** Una subconsulta correlacionada en el `SELECT` cuenta sin `JOIN` ni `GROUP BY` y da las mismas 27 filas:
+
+```sql
+SELECT d.department_name,
+       (SELECT COUNT(*)
+        FROM hr.employees e
+        WHERE e.department_id = d.department_id) AS empleados
+FROM hr.departments d
+ORDER BY empleados, d.department_name;
+```
+
+### Ejercicio 11 — Cinco tablas: de empleado a región
+
+**Idea.** Cada `JOIN` da un paso en el camino de los datos: empleado, departamento, ubicación, país y región.
+
+1. `hr.employees` se une con `hr.departments` por `department_id`.
+2. `hr.departments` se une con `hr.locations` por `location_id`.
+3. `hr.locations` se une con `hr.countries` por `country_id`.
+4. `hr.countries` se une con `hr.regions` por `region_id`.
+5. El filtro `c.country_id <> 'US'` va en el `WHERE`, y se ordena por país, ciudad y empleado.
+
+```sql
+SELECT e.first_name,
+       e.last_name,
+       d.department_name,
+       l.city,
+       c.country_id,
+       r.region_name
+FROM hr.employees e
+JOIN hr.departments d ON d.department_id = e.department_id
+JOIN hr.locations l ON l.location_id = d.location_id
+JOIN hr.countries c ON c.country_id = l.country_id
+JOIN hr.regions r ON r.region_id = c.region_id
+WHERE c.country_id <> 'US'
+ORDER BY c.country_name, l.city, e.last_name, e.first_name;
+```
+
+**Resultado en HR.** 38 filas y 6 columnas; se muestran las primeras 6 filas:
+
+```text
+FIRST_NAME  LAST_NAME  DEPARTMENT_NAME   CITY     COUNTRY_ID  REGION_NAME
+----------  ---------  ----------------  -------  ----------  -----------
+Pat         Davis      Marketing         Toronto  CA          Americas
+Michael     Martinez   Marketing         Toronto  CA          Americas
+Hermann     Brown      Public Relations  Munich   DE          Europe
+Susan       Jacobs     Human Resources   London   GB          Europe
+Ellen       Abel       Sales             Oxford   GB          Europe
+Sundar      Ande       Sales             Oxford   GB          Europe
+```
+
+**Ojo.** Con tantas tablas conviene un alias corto por tabla y un `JOIN` por línea. Quien no tiene departamento queda fuera desde el primer `JOIN`, igual que en el ejercicio 1. Salen 38 empleados: 35 en el Reino Unido, 2 en Canadá y 1 en Alemania.
+
+### Ejercicio 12 — Países con ubicaciones y ubicaciones con departamentos
+
+**Idea.** Dos `LEFT JOIN` encadenados: cada uno conserva lo que no encuentra pareja en el paso siguiente. Como una ubicación puede tener varios departamentos, se cuenta con `DISTINCT`.
+
+1. Manda `hr.countries`: todos los países tienen que salir.
+2. `LEFT JOIN hr.locations l` trae las ubicaciones de cada país; un país sin ubicaciones deja `l` en `NULL`.
+3. `LEFT JOIN hr.departments d` trae los departamentos de cada ubicación; si `l.location_id` es `NULL`, tampoco hay departamentos.
+4. `COUNT(DISTINCT l.location_id)` cuenta ubicaciones y `COUNT(DISTINCT d.location_id)` cuenta las que tienen algún departamento.
+
+```sql
+SELECT c.country_name,
+       COUNT(DISTINCT l.location_id) AS ubicaciones,
+       COUNT(DISTINCT d.location_id) AS con_departamentos
+FROM hr.countries c
+LEFT JOIN hr.locations l ON l.country_id = c.country_id
+LEFT JOIN hr.departments d ON d.location_id = l.location_id
+GROUP BY c.country_id, c.country_name
+ORDER BY ubicaciones DESC, c.country_name;
+```
+
+**Resultado en HR.** 25 filas y 3 columnas; se muestran las primeras 6 filas:
+
+```text
+COUNTRY_NAME                    UBICACIONES  CON_DEPARTAMENTOS
+------------------------------  -----------  -----------------
+United States of America                  4                  3
+United Kingdom of Great Bri...            3                  2
+Canada                                    2                  1
+Italy                                     2                  0
+Japan                                     2                  0
+Switzerland                               2                  0
+```
+
+**Ojo.** Sin `DISTINCT`, Estados Unidos saldría con 24 ubicaciones y 23 con departamento, en lugar de 4 y 3: Seattle tiene 21 departamentos y el `JOIN` repite la ubicación una vez por cada uno. En HR hay 11 países sin ubicaciones, que salen con 0 y 0.
+
+## Documento del trabajo
+
+- [Taller: enunciados y entregables (PDF)](/evidencias/sql-hr/enunciado-taller-sql-hr-4.pdf)
+- [Resolución paso a paso (PDF)](/evidencias/sql-hr/resolucion-taller-sql-hr-4.pdf)
+
+---
+
+### Contexto
+
+Taller de práctica de la asignatura **Bases de Datos 1** sobre el esquema de ejemplo `HR` de Oracle. El primer PDF reúne los enunciados y los entregables; el segundo, la resolución de cada ejercicio con sus pasos, el resultado de la consulta en HR y sus avisos.
