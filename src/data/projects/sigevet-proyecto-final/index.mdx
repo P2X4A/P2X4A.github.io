@@ -1,0 +1,119 @@
+---
+title: "SIGEVET: sistema integral de gestión veterinaria"
+tagline: "Proyecto final de Bases de Datos 1: la base de datos de una red de cinco clínicas veterinarias en MySQL, sobre Linux, con una aplicación web y 55 consultas de álgebra relacional"
+description: "Proyecto final de Bases de Datos 1 de la Universidad El Bosque, hecho por un equipo de cuatro integrantes: modelo conceptual y relacional en tercera forma normal, base de 22 tablas en MySQL 8.4 con 9 disparadores, servidor Linux con máquina virtual, aplicación web en Spring Boot y Angular, y 55 consultas de álgebra relacional. Resumen, equipo y enlaces a cada entregable."
+status: "complete"
+category: "proyecto"
+moduleId: "BD1-PRO-006"
+order: 35
+thumbnail: "../../../assets/evidencias/sigevet-proyecto-final/thumbnail.png"
+thumbnailAlt: "Portada de la ficha general del proyecto final SIGEVET: cinco sedes, 22 tablas y 55 consultas, con las etiquetas MySQL, Linux, Java y Angular"
+
+tech:
+  - "MySQL 8.4 LTS"
+  - "Oracle Linux 9"
+  - "Java 21 y Spring Boot"
+  - "Angular 21"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Curso"
+    value: "Bases de Datos 1, Ingeniería de Sistemas, Universidad El Bosque, periodo 2026-2"
+  - label: "Caso"
+    value: "Huella Sana S.A.S., una red de clínicas veterinarias inventada, con cinco sedes"
+  - label: "Equipo"
+    value: "Cuatro integrantes, con roles de gerencia y DBA, modelado, desarrollo web e infraestructura, y verificación e integración"
+  - label: "Base de datos"
+    value: "22 tablas, 113 restricciones, 6 vistas, 2 funciones, 3 procedimientos y 9 disparadores en MySQL 8.4"
+  - label: "Infraestructura"
+    value: "Oracle Linux 9 en una máquina virtual con Lima sobre un portátil con Fedora 44"
+  - label: "Aplicación"
+    value: "API REST en Java 21 con Spring Boot y SQL a mano, e interfaz en Angular 21"
+
+features:
+  - lead: "De la idea a la base"
+    text: "Requerimientos, modelo en cuatro notaciones, normalización hasta 3FN y una base física que cumple las reglas del negocio dentro del motor."
+  - lead: "Reglas en la base"
+    text: "113 restricciones con nombre y 9 disparadores con errores propios, para que ningún dato inválido entre sin importar quién lo envíe."
+  - lead: "Un servidor de verdad"
+    text: "MySQL 8.4 en Oracle Linux 9 dentro de una máquina virtual, elegidos con matrices ponderadas, con una carga de la base que se repite con un solo script."
+  - lead: "Una aplicación sobre la base"
+    text: "Una API REST en Java y una interfaz Angular que consultan y modifican la base con un usuario de mínimo privilegio."
+
+archCaption: "Arquitectura de SIGEVET: navegador con Angular, API REST en Spring Boot y MySQL 8.4 en una máquina virtual"
+
+challenge:
+  title: "Problema"
+  body: "Una red de cinco clínicas veterinarias con agendas, historias clínicas e inventarios separados por sede necesita una sola base de datos que centralice la atención, el inventario y la facturación, y que se pueda consultar desde la web sin perder la integridad de los datos."
+solution:
+  title: "Solución"
+  body: "El equipo modeló los datos desde cero, los normalizó hasta la tercera forma normal, los llevó a una base MySQL con las reglas del negocio dentro del motor, montó el servidor Linux donde corre y construyó una aplicación web que la usa con un usuario de mínimo privilegio, además de comprobar con 55 consultas de álgebra relacional que el modelo responde lo que se espera."
+---
+
+## El equipo
+
+SIGEVET es un trabajo de equipo, y esta ficha reúne lo que hizo el equipo completo. Los roles son los que fija la propuesta del proyecto.
+
+| Integrante | Rol | Responsabilidades según la propuesta |
+| :-- | :-- | :-- |
+| Juan David Polo Herrera | Gerente del proyecto y DBA | Planeación, modelo relacional, normalización y scripts |
+| Sebastián Castellanos Parra | Analista y modelador de datos | Requerimientos, supuestos, modelos Chen y EER y diccionario de datos |
+| Juan Miguel Ramos Sevilla | Desarrollador web e infraestructura | Álgebra y SQL, máquina virtual y aplicación web |
+| Sergio Alejandro Parra Rivera | Verificador de la base de datos e integrador | RDBMS, verificación, repositorio y cierre |
+
+Docente del curso: Ing., Esp., M.Ed. Christian Felipe Duarte Arévalo.
+
+### Mi rol
+
+En el equipo fui el verificador de la base de datos y el integrador. La propuesta define ese rol como el responsable del RDBMS, la verificación, el repositorio y el cierre: revisar que lo que entregaba cada integrante funcionara junto y quedara reunido en un solo repositorio. Lo que hizo cada parte del equipo está documentado en las fichas de abajo, con los roles de la propuesta.
+
+## El caso
+
+Huella Sana S.A.S. es una red de clínicas veterinarias inventada para el curso, con cinco sedes (Usaquén, Chapinero, Chía, Laureles y San Fernando), 27 empleados y servicios que van de la consulta y la vacunación a la cirugía, el laboratorio y la hospitalización. Hoy cada sede lleva su agenda, sus historias y su facturación por separado, lo que produce citas cruzadas, historias incompletas, clientes duplicados e ingresos que nadie conoce. El proyecto responde cómo centralizar las cinco sedes en una base clínica, operativa y comercial en tercera forma normal, consultable desde la web.
+
+## Qué contiene el proyecto
+
+| Entregable | Qué muestra |
+| :-- | :-- |
+| [Modelos conceptual, extendido y relacional](/projects/sigevet-modelos-fase1/) | Las notaciones Chen, EER, Barker y Crow's Foot, la normalización, los supuestos y las reglas de negocio |
+| [La base de datos en MySQL 8.4](/projects/sigevet-base-de-datos-mysql/) | Las 22 tablas con sus restricciones, las vistas, los disparadores, los roles y las pruebas de permisos |
+| [Selección de SO y RDBMS y máquina virtual](/projects/sigevet-infraestructura-so-rdbms/) | Dos matrices ponderadas, la instalación en una máquina virtual y los riesgos |
+| [55 ejercicios de álgebra relacional en SQL](/projects/sigevet-algebra-relacional-sql/) | La división, la reunión externa completa y la comparación con la Fase 1 |
+| [Aplicación web con Spring Boot y Angular](/projects/sigevet-aplicacion-web/) | La API por capas, las transacciones, la seguridad y las pruebas |
+
+## En cifras
+
+| Aspecto | Valor |
+| :-- | :-- |
+| Modelo conceptual | 18 entidades y 26 relaciones, con la especialización de EMPLEADO |
+| Modelo físico | 22 tablas en tercera forma normal |
+| Restricciones | 113 con nombre: 22 PK, 25 UNIQUE, 36 CHECK y 30 FK |
+| Programas en la base | 6 vistas, 2 funciones, 3 procedimientos y 9 disparadores |
+| Datos | 1.091 registros de prueba ficticios |
+| Pruebas | 10 pruebas de reglas de negocio en OK y 55 consultas de álgebra comparadas contra la Fase 1 |
+| Servidor | MySQL 8.4 LTS en Oracle Linux 9, en una máquina virtual con Lima sobre un portátil con Fedora 44 |
+| Aplicación | API REST en Java 21 con Spring Boot 3.5 e interfaz en Angular 21 |
+
+## Arquitectura
+
+```text
+Navegador (Angular) --HTTP 5000 /api--> Controller --> Service --> DAO (JDBC) --> MySQL 8.4 (vet_app)
+```
+
+La base corre en una máquina virtual con Oracle Linux 9 y se administra con MySQL Workbench por el puerto 3306. La aplicación es un solo `sigevet.jar` que sirve el frontend y la API por el puerto 5000. Ninguno de los dos puertos se reenvía a Internet.
+
+## Cómo se trabajó
+
+El proyecto se planeó para 14 semanas y cuatro estudiantes, con cuatro hitos: inicio y acta de constitución, validación de la propuesta y la Fase 1 por parte del docente, la Fase 2 (máquina virtual, RDBMS, scripts, aplicación, repositorio y video) y la sustentación con el cierre. El código y la documentación están en un repositorio de GitHub con los aportes de los cuatro integrantes, y los documentos se escriben en Markdown y se convierten a Word. Las herramientas fueron Draw.io y MySQL Workbench para el modelado, Oracle Linux 9 y MySQL 8.4 LTS para el servidor, y Java con Spring Boot y Angular para la aplicación.
+
+## Repositorio y documentos
+
+- [Repositorio del equipo en GitHub](https://github.com/Estarlan/proyecto-bd1-sigevet)
+- El informe final, la presentación de la sustentación y los documentos de gestión (acta de constitución, interesados, EDT, cronograma, presupuesto y acta de cierre) están en la carpeta `documentos` del repositorio.
+- Las claves de la base no están en el repositorio ni en este portafolio: cada integrante las crea a partir de un archivo de ejemplo.
+
+---
+
+### Contexto
+
+Proyecto final de **Bases de Datos 1** (Universidad El Bosque, Ingeniería de Sistemas, periodo 2026-2), hecho por un equipo de cuatro integrantes: Juan David Polo Herrera, Sebastián Castellanos Parra, Juan Miguel Ramos Sevilla y Sergio Alejandro Parra Rivera. Las fichas del portafolio reúnen los entregables del equipo con los créditos de cada rol; en los PDF se omitieron los números de documento de los integrantes que aparecían en las portadas.

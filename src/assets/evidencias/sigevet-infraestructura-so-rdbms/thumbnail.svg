@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Portada de la ficha de la infraestructura de SIGEVET: comandos para arrancar la máquina virtual e instalar MySQL 8.4, con las etiquetas OL9, MySQL 8.4, Lima y KVM">
+  <title>SIGEVET · So Y Rdbms En Una Maquina Virtual</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <text x="32" y="44" fill="#63de86" font-size="14">PROYECTO FINAL · SIGEVET</text>
+    <text x="448" y="44" fill="#f4677a" font-size="14" text-anchor="end">#03</text>
+
+    <rect x="32" y="56" width="416" height="99" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <rect x="32" y="56" width="416" height="18" fill="#62b4f8" />
+    <text x="42" y="69" fill="#0d0d26" font-size="9">servidor.sh</text>
+    <text x="44" y="96" font-size="12" xml:space="preserve"><tspan fill="#e8e8ff">$ limactl start sigevet</tspan></text>
+    <text x="44" y="115" font-size="12" xml:space="preserve"><tspan fill="#e8e8ff">$ sudo dnf module install mysql:8.4</tspan></text>
+    <text x="44" y="134" font-size="12" xml:space="preserve"><tspan fill="#e8e8ff">$ bash vm/scripts/cargar_bd.sh</tspan></text>
+
+    <rect x="32" y="169" width="48" height="26" fill="#171740" stroke="#63de86" stroke-width="2" /><text x="56" y="186" fill="#63de86" font-size="10" text-anchor="middle">OL9</text>
+    <rect x="92" y="169" width="96" height="26" fill="#171740" stroke="#63de86" stroke-width="2" /><text x="140" y="186" fill="#63de86" font-size="10" text-anchor="middle">MYSQL 8.4</text>
+    <rect x="200" y="169" width="56" height="26" fill="#171740" stroke="#63de86" stroke-width="2" /><text x="228" y="186" fill="#63de86" font-size="10" text-anchor="middle">LIMA</text>
+    <rect x="268" y="169" width="48" height="26" fill="#171740" stroke="#63de86" stroke-width="2" /><text x="292" y="186" fill="#63de86" font-size="10" text-anchor="middle">KVM</text>
+
+    <text x="32" y="248" fill="#b8b8d8" font-size="8" font-weight="normal">SO Y RDBMS EN UNA MAQUINA VIRTUAL</text>
+  </g>
+</svg>

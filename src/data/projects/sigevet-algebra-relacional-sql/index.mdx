@@ -1,0 +1,127 @@
+---
+title: "SIGEVET: 55 ejercicios de álgebra relacional resueltos en SQL"
+tagline: "Los 55 ejercicios de álgebra relacional de la Fase 1 escritos en SQL, ejecutados en MySQL 8.4 y comparados uno a uno con los resultados de la Fase 1"
+description: "Proyecto final de Bases de Datos 1: 55 consultas SQL sobre la base de SIGEVET que equivalen a los ejercicios de álgebra relacional (selección, proyección, producto, reuniones, conjuntos, división y agregación), con la simulación del FULL OUTER JOIN que MySQL no tiene y la verificación ejercicio por ejercicio. Trabajo de un equipo de cuatro integrantes."
+status: "complete"
+category: "proyecto"
+moduleId: "BD1-PRO-004"
+order: 33
+thumbnail: "../../../assets/evidencias/sigevet-algebra-relacional-sql/thumbnail.png"
+thumbnailAlt: "Portada de la ficha de los 55 ejercicios de álgebra relacional de SIGEVET: la división del ejercicio 41 con doble NOT EXISTS"
+
+tech:
+  - "Álgebra relacional extendida"
+  - "SQL (MySQL 8.4)"
+  - "División con doble NOT EXISTS"
+  - "Reuniones externas con UNION"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Ejercicios"
+    value: "55, en nueve grupos de operadores"
+  - label: "Esquema"
+    value: "La base sigevet de una red de clínicas veterinarias, con 1.091 registros de prueba"
+  - label: "Motor"
+    value: "MySQL 8.4 LTS"
+  - label: "Verificación"
+    value: "Cada ejercicio devuelve el mismo número de filas en SQLite (Fase 1) y en MySQL"
+  - label: "Límite del motor"
+    value: "MySQL no tiene FULL OUTER JOIN; el ejercicio 29 lo simula"
+  - label: "En la aplicación"
+    value: "La aplicación web ejecuta los 55 ejercicios en vivo"
+
+features:
+  - lead: "Nueve familias de operadores"
+    text: "Selección y proyección, producto cartesiano, renombramiento, reuniones natural y theta, reuniones externas, semirreunión y antirreunión, conjuntos, división y agregación."
+  - lead: "División sin operador"
+    text: "SQL no tiene división: los ejercicios 41 a 43 la resuelven con un doble NOT EXISTS, que se lee como «no existe ninguna sede donde falte»."
+  - lead: "Reunión externa completa"
+    text: "El ejercicio 29 compara los inventarios de dos sedes con LEFT JOIN y RIGHT JOIN unidos con UNION, porque MySQL no trae FULL OUTER JOIN."
+  - lead: "Resultado comparado"
+    text: "Un registro compara las 55 consultas contra la Fase 1 y cierra con 55 de 55."
+
+archCaption: "Ejercicio 41: división con doble NOT EXISTS sobre INVENTARIO y SEDE"
+
+challenge:
+  title: "Problema"
+  body: "Comprobar que las 55 consultas de álgebra relacional de la Fase 1 se pueden ejecutar sobre la base física de MySQL y dan los mismos resultados, sabiendo que SQL no trae división y que MySQL no trae reunión externa completa."
+solution:
+  title: "Solución"
+  body: "Cada ejercicio se escribió en SQL con la técnica que corresponde a su operador: doble NOT EXISTS para la división, LEFT JOIN y RIGHT JOIN con UNION para la reunión externa completa y subconsultas para semirreunión y antirreunión. Un script ejecuta las 55 consultas y compara el número de filas con las de la Fase 1."
+---
+
+## Un trabajo de equipo
+
+Los ejercicios los resolvió el equipo de SIGEVET. Según la propuesta del proyecto, el álgebra y el SQL estaban a cargo de Juan Miguel Ramos Sevilla, desarrollador web e infraestructura, y la verificación, de Sergio Alejandro Parra Rivera, verificador e integrador. La [ficha general](/projects/sigevet-proyecto-final/) tiene al equipo completo.
+
+## Los 55 ejercicios
+
+| Grupo | Ejercicios | Cantidad |
+| :-- | :-- | --: |
+| Selección y proyección | 1 a 12 | 12 |
+| Producto cartesiano | 13 y 14 | 2 |
+| Renombramiento | 15 y 16 | 2 |
+| Reunión natural y reunión theta | 17 a 25 | 9 |
+| Reuniones externas | 26 a 29 | 4 |
+| Semirreunión y antirreunión | 30 a 32 | 3 |
+| Operaciones de conjuntos | 33 a 40 | 8 |
+| División | 41 a 43 | 3 |
+| Agregación y agrupamiento | 44 a 55 | 12 |
+| **Total** | | **55** |
+
+Cada ejercicio del documento trae el enunciado, la consulta SQL y el resultado: el total de filas y hasta tres filas de muestra. Las consultas están en `database/03_varios/01_consultas_algebra_relacional.sql`.
+
+## Ejemplo: la división (ejercicio 41)
+
+«Encontrar los medicamentos que están en el inventario de todas las sedes.» El álgebra lo escribe con el operador de división; en SQL no existe, y se expresa al revés: los medicamentos para los que no existe ninguna sede donde falten.
+
+```sql
+SELECT m.id_medicamento, m.nombre
+FROM MEDICAMENTO m
+WHERE NOT EXISTS (
+  SELECT s.id_sede FROM SEDE s
+  WHERE NOT EXISTS (
+    SELECT 1 FROM INVENTARIO i
+    WHERE i.id_sede = s.id_sede AND i.id_medicamento = m.id_medicamento));
+```
+
+El resultado son 8 medicamentos presentes en las cinco sedes. Los otros dos ejercicios de división usan la misma plantilla con otro conjunto:
+
+| Ejercicio | Qué busca | Filas |
+| :-- | :-- | --: |
+| 41 | Medicamentos que están en el inventario de todas las sedes | 8 |
+| 42 | Veterinarios certificados en todas las especialidades de un conjunto (medicina interna y medicina felina) | 1 |
+| 43 | Clientes con facturas en todas las sedes de Bogotá | 6 |
+
+## Ejemplo: lo que MySQL no tiene (ejercicio 29)
+
+El ejercicio 29 compara el inventario de dos sedes por medicamento y muestra también los medicamentos que solo maneja una de las dos: una reunión externa completa. MySQL no trae `FULL OUTER JOIN`, así que se arma con un `LEFT JOIN` y un `RIGHT JOIN` unidos con `UNION`. El resultado tiene 18 filas.
+
+```sql
+SELECT a.id_medicamento AS med_usaquen, a.stock_actual AS stock_usaquen,
+       b.id_medicamento AS med_chia, b.stock_actual AS stock_chia
+FROM (SELECT * FROM INVENTARIO WHERE id_sede = 1) a
+  LEFT JOIN (SELECT * FROM INVENTARIO WHERE id_sede = 3) b ON a.id_medicamento = b.id_medicamento
+UNION
+SELECT a.id_medicamento, a.stock_actual, b.id_medicamento, b.stock_actual
+FROM (SELECT * FROM INVENTARIO WHERE id_sede = 1) a
+  RIGHT JOIN (SELECT * FROM INVENTARIO WHERE id_sede = 3) b ON a.id_medicamento = b.id_medicamento
+ORDER BY COALESCE(med_usaquen, med_chia);
+```
+
+## Cómo se verificó
+
+Un script ejecuta las 55 consultas en MySQL y, para cada una, compara el número de filas con el que dio el ejercicio en SQLite, donde se verificó en la Fase 1. El registro de la corrida lista los 55 ejercicios con el conteo de ambos lados y la marca OK, y cierra con el balance de 55 de 55. Es una comparación por número de filas, que es lo que muestra el registro. La aplicación web también ejecuta cada ejercicio por su número, y la ruta elige una de las 55 consultas guardadas sin recibir SQL del navegador.
+
+## Documento del trabajo
+
+- [Documento de las sentencias de álgebra relacional (PDF)](/evidencias/proyecto-final-sigevet/fase1-08-algebra-relacional.pdf)
+- [Las 55 consultas en SQL (`01_consultas_algebra_relacional.sql`)](/evidencias/proyecto-final-sigevet/sql/01_consultas_algebra_relacional.sql)
+- [Registro de la comparación contra la Fase 1 (`06_algebra_mysql.log`)](/evidencias/proyecto-final-sigevet/logs/06_algebra_mysql.log)
+- [Repositorio del equipo en GitHub](https://github.com/Estarlan/proyecto-bd1-sigevet), carpeta `database/03_varios`
+
+---
+
+### Contexto
+
+Entrega del proyecto final de **Bases de Datos 1** (Universidad El Bosque, Ingeniería de Sistemas, periodo 2026-2), hecha por un equipo de cuatro integrantes: Juan David Polo Herrera, Sebastián Castellanos Parra, Juan Miguel Ramos Sevilla y Sergio Alejandro Parra Rivera. En el PDF se omitieron los números de documento de los integrantes que aparecían en la portada.
