@@ -1,0 +1,140 @@
+---
+title: "SIGEVET: selección de SO y RDBMS e implementación en una máquina virtual"
+tagline: "Dos matrices ponderadas para elegir el sistema operativo y el motor, y la puesta en marcha de MySQL 8.4 sobre Oracle Linux 9 en una máquina virtual con Lima"
+description: "Fase 2 del proyecto final de Bases de Datos 1: análisis de seis sistemas operativos y cuatro motores con matrices ponderadas, resultado (Oracle Linux 9 con 4,90 y MySQL 8.4 LTS con 4,75), análisis de sensibilidad, riesgos y mitigaciones, y la máquina virtual con KVM/QEMU y Lima donde corre la base. Trabajo de un equipo de cuatro integrantes."
+status: "complete"
+category: "proyecto"
+moduleId: "BD1-PRO-003"
+order: 32
+thumbnail: "../../../assets/evidencias/sigevet-infraestructura-so-rdbms/thumbnail.png"
+thumbnailAlt: "Portada de la ficha de la infraestructura de SIGEVET: comandos para arrancar la máquina virtual e instalar MySQL 8.4, con las etiquetas OL9, MySQL 8.4, Lima y KVM"
+
+tech:
+  - "Oracle Linux 9"
+  - "MySQL 8.4 LTS"
+  - "Lima, KVM/QEMU"
+  - "Matriz de decisión ponderada"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Sistema operativo"
+    value: "Oracle Linux 9 (4,90 de 5) entre seis alternativas"
+  - label: "Motor"
+    value: "MySQL 8.4 LTS Community (4,75 de 5) entre cuatro alternativas"
+  - label: "Máquina virtual"
+    value: "KVM/QEMU con Lima: 2 vCPU, 6 GiB de RAM y 40 GiB de disco"
+  - label: "Servidor"
+    value: "Un portátil con Fedora 44 que aloja la máquina virtual"
+  - label: "Puertos"
+    value: "3306 (MySQL, para Workbench) y 5000 (aplicación), abiertos solo a la red local"
+  - label: "Instalación"
+    value: "Módulo mysql:8.4 de AppStream, sin repositorios externos"
+
+features:
+  - lead: "Decisión con método"
+    text: "Dos matrices con criterios, pesos que suman 100 % y puntajes de 1 a 5, con la fórmula escrita y sin medir rendimiento."
+  - lead: "Sensibilidad del resultado"
+    text: "Si se mueven 10 puntos de modelado y 5 de familiaridad a SQL, MySQL y PostgreSQL empatan en 4,60: el análisis dice cuánto depende el resultado de los pesos."
+  - lead: "Riesgos con respuesta"
+    text: "Sin FULL OUTER JOIN, disparadores de un solo evento, nombres sensibles a mayúsculas en Linux y acceso remoto, cada uno con su mitigación."
+  - lead: "Simulación y servidor"
+    text: "La instalación se probó desde cero en una simulación con macOS y luego se repitió en el portátil con Fedora, que arranca la máquina virtual sola."
+
+archCaption: "Infraestructura de SIGEVET: portátil con Fedora 44, máquina virtual con Oracle Linux 9 y MySQL 8.4"
+
+challenge:
+  title: "Problema"
+  body: "Elegir con criterios explícitos el sistema operativo Linux o Unix y el RDBMS donde correría la base, sin SQL Server, y dejarlos funcionando de forma repetible dentro de una máquina virtual con recursos limitados."
+solution:
+  title: "Solución"
+  body: "Se compararon seis sistemas y cuatro motores con matrices ponderadas, se escogieron Oracle Linux 9 y MySQL 8.4 LTS, se documentaron las limitaciones de MySQL y su mitigación, y se montó la máquina virtual con Lima y un script que instala el motor, crea los usuarios y carga la base."
+---
+
+## Un trabajo de equipo
+
+La infraestructura la documentó y la montó el equipo de SIGEVET. Según la propuesta del proyecto, la máquina virtual y la web eran de Juan Miguel Ramos Sevilla, desarrollador web e infraestructura, y el RDBMS y la verificación, de Sergio Alejandro Parra Rivera, verificador e integrador. El servidor es de uno de los integrantes. La [ficha general](/projects/sigevet-proyecto-final/) tiene al equipo completo.
+
+## Sistema operativo
+
+Se compararon seis sistemas para alojar MySQL 8.4 LTS y la aplicación Java: Oracle Linux 9, Rocky Linux 9, AlmaLinux 9, Ubuntu Server 24.04 LTS, Debian 12 y FreeBSD 14. Los puntajes son del equipo, de 1 (muy bajo) a 5 (muy alto), y el total es la suma de peso por puntaje dividida entre 100.
+
+| Criterio | Peso (%) | Oracle Linux 9 | Rocky | Alma | Ubuntu | Debian | FreeBSD |
+| :-- | --: | --: | --: | --: | --: | --: | --: |
+| Adecuación a MySQL y Java | 25 | 5 | 5 | 5 | 5 | 5 | 4 |
+| Costo y licencia | 10 | 5 | 5 | 5 | 5 | 5 | 5 |
+| Soporte y ciclo de vida | 15 | 5 | 5 | 5 | 5 | 3 | 3 |
+| Consumo de recursos | 10 | 4 | 4 | 4 | 4 | 5 | 4 |
+| Facilidad de administración | 10 | 5 | 5 | 5 | 5 | 5 | 3 |
+| Documentación y comunidad | 10 | 5 | 4 | 4 | 5 | 5 | 4 |
+| Alineación con la asignatura y continuidad | 15 | 5 | 3 | 3 | 3 | 3 | 2 |
+| Seguridad y actualizaciones | 5 | 5 | 5 | 5 | 5 | 5 | 5 |
+| **Total ponderado** | **100** | **4,90** | **4,50** | **4,50** | **4,60** | **4,40** | **3,60** |
+
+Oracle Linux 9 gana por la sugerencia del curso, porque MySQL viene en AppStream y por la continuidad del entorno. Las demás alternativas eran viables con adaptaciones; FreeBSD pierde puntos porque obligaría a adaptar los scripts (`dnf`, `systemd`, SELinux, `firewalld`).
+
+## Motor de base de datos
+
+Los cuatro motores evaluados fueron MySQL 8.4 LTS Community, PostgreSQL 17, Oracle Database Free y MariaDB 11.4 LTS. Oracle Free queda de respaldo; sus límites (2 CPU, 2 GB de RAM y 12 GB de datos de usuario) pesan en el criterio de costo, licencia y límites, donde saca 3.
+
+| Criterio | Peso (%) | MySQL | PostgreSQL | Oracle | MariaDB |
+| :-- | --: | --: | --: | --: | --: |
+| Cumplimiento SQL y álgebra relacional | 15 | 4 | 5 | 5 | 4 |
+| Integridad referencial y transacciones | 15 | 5 | 5 | 5 | 5 |
+| Herramientas de modelado y administración | 15 | 5 | 4 | 5 | 3 |
+| Costo, licencia y límites | 10 | 5 | 5 | 3 | 5 |
+| Instalación y mantenimiento en Oracle Linux 9 | 15 | 5 | 4 | 3 | 4 |
+| Recursos y operación en la VM | 10 | 4 | 4 | 3 | 4 |
+| Conectividad desde Java (JDBC) | 5 | 5 | 5 | 5 | 5 |
+| Familiaridad del equipo | 10 | 5 | 3 | 4 | 3 |
+| Comunidad y documentación | 5 | 5 | 5 | 5 | 4 |
+| **Total ponderado** | **100** | **4,75** | **4,40** | **4,20** | **4,05** |
+
+MySQL gana por AppStream, Workbench y la experiencia del equipo. El análisis es honesto sobre su alcance: los pesos salen de la asignatura, las herramientas y la experiencia, y no miden rendimiento. Si se trasladan 10 puntos de modelado y 5 de familiaridad al criterio de SQL, MySQL y PostgreSQL empatan en 4,60.
+
+## La máquina virtual
+
+| Elemento | Condición del proyecto |
+| :-- | :-- |
+| Sistema invitado | Oracle Linux 9 x86_64, instalación mínima (la VM reporta Oracle Linux Server 9.8 con kernel UEK 6.12) |
+| Servidor definitivo | Un portátil con Fedora 44; la máquina virtual corre con KVM/QEMU mediante Lima |
+| Simulación | Lima sobre Virtualization.framework en macOS, donde se probó el script desde cero |
+| Recursos | 2 vCPU en el servidor (4 en la simulación), 6 GiB de RAM y 40 GiB de disco |
+| Motor | Módulo `mysql:8.4` de AppStream (`mysql-server` y `mysql`) |
+| Administración | MySQL Workbench 8.0.44 en el anfitrión, por el puerto 3306 |
+| Red | Los puertos 3306 y 5000 se abren a la red local; no se reenvían a Internet |
+
+Una sola línea resume el montaje en Linux: `bash vm/migrar_linux.sh` crea la máquina virtual, instala MySQL, carga la base y deja la aplicación funcionando. Paso a paso, dentro de la VM:
+
+```text
+sudo bash vm/scripts/instalar_mysql.sh     instala MySQL 8.4 desde el módulo de AppStream
+bash vm/scripts/cargar_bd.sh               crea usuarios, tablas y datos, y verifica
+sudo bash vm/scripts/instalar_app.sh       instala la aplicación como servicio, en el puerto 5000
+```
+
+## Riesgos y cómo se respondió
+
+| Riesgo o limitación | Mitigación |
+| :-- | :-- |
+| MySQL no tiene FULL OUTER JOIN | El ejercicio 29 de álgebra lo simula con LEFT JOIN y RIGHT JOIN unidos con UNION |
+| Un disparador cubre un solo evento | Las reglas compartidas viven en procedimientos que llaman los disparadores de INSERT y de UPDATE, y SIGNAL comunica el incumplimiento |
+| Nombres de tabla sensibles a mayúsculas en Linux | Respetar los nombres de los scripts en Workbench y en Java |
+| Workbench no analiza `DEFAULT (CURRENT_DATE)` | Las fechas de registro son `DATETIME DEFAULT CURRENT_TIMESTAMP`, con el DDL comprobado en el servidor |
+| Acceso remoto y permisos excesivos | `vetdb` solo para administración, `vet_app` con mínimo privilegio, claves fuera del repositorio y red limitada |
+| Cambios de paquetes o de hipervisor | Mantener la rama `mysql:8.4`, registrar los paquetes y repetir la carga y las pruebas en ambos entornos |
+| Pérdida de datos o dependencia del dialecto | Scripts y exportaciones fuera de la VM, prueba de reconstrucción y diferencias documentadas con la versión Oracle |
+
+Para el sistema operativo, la presión de memoria se atiende con una VM de 6 GiB sobre un anfitrión mayor y apagándola al terminar, los bloqueos de SELinux o del firewall conservando `mysql-selinux` y abriendo solo los puertos necesarios, y la pérdida del anfitrión con los scripts en Git y exportaciones fuera de la VM.
+
+## Documento del trabajo
+
+- [Análisis de selección del sistema operativo (PDF)](/evidencias/proyecto-final-sigevet/fase2-01-seleccion-so.pdf)
+- [Implementación de la máquina virtual (PDF)](/evidencias/proyecto-final-sigevet/fase2-02-implementacion-vm.pdf)
+- [Análisis de selección del RDBMS (PDF)](/evidencias/proyecto-final-sigevet/fase2-03-seleccion-rdbms.pdf)
+- [Implementación del RDBMS (PDF)](/evidencias/proyecto-final-sigevet/fase2-04-implementacion-rdbms.pdf)
+- [Repositorio del equipo en GitHub](https://github.com/Estarlan/proyecto-bd1-sigevet), carpeta `vm`
+
+---
+
+### Contexto
+
+Entrega de la Fase 2 del proyecto final de **Bases de Datos 1** (Universidad El Bosque, Ingeniería de Sistemas, periodo 2026-2), hecha por un equipo de cuatro integrantes: Juan David Polo Herrera, Sebastián Castellanos Parra, Juan Miguel Ramos Sevilla y Sergio Alejandro Parra Rivera. En los PDF se omitieron los números de documento de los integrantes que aparecían en las portadas.

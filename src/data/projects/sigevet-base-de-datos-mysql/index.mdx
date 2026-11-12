@@ -1,0 +1,187 @@
+---
+title: "SIGEVET: la base de datos en MySQL 8.4"
+tagline: "De 22 tablas a 113 restricciones, 6 vistas, 9 disparadores y un usuario de aplicación con mínimo privilegio, cargados y verificados con un solo script"
+description: "Fase 2 del proyecto final de Bases de Datos 1: la base sigevet en MySQL 8.4 LTS con 22 tablas, 113 restricciones con nombre, 6 vistas, 2 funciones, 3 procedimientos, 9 disparadores con errores propios, 1.091 registros de prueba, roles de lectura y escritura y pruebas de permisos. Trabajo de un equipo de cuatro integrantes."
+status: "complete"
+category: "proyecto"
+moduleId: "BD1-PRO-002"
+order: 31
+thumbnail: "../../../assets/evidencias/sigevet-base-de-datos-mysql/thumbnail.png"
+thumbnailAlt: "Portada de la ficha de la base de datos de SIGEVET: un disparador de MySQL y las etiquetas 22 tablas, 9 triggers, 6 vistas y FK/CHECK"
+
+tech:
+  - "MySQL 8.4 LTS (InnoDB)"
+  - "DDL, disparadores y procedimientos"
+  - "Roles y mínimo privilegio"
+  - "MySQL Workbench"
+  - "Bases de Datos 1"
+
+specs:
+  - label: "Motor"
+    value: "MySQL 8.4 LTS Community Edition, base sigevet, motor InnoDB"
+  - label: "Objetos"
+    value: "22 tablas, 6 vistas, 2 funciones, 3 procedimientos y 9 disparadores"
+  - label: "Restricciones"
+    value: "113 con nombre: 22 PK, 25 UNIQUE, 36 CHECK y 30 FK"
+  - label: "Datos"
+    value: "1.091 registros de prueba ficticios, un archivo por tabla"
+  - label: "Seguridad"
+    value: "vetdb es el dueño del esquema y vet_app, la aplicación, lee todo y escribe solo en 12 tablas"
+  - label: "Tamaño"
+    value: "1,08 MB de datos e índices según information_schema, que no es el peso en disco"
+
+features:
+  - lead: "Reglas dentro de la base"
+    text: "CHECK, UNIQUE, llaves foráneas y 9 disparadores que lanzan errores con código propio (20001 a 20006) cuando un dato rompe una regla de negocio."
+  - lead: "Una FK circular resuelta"
+    text: "SEDE y EMPLEADO se referencian entre sí: las sedes se insertan sin director y el director se asigna después de cargar los empleados."
+  - lead: "Mínimo privilegio"
+    text: "La aplicación entra como vet_app con dos roles: DELETE solo en cuatro tablas, DETALLE_FACTURA solo con INSERT, y sin DROP ni ALTER."
+  - lead: "Carga reproducible"
+    text: "Un solo script crea los usuarios, las tablas, los datos y la verificación, y con una opción borra la base y la vuelve a cargar en 1 o 2 segundos."
+
+archCaption: "Objetos de la base sigevet: tablas, vistas, funciones, procedimientos y disparadores"
+
+challenge:
+  title: "Problema"
+  body: "Llevar el modelo lógico de la red de clínicas a un esquema físico que haga cumplir sus reglas dentro de la base y no solo en la aplicación, con datos de prueba reproducibles y una cuenta de aplicación que no pueda dañar el esquema."
+solution:
+  title: "Solución"
+  body: "Se escribió el DDL con todas las restricciones nombradas, se pasaron a disparadores y procedimientos las reglas que MySQL no declara en una tabla, se cargaron 1.091 registros en orden de dependencias y se creó un rol de lectura y otro de escritura limitado a las tablas que la aplicación modifica, con pruebas que confirman lo que falla."
+---
+
+## Un trabajo de equipo
+
+La base la construyó y la revisó el equipo de SIGEVET. Según la propuesta del proyecto, Juan David Polo Herrera, gerente del proyecto y DBA, llevó el modelo relacional, la normalización y los scripts, y Sergio Alejandro Parra Rivera, verificador e integrador, el RDBMS y la verificación. La [ficha general](/projects/sigevet-proyecto-final/) tiene al equipo completo y el contexto del curso.
+
+## Qué contiene la base
+
+| Objeto | Cantidad | Detalle |
+| :-- | :-- | :-- |
+| Tablas | 22 | Cada tabla y cada columna llevan su `COMMENT`: el diccionario de datos vive dentro de la base |
+| Restricciones | 113 | 22 `PK_`, 25 `UQ_`, 36 `CK_` y 30 `FK_`, todas declaradas con nombre |
+| Índices | 71 | Los que InnoDB crea para PK, UNIQUE y FK, más cinco de búsqueda en `02_indices.sql` |
+| Vistas | 6 | `V_FACTURA_TOTAL`, `V_MASCOTA_DETALLE`, `V_HISTORIAL_CLINICO`, `V_AGENDA`, `V_STOCK_BAJO` y `V_INGRESOS_SEDE_MES` |
+| Funciones | 2 | `FN_EDAD_MASCOTA` y `FN_TOTAL_FACTURA` |
+| Procedimientos | 3 | `PR_VALIDAR_TIPO_EMPLEADO`, `PR_VALIDAR_SEDE_VETERINARIO` y `PR_VALIDAR_CITA_ATENDIDA` |
+| Disparadores | 9 | Reglas RN-08 y RN-09, y que solo una cita atendida tenga consulta |
+| Registros | 1.091 | Datos ficticios, un archivo por tabla, en orden de dependencias |
+
+Las cantidades de objetos y de restricciones salen de contar las sentencias de los propios scripts; la cifra de índices es la que documenta el equipo en su verificación.
+
+## Las restricciones por dentro
+
+La tabla `CITA` muestra cómo se combinan los cuatro tipos de restricción. Un veterinario no puede tener dos citas a la misma hora (`UQ_CITA_VETERINARIO_FECHA_HORA`), el estado solo admite cuatro valores y cada llave foránea apunta a su tabla.
+
+```sql
+CREATE TABLE CITA (
+    id_cita         BIGINT NOT NULL AUTO_INCREMENT,
+    fecha_hora      DATETIME NOT NULL,
+    motivo          VARCHAR(200),
+    estado          VARCHAR(12) NOT NULL DEFAULT 'PROGRAMADA',
+    id_mascota      INT NOT NULL,
+    id_veterinario  INT NOT NULL,
+    id_sede         INT NOT NULL,
+    id_servicio     INT NOT NULL,
+    CONSTRAINT PK_CITA PRIMARY KEY (id_cita),
+    CONSTRAINT UQ_CITA_VETERINARIO_FECHA_HORA UNIQUE (id_veterinario, fecha_hora),
+    CONSTRAINT CK_CITA_ESTADO CHECK (estado IN ('PROGRAMADA','ATENDIDA','CANCELADA','NO_ASISTIO')),
+    CONSTRAINT FK_CITA_MASCOTA FOREIGN KEY (id_mascota) REFERENCES MASCOTA (id_mascota),
+    CONSTRAINT FK_CITA_VETERINARIO FOREIGN KEY (id_veterinario) REFERENCES VETERINARIO (id_empleado),
+    CONSTRAINT FK_CITA_SEDE FOREIGN KEY (id_sede) REFERENCES SEDE (id_sede),
+    CONSTRAINT FK_CITA_SERVICIO FOREIGN KEY (id_servicio) REFERENCES SERVICIO (id_servicio)
+) ENGINE=InnoDB;
+```
+
+El fragmento omite los comentarios de columna que sí tiene el script original.
+
+## Reglas que el modelo relacional no expresa
+
+Hay reglas que ni un CHECK ni una llave foránea pueden declarar, porque comparan filas de tablas distintas: que el veterinario de una cita trabaje en la sede de la cita, que un veterinario sea de tipo veterinario, que solo una cita atendida tenga consulta. Se implementaron con disparadores que llaman a procedimientos y que rechazan el dato con `SIGNAL SQLSTATE '45000'` y un código de error propio. En MySQL un disparador cubre un solo evento, así que la lógica compartida vive en los procedimientos y la llaman los disparadores de `INSERT` y de `UPDATE`.
+
+```sql
+-- RN-08: el veterinario de una cita debe trabajar en la sede de la cita.
+CREATE PROCEDURE PR_VALIDAR_SEDE_VETERINARIO (p_id_veterinario INT, p_id_sede INT)
+BEGIN
+  DECLARE v_sede INT;
+  DECLARE v_mensaje VARCHAR(200);
+  SELECT id_sede INTO v_sede FROM EMPLEADO WHERE id_empleado = p_id_veterinario;
+  IF v_sede <> p_id_sede THEN
+    SET v_mensaje = CONCAT('El veterinario ', p_id_veterinario, ' labora en la sede ', v_sede,
+                           ', no en la sede ', p_id_sede, '.');
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_mensaje, MYSQL_ERRNO = 20003;
+  END IF;
+END$$
+```
+
+| Código | Qué rechaza | Dónde está |
+| :-- | :-- | :-- |
+| 20001 | Una fila en `VETERINARIO` cuyo empleado no es de tipo veterinario | Disparadores de `VETERINARIO`, con `PR_VALIDAR_TIPO_EMPLEADO` |
+| 20002 | Una fila en `AUXILIAR` cuyo empleado no es de tipo auxiliar | Disparadores de `AUXILIAR`, con `PR_VALIDAR_TIPO_EMPLEADO` |
+| 20003 | Una cita con un veterinario que labora en otra sede | Disparadores de `CITA`, con `PR_VALIDAR_SEDE_VETERINARIO` |
+| 20004 | Una consulta de una cita que no está atendida | Disparadores de `CONSULTA`, con `PR_VALIDAR_CITA_ATENDIDA` |
+| 20005 | Cambiar el tipo de un empleado que ya tiene fila de subtipo | `TRG_EMPLEADO_TIPO` |
+| 20006 | Sacar del estado atendida a una cita que ya tiene consulta | `TRG_CITA_UPD` |
+
+## Carga y verificación
+
+El script `cargar_bd.sh` ejecuta todo en el orden que exigen las dependencias: usuarios como root, tablas, índices, programas, datos, vistas, verificación y, al final, los permisos de la aplicación, porque MySQL solo concede permisos de tabla sobre tablas que ya existen. Los programas van antes de los datos porque los disparadores validan cada `INSERT`.
+
+```text
+bash vm/scripts/cargar_bd.sh               crea la base y los usuarios y carga todo
+bash vm/scripts/cargar_bd.sh --reiniciar   borra la base y la vuelve a cargar
+```
+
+- La llave foránea `FK_SEDE_DIRECTOR` es circular (EMPLEADO referencia a SEDE y SEDE a EMPLEADO): las sedes se insertan sin director y el director se asigna con un `UPDATE` cuando ya existen los empleados.
+- Para que el usuario dueño cree funciones y disparadores con el registro binario activo hace falta `log_bin_trust_function_creators = 1`; sin eso, el script de programas falla con el error 1419.
+- La carga tarda de 1 a 2 segundos, y las 10 pruebas de reglas de negocio (llaves foráneas, CHECK, UNIQUE y disparadores) pasan en OK.
+- Los 1,08 MB son datos más índices según `DATA_LENGTH` más `INDEX_LENGTH` en `information_schema.TABLES`; no es el espacio que ocupan los archivos del servidor en el disco.
+
+## Mínimo privilegio
+
+La aplicación nunca entra como administrador. `vetdb` es el dueño del esquema y `vet_app` recibe dos roles.
+
+| Usuario o rol | Privilegios |
+| :-- | :-- |
+| `vetdb` | Todos los privilegios sobre `sigevet`; solo sobre ese esquema |
+| `rol_sigevet_lectura` | `SELECT` y `SHOW VIEW` sobre `sigevet` |
+| `rol_sigevet_escritura` | `INSERT` y `UPDATE` sobre 12 tablas; `DELETE` solo en `CLIENTE`, `TELEFONO_CLIENTE`, `INVENTARIO` y `VETERINARIO_ESPECIALIDAD`; `DETALLE_FACTURA` solo con `INSERT` |
+| `vet_app` | Los dos roles anteriores, sin `DROP`, `ALTER` ni cambios en los catálogos |
+
+La prueba de privilegios del equipo, ejecutada como `vet_app` en el servidor, confirma lo que debe fallar:
+
+| Intento | Resultado |
+| :-- | :-- |
+| `DELETE` sobre `MASCOTA` | Error 1142: comando denegado |
+| `UPDATE` sobre `SERVICIO` | Error 1142: comando denegado |
+| `INSERT` en `ESPECIE` | Error 1142: comando denegado |
+| `DROP TABLE` sobre `CITA` | Error 1142: comando denegado |
+
+## Los datos de prueba
+
+Los 1.091 registros son ficticios y se reparten así por tabla:
+
+| Tabla | Registros | Tabla | Registros | Tabla | Registros |
+| :-- | --: | :-- | --: | :-- | --: |
+| `DEPARTAMENTO` | 6 | `ESPECIE` | 5 | `PRESCRIPCION` | 88 |
+| `CIUDAD` | 11 | `RAZA` | 20 | `INVENTARIO` | 79 |
+| `SEDE` | 5 | `MASCOTA` | 59 | `FACTURA` | 109 |
+| `EMPLEADO` | 27 | `HISTORIA_CLINICA` | 59 | `DETALLE_FACTURA` | 201 |
+| `VETERINARIO` | 12 | `SERVICIO` | 14 | `CLIENTE` | 45 |
+| `AUXILIAR` | 8 | `CITA` | 144 | `TELEFONO_CLIENTE` | 66 |
+| `ESPECIALIDAD` | 8 | `CONSULTA` | 95 | `MEDICAMENTO` | 18 |
+| `VETERINARIO_ESPECIALIDAD` | 12 | | | | |
+
+## Documento del trabajo
+
+- [Implementación del RDBMS (PDF)](/evidencias/proyecto-final-sigevet/fase2-04-implementacion-rdbms.pdf)
+- [Scripts de implementación del modelo lógico al físico (PDF)](/evidencias/proyecto-final-sigevet/fase2-05-scripts-implementacion.pdf)
+- Scripts SQL: [tablas y restricciones](/evidencias/proyecto-final-sigevet/sql/01_crear_tablas.sql), [índices](/evidencias/proyecto-final-sigevet/sql/02_indices.sql), [vistas](/evidencias/proyecto-final-sigevet/sql/03_vistas.sql), [funciones, procedimientos y disparadores](/evidencias/proyecto-final-sigevet/sql/04_programas.sql), [permisos de la aplicación](/evidencias/proyecto-final-sigevet/sql/05_permisos_app.sql) y [verificación](/evidencias/proyecto-final-sigevet/sql/02_verificacion.sql)
+- Registros de las corridas: [carga de la base](/evidencias/proyecto-final-sigevet/logs/04_carga_bd.log) y [prueba de conexión y de privilegios de `vet_app`](/evidencias/proyecto-final-sigevet/logs/07_prueba_conexion.log)
+- [Repositorio del equipo en GitHub](https://github.com/Estarlan/proyecto-bd1-sigevet), carpeta `database`
+
+---
+
+### Contexto
+
+Entrega de la Fase 2 del proyecto final de **Bases de Datos 1** (Universidad El Bosque, Ingeniería de Sistemas, periodo 2026-2), hecha por un equipo de cuatro integrantes: Juan David Polo Herrera, Sebastián Castellanos Parra, Juan Miguel Ramos Sevilla y Sergio Alejandro Parra Rivera. Las claves de la base no están en el repositorio ni en esta página: cada integrante las crea a partir de un archivo de ejemplo. En los PDF se omitieron los números de documento de los integrantes que aparecían en las portadas.
