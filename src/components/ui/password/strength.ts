@@ -6,7 +6,7 @@ export type Strength = 0 | 1 | 2 | 3 | 4; // none · weak · fair · good · str
 /**
  * Score a password's strength on a 0–4 scale.
  *
- * ponytail: naive rule-based scorer (length + character-class diversity), NOT entropy. Ceiling: it
+ * Note: naive rule-based scorer (length + character-class diversity), NOT entropy. Ceiling: it
  * rates "Password1!" as strong even though it's weak. Upgrade path: drop in `zxcvbn` per-project for
  * real estimation — keep this signature so callers (PasswordStrength) don't change.
  *

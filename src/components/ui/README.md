@@ -144,7 +144,7 @@ Slider · InputNumber · ToggleCount (+ Value) · PasswordInput · PasswordStren
 · AdvancedSelect · Searchbox (+ Item). The Preline "advanced forms" set, native-first — no
 `preline.js`, tokens only. Three (ComboBox, AdvancedSelect, Searchbox) were initially deferred as
 "heavy JS" and built later; each keeps its own small bundled script (re-init on `astro:after-swap`)
-and states its ceiling with a `ponytail:` note.
+and states its ceiling in a comment at the top of its file.
 
 - **Slider** is a native `<input type="range">` styled through the range pseudo-elements — a `bg-muted`
   track (`::-webkit-slider-runnable-track` / `::-moz-range-track`) and a `bg-primary` thumb ringed in
@@ -183,7 +183,7 @@ MegaMenu (Trigger/Panel/Item) · List (+ Item). Native-first, no new JS beyond t
   Dropdown, one delegated controller drives both, binds once, survives view transitions. The trigger
   reuses the `navLink` config so it sits between NavLinks in a Nav; the panel keeps natural Tab order
   (no roving — it's a grid of links, not a `role="menu"`). Click-to-open only (hover triggers are
-  hostile to touch/keyboard — see the `ponytail:` note). `columns` (1/2/3) sets width + column count;
+  hostile to touch/keyboard — see the comment in the file). `columns` (1/2/3) sets width + column count;
   MegaMenuItem is the Preline rich link (icon slot + title + description slot).
 - **List** is the static Preline lists set: `marker` (none / disc / decimal — decimal renders an
   `<ol>`), `orientation="horizontal"` for the dot-separated inline list, and ListItem's `icon` slot
@@ -212,6 +212,6 @@ composes the owned animation catalog (`src/styles/motion/index.css`): an entranc
 follows `siteSettings.useAnimations` (off ⇒ plain pass-through wrapper) with a per-call `animate`
 override, and carries `motion-reduce:animate-none` so reduced motion degrades to static content (the
 global reduced-motion guard zeroes time durations but can't stop a scroll-driven animation — see the
-`ponytail:` note in the file). The whole motion system — the catalog, the guard, and the two switches
+comment in the file). The whole motion system — the catalog, the guard, and the two switches
 (`prefers-reduced-motion` vs `useAnimations`) — lives in `src/styles/motion/` and is documented in
 its file headers and the project docs.

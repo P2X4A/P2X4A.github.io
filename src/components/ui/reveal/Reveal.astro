@@ -11,7 +11,7 @@
 //   • `siteSettings.useAnimations` is the site master switch (build-time). Off ⇒ plain pass-through
 //     wrapper. The `animate` prop overrides per call site (keeps the primitive usable config-free).
 //
-// ponytail: native scroll timelines are Chromium + Safari; where unsupported (e.g. Firefox), the
+// Note: native scroll timelines are Chromium + Safari; where unsupported (e.g. Firefox), the
 // animation ignores the timeline and simply plays once on load — content still ends visible (graceful
 // degradation, no JS fallback shipped). For above-the-fold content prefer a plain `animate-*` utility.
 import { siteSettings } from "@config/siteSettings.json";

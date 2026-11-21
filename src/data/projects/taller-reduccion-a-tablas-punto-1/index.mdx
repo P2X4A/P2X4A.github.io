@@ -33,7 +33,7 @@ features:
   - lead: "Relaciones M:N a tablas intermedias"
     text: "Cada relación muchos-a-muchos se transformó en una tabla asociativa con clave primaria compuesta: AUTOR_LIBRO, EDITOR_LIBRO, LIBRO_CESTA, LIBRO_ALMACÉN y CLIENTE_CESTA."
   - lead: "Claves foráneas definidas"
-    text: "Cada tabla intermedia lleva claves foráneas que referencian a las entidades participantes, garantizando integridad referencial."
+    text: "Cada tabla intermedia lleva claves foráneas hacia las entidades que participan; así no pueden quedar filas huérfanas."
   - lead: "Atributos de relación"
     text: "Algunas asociaciones incluyen atributos propios (por ejemplo, número en LIBRO_CESTA y LIBRO_ALMACÉN)."
 

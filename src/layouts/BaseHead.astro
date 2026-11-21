@@ -38,7 +38,7 @@ const siteNodes = getSiteSchema({
   url: canonicalURL.href,
   description: siteData.description,
   inLanguage: siteLocale,
-  // ponytail: placeholder logo = the default OG image; swap for a real brand logo before deploy.
+  // Note: placeholder logo = the default OG image; swap for a real brand logo before deploy.
   logo: new URL(siteData.defaultImage.src, canonicalURL).href,
   sameAs: siteData.sameAs,
 });

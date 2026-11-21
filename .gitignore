@@ -3,16 +3,10 @@ dist/
 # generated types
 .astro/
 
-# stray root artifacts — accidental build-output redirects (real HTML lives in dist/ or as .astro),
-# curl cookie jars from probing the running Worker, and loose authoring notes. Keeps a
-# `pnpm build > g.html` typo and a `curl -c cj.txt` session out of git.
+# loose files at the repo root
 /*.html
-/audit-prompt.md
 /cj*.txt
 /cookies*.txt
-
-# internal handoff + planning notes. Never ships to a buyer — see the template licence.
-tasks/
 
 # dependencies
 node_modules/
@@ -33,8 +27,3 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
-
-# local-only files
-.claude/
-AGENTS.md
-CLAUDE.md

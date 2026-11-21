@@ -2,13 +2,11 @@ import siteData from "@config/siteData.json";
 import type { APIRoute } from "astro";
 
 /**
- * /llms.txt — a machine-readable content map for AI retrieval systems (llmstxt.org).
- * Not a ranking factor; a curated index of what's worth reading. Dynamic so links stay
- * absolute and in sync with `site` + siteData. Prerenders to a static file at build.
+ * /llms.txt — a plain-text index of the site's main pages (llmstxt.org). Dynamic so links
+ * stay absolute and in sync with `site` + siteData. Prerenders to a static file at build.
  *
- * ponytail: hand-curated, not an auto-generated sitemap — add new top-level entry points here as
- * the site grows, or this drifts. Currently the main pages and the legal documents. It's an
- * editorial content map for AI crawlers, not a ranking factor.
+ * Note: hand-curated, not an auto-generated sitemap — add new top-level entry points here as
+ * the site grows, or this drifts. Currently the main pages and the legal documents.
  */
 export const GET: APIRoute = ({ site }) => {
   const { name, description } = siteData;
