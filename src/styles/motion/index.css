@@ -353,7 +353,7 @@
    degradation) but NOT for the scroll-only shapes: a played-once parallax leaves content offset and
    fade-through ends invisible. So those are inert here instead. `progress` is exempt — its identity
    end state (a full bar) is exactly what `animation: none` would render anyway.
-   ponytail: substring match so variant-prefixed uses (`md:animate-parallax-up`) are covered; the
+   Note: substring match so variant-prefixed uses (`md:animate-parallax-up`) are covered; the
    ceiling is a false positive on any future class *containing* one of these names. Add new
    scroll-only animations to this list.
    ============================================ */

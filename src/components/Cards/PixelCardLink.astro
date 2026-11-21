@@ -6,7 +6,7 @@
 // interaction (focus ring + hover lift, RM-guarded) and the thumbnail so the two cards can't drift.
 // The `group` lives here, so slotted bodies can still use `group-hover:*` on their CTA/title.
 //
-// ponytail: plain <img> on the Vite-fingerprinted import (like Header.astro's avatar), NOT
+// Note: plain <img> on the Vite-fingerprinted import (like Header.astro's avatar), NOT
 // astro:assets <Image>, so the build needs no Sharp. Demo thumbnails ship at ~2× display size.
 import { PixelPanel } from "@components/ui/pixel-panel";
 

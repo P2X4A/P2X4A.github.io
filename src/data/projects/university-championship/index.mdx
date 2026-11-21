@@ -51,7 +51,7 @@ El University Champions League es el torneo de fútbol de la Universidad El Bosq
 
 Hay un segundo plano que suele pasarse por alto: el torneo es también el registro académico de quienes participan. De cada jugador se conoce el semestre y el programa en el que cursa, y esa información viaja junto con lo deportivo.
 
-Ese cruce define el alcance del modelo. No es un calendario de partidos, es el historial del torneo emparejado con el historial académico de sus participantes.
+Ese cruce define el alcance del modelo: lo que se guarda es el historial del torneo emparejado con el historial académico de sus participantes, no un calendario de partidos.
 
 ## Entidades y atributos
 
@@ -76,7 +76,7 @@ El nombre de las personas se modela como atributo compuesto en sus cuatro partes
 | PERTENECE | TABLA — EQUIPO | 1:M | cada equipo tiene su fila en la tabla |
 | DIRIGE | DT — EQUIPO | 1:1 | cada equipo tiene un director técnico |
 
-Las dos relaciones N:M son la decisión con más peso sobre el modelo. Un partido no pertenece a un equipo: lo juegan dos. Con el arbitraje pasa lo mismo, porque un partido cuenta con principal y asistentes. Ninguna de las dos relaciones cabe en una clave foránea sobre la entidad fuerte; ambas se resuelven con una tabla intermedia que guarde la participación y sus atributos.
+Las dos relaciones N:M son la decisión con más peso sobre el modelo. Un partido no pertenece a un equipo: lo juegan dos. Con el arbitraje pasa lo mismo, porque un partido tiene un árbitro principal y varios asistentes. Ninguna de las dos relaciones cabe en una clave foránea sobre la entidad fuerte; ambas se resuelven con una tabla intermedia que guarde la participación y sus atributos.
 
 ## Decisiones de modelado
 

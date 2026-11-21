@@ -145,7 +145,7 @@ repository records nothing about where they came from or under what terms:
 - `src/assets/images/demo/post-css-grid.jpg`, `post-floppy-disk.jpg`, `post-retro-deploy.jpg`
 - `src/assets/images/demo/project-cli-quest.png`, `project-pixel-art.png`, `project-retro-chat.png`
 
-If they are the owner's own work or AI-generated, say so here and the matter is closed. If any came
+If they are the owner's own work, say so here and the matter is closed. If any came
 from a stock library, an image search, or another template, its terms must be checked and stated —
 or the file replaced.
 

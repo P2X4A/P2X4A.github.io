@@ -6,7 +6,7 @@
 // support (↑/↓/Home/End/Enter/Esc). Pass `options` (value/label/disabled/selected); the native select
 // stays the single source of truth for the value.
 //
-// ponytail: this one needs JS — without it you get an inert trigger over an sr-only <select>. That's
+// Note: this one needs JS — without it you get an inert trigger over an sr-only <select>. That's
 // the deliberate trade for a styled/searchable control (Preline's is JS-only too). Zero-JS callers
 // should use the native `<Select>` primitive instead. Options are static and client-filtered (substring
 // match); remote/async loading is out of scope — fetch + render server-side per project if needed.

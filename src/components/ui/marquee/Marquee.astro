@@ -35,7 +35,7 @@ const {
 } = Astro.props;
 const vertical = direction === "up" || direction === "down";
 const reverse = direction === "right" || direction === "down";
-// ponytail: `repeat` copies fill the viewport; if content is much narrower than the viewport, raise
+// Note: `repeat` copies fill the viewport; if content is much narrower than the viewport, raise
 // it (each copy is one more render of the slot). At least 2 are needed for the loop to close.
 const copies = Math.max(2, repeat);
 const track = [

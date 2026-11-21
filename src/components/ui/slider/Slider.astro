@@ -6,7 +6,7 @@
 // WebKit has no progress pseudo, so its track stays uniform. Zero-JS. Pass native min/max/step/value/
 // disabled through; give it a name via `id`/`name` and a label via `aria-label` or an associated Label.
 //
-// ponytail: no filled portion in WebKit/Blink without JS (there's no `::-webkit-*-progress`). If a
+// Note: no filled portion in WebKit/Blink without JS (there's no `::-webkit-*-progress`). If a
 // design needs the fill on all browsers, mirror `value` into a `--fill` custom property from a small
 // script and paint the track with a gradient — kept out here to stay zero-JS.
 import type { HTMLAttributes } from "astro/types";

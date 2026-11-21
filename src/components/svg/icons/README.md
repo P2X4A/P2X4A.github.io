@@ -46,7 +46,7 @@ Follows the [primitive contract](../../ui/README.md): `data-slot="icon"`, export
 union and an `iconNames` array (handy for galleries). Treat it as an artifact: to change a glyph,
 re-import it from the source rather than editing the string in place.
 
-> `ponytail:` the whole registry is one module (~435 KB at 553 icons). It stays build-time —
+> The whole registry is one module (~435 KB at 553 icons). It stays build-time —
 > icons inline into HTML and nothing lands in client JS — but every icon markup loads even if a
 > page uses one. Ceiling/upgrade path: importing it in a client `<script>` would ship it all;
 > at that point split to per-file `.svg` imports (Astro native SVG components) or an SVG sprite.
