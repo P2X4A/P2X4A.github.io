@@ -1,19 +1,74 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-  <rect width="400" height="300" fill="#0f172a"/>
-  <rect x="40" y="40" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
-  <text x="100" y="75" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">PROGRAMA</text>
-  <text x="100" y="92" font-family="monospace" font-size="12" fill="#94a3b8" text-anchor="middle">1:N</text>
-  <rect x="240" y="40" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
-  <text x="300" y="75" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">CURSO</text>
-  <rect x="40" y="140" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
-  <text x="100" y="175" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">ESTUDIANTE</text>
-  <text x="100" y="192" font-family="monospace" font-size="12" fill="#94a3b8" text-anchor="middle">N:M</text>
-  <rect x="240" y="140" width="120" height="60" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
-  <text x="300" y="175" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">GRUPO</text>
-  <rect x="140" y="240" width="120" height="40" rx="6" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
-  <text x="200" y="268" font-family="monospace" font-size="14" fill="#ffffff" text-anchor="middle">MATRICULA</text>
-  <line x1="160" y1="100" x2="240" y2="100" stroke="#3b82f6" stroke-width="2"/>
-  <line x1="160" y1="200" x2="240" y2="200" stroke="#3b82f6" stroke-width="2"/>
-  <line x1="200" y1="160" x2="200" y2="240" stroke="#3b82f6" stroke-width="2"/>
-  <text x="200" y="225" font-family="monospace" font-size="12" fill="#94a3b8" text-anchor="middle">1:N</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="MER de gestión académica: PLAN_ESTUDIO, PROGRAMA, CURSO, ESTUDIANTE, GRUPO, MATRICULA y PROFESOR con sus cardinalidades">
+  <title>MER de gestión académica con cardinalidades</title>
+  <rect width="480" height="270" fill="#0d0d26" />
+  <rect x="8" y="8" width="464" height="254" fill="none" stroke="#3d3d7a" stroke-width="4" />
+  <rect x="16" y="16" width="448" height="238" fill="none" stroke="#1c1c4a" stroke-width="2" />
+
+  <g font-family="'Courier New', Courier, monospace" font-weight="bold">
+    <!-- relaciones -->
+    <g stroke="#8a8ab8" stroke-width="2" fill="none">
+      <path d="M148 49 H178" />
+      <path d="M302 49 H332" />
+      <path d="M240 72 V112" />
+      <path d="M394 72 V112" />
+      <path d="M394 158 V198" />
+      <path d="M240 158 V198" />
+      <path d="M302 221 H317 V135 H332" />
+    </g>
+    <g font-size="9" fill="#7df9ff" font-weight="normal">
+      <text x="163" y="43" text-anchor="middle">1:1</text>
+      <text x="317" y="43" text-anchor="middle">1:N</text>
+      <text x="246" y="96">1:N</text>
+      <text x="400" y="96">1:N</text>
+      <text x="400" y="182">N:1</text>
+      <text x="246" y="182">1:N</text>
+      <text x="313" y="190" text-anchor="end">N:1</text>
+    </g>
+
+    <!-- PLAN_ESTUDIO -->
+    <rect x="24" y="26" width="124" height="46" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="34" y="43" fill="#62b4f8" font-size="11">PLAN_ESTUDIO</text>
+    <text x="34" y="56" fill="#b8b8d8" font-size="9" font-weight="normal">id_plan PK</text>
+    <text x="34" y="67" fill="#7df9ff" font-size="9" font-weight="normal">id_programa FK</text>
+
+    <!-- PROGRAMA -->
+    <rect x="178" y="26" width="124" height="46" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="188" y="43" fill="#62b4f8" font-size="11">PROGRAMA</text>
+    <text x="188" y="58" fill="#b8b8d8" font-size="9" font-weight="normal">id_programa PK</text>
+
+    <!-- CURSO -->
+    <rect x="332" y="26" width="124" height="46" fill="#171740" stroke="#62b4f8" stroke-width="3" />
+    <text x="342" y="43" fill="#62b4f8" font-size="11">CURSO</text>
+    <text x="342" y="56" fill="#b8b8d8" font-size="9" font-weight="normal">id_curso PK</text>
+    <text x="342" y="67" fill="#7df9ff" font-size="9" font-weight="normal">id_programa FK</text>
+
+    <!-- ESTUDIANTE -->
+    <rect x="178" y="112" width="124" height="46" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="188" y="129" fill="#f4677a" font-size="11">ESTUDIANTE</text>
+    <text x="188" y="142" fill="#b8b8d8" font-size="9" font-weight="normal">id_estudiante PK</text>
+    <text x="188" y="153" fill="#7df9ff" font-size="9" font-weight="normal">id_programa FK</text>
+
+    <!-- GRUPO -->
+    <rect x="332" y="112" width="124" height="46" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="342" y="129" fill="#63de86" font-size="11">GRUPO</text>
+    <text x="342" y="142" fill="#b8b8d8" font-size="9" font-weight="normal">id_grupo PK</text>
+    <text x="342" y="153" fill="#7df9ff" font-size="9" font-weight="normal">FK curso, profesor</text>
+
+    <!-- MATRICULA -->
+    <rect x="178" y="198" width="124" height="46" fill="#171740" stroke="#f4677a" stroke-width="3" />
+    <text x="188" y="215" fill="#f4677a" font-size="11">MATRICULA</text>
+    <text x="188" y="228" fill="#b8b8d8" font-size="9" font-weight="normal">id_matricula PK</text>
+    <text x="188" y="239" fill="#7df9ff" font-size="9" font-weight="normal">FK estudiante, grupo</text>
+
+    <!-- PROFESOR -->
+    <rect x="332" y="198" width="124" height="46" fill="#171740" stroke="#63de86" stroke-width="3" />
+    <text x="342" y="215" fill="#63de86" font-size="11">PROFESOR</text>
+    <text x="342" y="230" fill="#b8b8d8" font-size="9" font-weight="normal">id_profesor PK</text>
+
+    <!-- leyenda y pie -->
+    <text x="24" y="128" fill="#b8b8d8" font-size="9" font-weight="normal">PK llave primaria</text>
+    <text x="24" y="142" fill="#7df9ff" font-size="9" font-weight="normal">FK llave foránea</text>
+    <text x="24" y="214" fill="#63de86" font-size="10">3FN — 7 TABLAS</text>
+    <text x="24" y="230" fill="#b8b8d8" font-size="9" font-weight="normal">MER de gestión académica</text>
+  </g>
 </svg>
