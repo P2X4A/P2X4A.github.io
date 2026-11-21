@@ -1,13 +1,13 @@
 ---
 title: "MER Entidad Académica — Normalización del modelo universitario"
-tagline: "Del MER de gestión académica al esquema relacional en 3FN: dependencias funcionales, anomalías y descomposición"
-description: "Ejercicio de normalización sobre el MER de gestión académica universitaria: análisis de dependencias funcionales, verificación de 1FN, 2FN y 3FN, y esquema relacional resultante con siete tablas."
+tagline: "Del MER de gestión académica al esquema relacional en 3FN: relaciones, dependencias funcionales, anomalías y descomposición"
+description: "Ejercicio de normalización sobre el MER de gestión académica universitaria: relaciones con sus cardinalidades, dependencias funcionales por tabla, verificación de 1FN, 2FN y 3FN, y esquema relacional resultante con siete tablas."
 status: "complete"
 category: "normalizacion"
 moduleId: "BD1-NOR-008"
 order: 16
 thumbnail: "../../../assets/evidencias/mer-entidad-academica-normalizacion/thumbnail.png"
-thumbnailAlt: "Esquema MER de gestión académica con siete entidades: PROGRAMA, CURSO, GRUPO, PROFESOR, ESTUDIANTE, MATRICULA y PLAN_ESTUDIO"
+thumbnailAlt: "Esquema MER de gestión académica con siete entidades (PLAN_ESTUDIO, PROGRAMA, CURSO, ESTUDIANTE, GRUPO, MATRICULA y PROFESOR) unidas por sus relaciones y cardinalidades"
 
 tech:
   - "Normalización (1FN · 2FN · 3FN)"
@@ -24,17 +24,19 @@ specs:
   - label: "Forma normal final"
     value: "3FN — cada atributo depende únicamente de la llave de su tabla"
   - label: "Alcance"
-    value: "Siete tablas, de las dependencias funcionales a la verificación de 1FN, 2FN y 3FN"
+    value: "Siete tablas: de las reglas de negocio a las relaciones, las dependencias funcionales y la verificación de 1FN, 2FN y 3FN"
 
 features:
+  - lead: "Relaciones y cardinalidades"
+    text: "Las seis reglas del enunciado se convierten en relaciones con su cardinalidad y la llave foránea que las implementa."
   - lead: "Dependencias funcionales"
-    text: "Se identifican las dependencias entre atributos de cada entidad para detectar anomalías de inserción, actualización y borrado."
+    text: "Se listan las dependencias de cada tabla y sus llaves candidatas para detectar anomalías de inserción, actualización y borrado."
   - lead: "Verificación de formas normales"
     text: "Se revisa cada tabla contra 1FN, 2FN y 3FN; se documenta dónde cumple y dónde no."
   - lead: "Esquema relacional final"
     text: "Siete tablas con claves primarias, foráneas y restricciones de unicidad listas para implementar en SQL."
 
-archCaption: "Esquema MER original de gestión académica universitaria"
+archCaption: "MER de gestión académica: siete entidades con sus relaciones y cardinalidades"
 
 challenge:
   title: "Problema"
@@ -42,26 +44,70 @@ challenge:
 
 solution:
   title: "Solución"
-  body: "Se analizan las siete entidades del MER (PROGRAMA, CURSO, GRUPO, PROFESOR, ESTUDIANTE, MATRICULA, PLAN_ESTUDIO), se extraen las dependencias funcionales y se verifica que el esquema cumple 1FN y 2FN. Se identifican dos candidatos a violar 3FN (facultad en PROGRAMA y departamento en PROFESOR) y se justifica por qué se mantienen como atributos simples dentro del alcance de siete tablas pedidas."
+  body: "Se analizan las siete entidades del MER (PROGRAMA, CURSO, GRUPO, PROFESOR, ESTUDIANTE, MATRICULA, PLAN_ESTUDIO), se pasan las seis reglas de negocio a relaciones con llaves foráneas, se listan las dependencias funcionales y se verifica que el esquema cumple 1FN, 2FN y 3FN. Se identifican dos candidatos a violar 3FN (facultad en PROGRAMA y departamento en PROFESOR) y se justifica por qué se mantienen como atributos simples dentro del alcance de siete tablas pedidas."
 ---
 
 ## Descripción
 
-Este documento resuelve el ejercicio de normalización basado en el **MER de gestión académica universitaria**. El modelo define siete entidades y sus relaciones. El trabajo consiste en analizar cada tabla contra las formas normales y entregar el esquema relacional listo para implementar.
+Este documento resuelve el ejercicio de normalización basado en el **MER de gestión académica universitaria**. El modelo define siete entidades y sus relaciones. El trabajo consiste en pasar las reglas de negocio a relaciones con cardinalidad, analizar cada tabla contra las formas normales y entregar el esquema relacional listo para implementar.
 
 ## Las siete entidades del MER
 
-El diagrama original contempla estas entidades:
+El diagrama original contempla estas entidades. La tercera columna recoge las llaves foráneas que el enunciado no incluye en su lista de atributos y que salen de las reglas de negocio:
 
-| Entidad | Atributos principales |
-|---|---|
-| PROGRAMA | id_programa, nombre, nivel, facultad, duracion |
-| PLAN_ESTUDIO | id_plan, id_programa, nombre_plan, descripcion, fechas |
-| CURSO | id_curso, nombre, creditos, descripcion, id_programa |
-| PROFESOR | id_profesor, nombre, apellido, documento, correo, telefono, departamento |
-| GRUPO | id_grupo, id_curso, id_profesor, periodo, horario, salon, capacidad |
-| ESTUDIANTE | id_estudiante, nombre, apellido, documento, correo, telefono, fecha_nacimiento, estado |
-| MATRICULA | id_matricula, id_estudiante, id_grupo, fecha_matricula, estado, nota_final |
+| Entidad | Atributos del enunciado | Llave foránea que añaden las reglas |
+|---|---|---|
+| PROGRAMA | id_programa, nombre, nivel, facultad, duracion | — |
+| PLAN_ESTUDIO | id_plan, id_programa (FK), nombre_plan, descripcion, fecha_inicio, fecha_fin | — |
+| CURSO | id_curso, nombre, creditos, descripcion | id_programa (regla 1) |
+| PROFESOR | id_profesor, nombre, apellido, documento, correo, telefono, departamento | — |
+| GRUPO | id_grupo, id_curso (FK), id_profesor (FK), periodo, horario, salon, capacidad | — |
+| ESTUDIANTE | id_estudiante, nombre, apellido, documento, correo, telefono, fecha_nacimiento, estado | id_programa (regla 6) |
+| MATRICULA | id_matricula, id_estudiante (FK), id_grupo (FK), fecha_matricula, estado, nota_final | — |
+
+Las reglas 2, 3, 4 y 5 ya quedan cubiertas por las llaves foráneas de la lista del enunciado (la 5 además con una restricción UNIQUE). Las reglas 1 y 6 piden dos que la lista no menciona: `id_programa` en CURSO y `id_programa` en ESTUDIANTE.
+
+## Relaciones y cardinalidades
+
+| Regla | Relación | Cardinalidad | Cómo queda en las tablas |
+|---|---|---|---|
+| 1 | PROGRAMA ofrece CURSO | 1:N | CURSO.id_programa, llave foránea obligatoria: cada curso pertenece a un solo programa |
+| 2 | CURSO tiene GRUPO | 1:N | GRUPO.id_curso, obligatoria |
+| 3 | PROFESOR dicta GRUPO | 1:N | GRUPO.id_profesor, obligatoria: cada grupo tiene un solo profesor |
+| 4 | ESTUDIANTE se matricula en GRUPO | N:M | Tabla MATRICULA con id_estudiante e id_grupo, y UNIQUE sobre el par |
+| 5 | PROGRAMA tiene PLAN_ESTUDIO | 1:1 | PLAN_ESTUDIO.id_programa, obligatoria y UNIQUE |
+| 6 | ESTUDIANTE pertenece a PROGRAMA, y por él a un plan | N:1 | ESTUDIANTE.id_programa, obligatoria |
+
+La regla 4 es la única muchos a muchos y se resuelve con la tabla MATRICULA, que además guarda los datos propios de cada matrícula: fecha, estado y nota final. Con las siete tablas pedidas no queda espacio para otra tabla intermedia, y tampoco hace falta, porque ninguna otra relación es N:M.
+
+## Dependencias funcionales
+
+Cada tabla se identifica por su llave primaria. Las otras llaves candidatas salen de las restricciones UNIQUE del esquema: `documento` y `correo` en PROFESOR y ESTUDIANTE (se asume que identifican a una sola persona), `id_programa` en PLAN_ESTUDIO por la relación 1:1, y el par `(id_estudiante, id_grupo)` en MATRICULA.
+
+```
+PROGRAMA      id_programa → nombre, nivel, facultad, duracion
+
+PLAN_ESTUDIO  id_plan → id_programa, nombre_plan, descripcion, fecha_inicio, fecha_fin
+              id_programa → id_plan
+
+CURSO         id_curso → nombre, creditos, descripcion, id_programa
+
+PROFESOR      id_profesor → nombre, apellido, documento, correo, telefono, departamento
+              documento → id_profesor
+              correo → id_profesor
+
+GRUPO         id_grupo → id_curso, id_profesor, periodo, horario, salon, capacidad
+
+ESTUDIANTE    id_estudiante → nombre, apellido, documento, correo, telefono,
+                              fecha_nacimiento, estado, id_programa
+              documento → id_estudiante
+              correo → id_estudiante
+
+MATRICULA     id_matricula → id_estudiante, id_grupo, fecha_matricula, estado, nota_final
+              (id_estudiante, id_grupo) → id_matricula
+```
+
+En las siete tablas, todo determinante es una llave candidata de su tabla.
 
 ## Verificación de la Primera Forma Normal (1FN)
 
@@ -69,13 +115,15 @@ El diagrama original contempla estas entidades:
 
 ## Verificación de la Segunda Forma Normal (2FN)
 
-**Cumple 2FN.** Todas las tablas tienen llave primaria simple, salvo MATRICULA cuya llave es `id_matricula` (también simple). Con una llave de un solo campo no existen dependencias parciales: cada atributo no clave depende de la llave completa por definición.
+**Cumple 2FN.** Las siete tablas tienen llave primaria de un solo campo, así que no existen dependencias parciales: cada atributo no clave depende de la llave completa por definición.
 
-Si en MATRICULA se hubiera usado la llave compuesta `(id_estudiante, id_grupo)`, la nota final y la fecha de matrícula dependen del par completo, por lo que también se cumpliría la 2FN.
+La única llave candidata compuesta es el par `(id_estudiante, id_grupo)` de MATRICULA. La nota final, la fecha de matrícula y el estado dependen del par completo y no de uno solo de sus campos (la nota de un estudiante cambia de un grupo a otro, y la de un grupo cambia de un estudiante a otro), por lo que también con esa llave se cumpliría la 2FN.
 
 ## Verificación de la Tercera Forma Normal (3FN)
 
-**Cumple 3FN con dos notas.** Ningún atributo no clave depende de otro atributo no clave. Cada dato describe directamente a su entidad: el salón es del grupo, el departamento del profesor, los créditos del curso.
+**Cumple 3FN con dos notas.** Ningún atributo no clave depende de otro atributo no clave: en la lista de dependencias de arriba todo determinante es una llave candidata, así que las tablas cumplen además la forma normal de Boyce-Codd. Cada dato describe directamente a su entidad: el salón es del grupo, el departamento del profesor, los créditos del curso.
+
+Por eso ESTUDIANTE guarda `id_programa` y no `id_plan`. Como cada programa tiene un solo plan, guardar también el plan crearía la dependencia transitiva `id_estudiante → id_programa → id_plan` y rompería la 3FN.
 
 Hay dos atributos que merecen atención porque son candidatos clásicos a romper la 3FN si el sistema creciera:
 
@@ -86,51 +134,55 @@ Con los datos del enunciado, ambos son atributos simples que dependen solo de su
 
 ## Esquema relacional resultante
 
-Siete tablas, claves primarias subrayadas conceptualmente y foráneas con flecha:
+Siete tablas. Las llaves foráneas llevan flecha hacia la tabla que referencian, y NOT NULL cuando la regla dice que la relación es obligatoria:
 
 ```
 PROGRAMA      (id_programa PK, nombre, nivel, facultad, duracion)
-PLAN_ESTUDIO  (id_plan PK, id_programa FK→PROGRAMA UNIQUE, nombre_plan,
-               descripcion, fecha_inicio, fecha_fin)
+PLAN_ESTUDIO  (id_plan PK, id_programa FK→PROGRAMA UNIQUE NOT NULL,
+               nombre_plan, descripcion, fecha_inicio, fecha_fin)
 CURSO         (id_curso PK, nombre, creditos, descripcion,
-               id_programa FK→PROGRAMA)
+               id_programa FK→PROGRAMA NOT NULL)
 PROFESOR      (id_profesor PK, nombre, apellido, documento UNIQUE,
                correo UNIQUE, telefono, departamento)
-GRUPO         (id_grupo PK, id_curso FK→CURSO, id_profesor FK→PROFESOR,
+GRUPO         (id_grupo PK, id_curso FK→CURSO NOT NULL,
+               id_profesor FK→PROFESOR NOT NULL,
                periodo, horario, salon, capacidad)
 ESTUDIANTE    (id_estudiante PK, nombre, apellido, documento UNIQUE,
-               correo UNIQUE, telefono, fecha_nacimiento, estado)
-MATRICULA     (id_matricula PK, id_estudiante FK→ESTUDIANTE,
-               id_grupo FK→GRUPO, fecha_matricula, estado, nota_final,
-               UNIQUE(id_estudiante, id_grupo))
+               correo UNIQUE, telefono, fecha_nacimiento, estado,
+               id_programa FK→PROGRAMA NOT NULL)
+MATRICULA     (id_matricula PK, id_estudiante FK→ESTUDIANTE NOT NULL,
+               id_grupo FK→GRUPO NOT NULL, fecha_matricula, estado,
+               nota_final, UNIQUE(id_estudiante, id_grupo))
 ```
 
 ## Sobre la regla de pertenencia a plan de estudio
 
-El enunciado indica que un estudiante pertenece a un único plan "a través de su programa". Pero la tabla ESTUDIANTE no tiene FK hacia programa ni hacia plan. El vínculo se reconstruye por el camino:
+El enunciado indica que un estudiante pertenece a un único plan "a través de su programa". La lista de atributos de ESTUDIANTE no trae ninguna columna que lo exprese, así que la regla obliga a añadir `id_programa` (llave foránea obligatoria) a esa tabla. El plan se obtiene por el camino:
 
 ```
-Estudiante → Matrícula → Grupo → Curso → Programa → Plan_Estudio
+Estudiante → Programa → Plan_Estudio
 ```
 
-Funciona mientras el estudiante tenga al menos una matrícula. Un estudiante recién admitido, sin ninguna, no pertenece a ningún programa según el modelo. Nada impide que alguien se matricule en cursos de dos programas distintos.
+Como PROGRAMA y PLAN_ESTUDIO son 1:1, cada estudiante queda en un único plan, y la pertenencia se registra desde la admisión, antes de que exista una sola matrícula.
 
-Para un sistema real, la mejora natural es agregar `id_programa` (FK) a ESTUDIANTE, de modo que la pertenencia quede registrada desde la admisión y no se deduzca de las matrículas.
+Lo que el esquema no impide es que un estudiante se matricule en grupos de cursos de otro programa. El enunciado no lo prohíbe (podría ser una electiva), y prohibirlo exigiría una regla que ninguna llave foránea puede expresar: un disparador o una validación en la aplicación.
 
 ## Anomalías de datos
 
 Con el esquema en 3FN las tres anomalías clásicas quedan bajo control, con una excepción:
 
 - **Actualización:** cada dato se guarda una sola vez, en la tabla de la entidad que describe. Cambiar el salón de un grupo toca una sola fila de GRUPO, no todas las matrículas. La excepción es `facultad`: al ser un texto repetido en cada PROGRAMA, renombrar una facultad obliga a actualizar todos los programas que la usan. Lo mismo pasa con `departamento` en PROFESOR. Por eso ambos quedaron señalados como candidatos a tabla propia.
-- **Inserción:** se puede registrar un plan de estudio nuevo sin necesidad de cursos asociados.
+- **Inserción:** se puede registrar un plan de estudio nuevo sin necesidad de cursos asociados, y un estudiante recién admitido queda en su programa sin necesidad de una matrícula.
 - **Borrado:** eliminar una matrícula no borra al estudiante ni al grupo.
 
 ## Documento del trabajo
 
-- [Enunciado del ejercicio (DOCX)](/evidencias/mer-entidad-academica-normalizacion/EJEMPLO1_GESTION_ACADEMICA_EJERCICIO.docx)
+- [Enunciado original del ejercicio, del docente Alexander Darío Agudelo Cubillos (archivo DOCX)](/evidencias/mer-entidad-academica-normalizacion/EJEMPLO1_GESTION_ACADEMICA_EJERCICIO.docx)
 
 ---
 
 ### Contexto
 
 Ejercicio de modelado de la asignatura **Bases de Datos 1**. El documento adjunto es el enunciado original: la descripción del sistema, las siete entidades con sus atributos, las reglas de negocio y el objetivo del modelo. Las dependencias funcionales, el paso al modelo relacional y la verificación de las formas normales son de elaboración propia.
+
+El enunciado es del docente Alexander Darío Agudelo Cubillos, de la Universidad El Bosque, profesor de otro grupo de Bases de Datos 1. Me lo entregó para complementar este portafolio y su nombre aparece en el documento.
