@@ -6,7 +6,6 @@
 // This site is deployed 100% to GitHub Pages — a static host with no server runtime — so this route
 // is PRERENDERED like every other page. The contact form validates in the browser and hands the
 // visitor a prefilled mailto: link; see src/components/Sections/Contact/Form.astro and @js/contact.
-import Faq from "@components/Sections/Contact/Faq.astro";
 import Form from "@components/Sections/Contact/Form.astro";
 import Hero from "@components/Sections/Contact/Hero.astro";
 import InfoCards from "@components/Sections/Contact/InfoCards.astro";
@@ -16,7 +15,7 @@ import BaseLayout from "@layouts/BaseLayout.astro";
 
 <BaseLayout
   title={`Contact — ${siteData.name}`}
-  description="Drop me a transmission — questions on vintage hardware, a retro-quest collab, or a guest devlog pitch — plus e-mail, Discord and GitHub links and a system FAQ."
+  description="Escríbeme por correo o desde el formulario para hablar de mis proyectos de Bases de Datos y desarrollo de software, o para colaborar. También puedes ver mi código en GitHub."
 >
   <div class="site-container flex flex-col gap-10 py-8 md:gap-12 md:py-12">
     <Hero />
@@ -26,7 +25,5 @@ import BaseLayout from "@layouts/BaseLayout.astro";
       <Form />
       <InfoCards />
     </div>
-
-    <Faq />
   </div>
 </BaseLayout>
