@@ -1,12 +1,12 @@
 ---
 // src/components/Sections/Contact/InfoCards.astro — Figma "InfoCardsContainer" (node 9:53).
 //
-// Three pixel info cards beside the form: a retro tag, a title, a one-line blurb, and a linked
+// Two pixel info cards beside the form: a retro tag, a title, a one-line blurb, and a linked
 // value box. Reuses the shared pixel surface + badge; the value box is a real <a> that goes green on
 // hover (the house active/hover colour). Tokens only.
 //
-// WIRING (real, not transcribed): the E-MAIL value is `siteData.author.email` (→ mailto); GITHUB and
-// DISCORD resolve through `@config/socialData`, which owns the `sameAs` derivation every section
+// WIRING (real, not transcribed): the E-MAIL value is `siteData.author.email` (→ mailto); GITHUB
+// resolves through `@config/socialData`, which owns the `sameAs` derivation every section
 // shares and falls back to the platform root when `sameAs` is empty. The mock's placeholder brand
 // values (HELLO@PIXELQUESTS.COM, GITHUB.COM/PIXELQUESTS) are NOT transcribed. Fill `sameAs` +
 // `author.email` in siteData to point these at real profiles.
@@ -18,7 +18,6 @@ import { socialHref } from "@config/socialData.json";
 
 const email = siteData.author.email;
 const github = socialHref("github");
-const discord = socialHref("discord");
 
 /** Strip scheme + trailing slash for the displayed value (the box still links to the full URL). */
 const display = (url: string): string => url.replace(/^https?:\/\//, "").replace(/\/$/, "");
@@ -38,14 +37,6 @@ const cards: readonly {
     blurb: "Direct digital link to my HQ mailbox",
     value: email,
     href: `mailto:${email}`,
-  },
-  {
-    tag: "Community",
-    tone: "success",
-    title: "Discord Bar",
-    blurb: "Hang out with fellow retro hackers",
-    value: display(discord),
-    href: discord,
   },
   {
     tag: "Codebase",
